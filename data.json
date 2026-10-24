@@ -10,6 +10,17 @@
       "locked": false,
       "dice": null,
       "registeredAt": 1792822370304
+    },
+    "222222222": {
+      "qq": "222222222",
+      "majia": "小美",
+      "gender": "female",
+      "balance": 9001,
+      "status": "registered",
+      "partner": null,
+      "locked": false,
+      "dice": null,
+      "registeredAt": 1792822625262
     }
   },
   "matches": [],
