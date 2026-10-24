@@ -27,7 +27,8 @@
     {
       "majia": "男二",
       "ticket": "666",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1792861400565
     },
     {
       "majia": "男三",
@@ -96,6 +97,20 @@
       "deposit": 0,
       "matchScore": 0,
       "registeredAt": 1792861383127
+    },
+    "男二": {
+      "majia": "男二",
+      "ticket": "666",
+      "gender": "male",
+      "wish": "",
+      "about": "",
+      "balance": 9001,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "matchScore": 0,
+      "registeredAt": 1792861400565
     }
   },
   "matches": [],
@@ -158,6 +173,13 @@
     {
       "time": "2026-10-24T17:03:03.127Z",
       "actor": "男一",
+      "action": "报名入场",
+      "amount": -999,
+      "balance": 9001
+    },
+    {
+      "time": "2026-10-24T17:03:20.565Z",
+      "actor": "男二",
       "action": "报名入场",
       "amount": -999,
       "balance": 9001
