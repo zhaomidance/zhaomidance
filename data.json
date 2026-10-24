@@ -1,36 +1,7 @@
 {
-  "players": {
-    "123456789": {
-      "qq": "123456789",
-      "majia": "小明",
-      "balance": 9001,
-      "status": "matched",
-      "partner": "987654321",
-      "locked": false,
-      "dice": 3,
-      "registeredAt": 1792820890097,
-      "divorceRequested": false,
-      "divorcePending": false
-    },
-    "987654321": {
-      "qq": "987654321",
-      "majia": "小红",
-      "balance": 9001,
-      "status": "matched",
-      "partner": "123456789",
-      "locked": false,
-      "registeredAt": 1792821004709,
-      "dice": 4,
-      "divorceRequested": false,
-      "divorcePending": false
-    }
-  },
-  "matches": [
-    [
-      "123456789",
-      "987654321"
-    ]
-  ],
+  "players": {},
+  "matches": [],
+  "round": 1,
   "tasks": [
     {
       "id": 1,
@@ -47,6 +18,5 @@
       "title": "互相表白",
       "done": false
     }
-  ],
-  "round": 2
+  ]
 }
