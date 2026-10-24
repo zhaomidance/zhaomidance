@@ -9,6 +9,15 @@
       "locked": false,
       "dice": null,
       "registeredAt": 1792820890097
+    },
+    "987654321": {
+      "qq": "987654321",
+      "majia": "小红",
+      "balance": 9001,
+      "status": "registered",
+      "partner": null,
+      "locked": false,
+      "registeredAt": 1792821004709
     }
   },
   "matches": [],
