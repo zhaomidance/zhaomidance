@@ -75,7 +75,7 @@
       <table class="data-table" id="playersTable">
         <thead>
           <tr>
-            <th>QQ号</th><th>马甲</th><th>性别</th><th>灵石</th><th>状态</th><th>舞伴</th><th>许愿</th><th>自述</th><th>操作</th>
+            <th>身份</th><th>昵称</th><th>马甲</th><th>性别</th><th>灵石</th><th>状态</th><th>舞伴</th><th>许愿</th><th>自述</th><th>操作</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -87,7 +87,7 @@
     <div class="table-wrap">
       <table class="data-table" id="matchesTable">
         <thead>
-          <tr><th>马甲A</th><th>QQ</th><th>马甲B</th><th>QQ</th><th>缘分</th><th>锁定</th><th>操作</th></tr>
+          <tr><th>马甲A</th><th>身份A</th><th>马甲B</th><th>身份B</th><th>缘分</th><th>锁定</th><th>操作</th></tr>
         </thead>
         <tbody></tbody>
       </table>
@@ -195,10 +195,15 @@
     const players = Object.values(data.players).sort((a,b) => (b.registeredAt||0) - (a.registeredAt||0));
     for (const p of players) {
       const spouse = p.partner ? data.players[p.partner] : null;
+      // 身份 ID 截断显示（openid 通常很长）
+      const idDisplay = (p.qq || p.openid || '').length > 16
+        ? (p.qq || p.openid).slice(0, 6) + '…' + (p.qq || p.openid).slice(-6)
+        : (p.qq || p.openid || '-');
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${p.qq}</td>
-        <td>${p.majia}</td>
+        <td title="${esc(p.qq || p.openid || '')}">${esc(idDisplay)}</td>
+        <td>${esc(p.nick) || '<span style="opacity:.4">-</span>'}</td>
+        <td>${esc(p.majia)}</td>
         <td>${genderText(p)}</td>
         <td><b>${p.balance}</b> 💎</td>
         <td>${statusText(p)}</td>
@@ -206,13 +211,13 @@
         <td>${esc(p.wish) || '<span style="opacity:.4">-</span>'}</td>
         <td>${esc(p.about) || '<span style="opacity:.4">-</span>'}</td>
         <td>
-          <button class="mini-btn" onclick="window._adjBal('${p.qq}')">调灵石</button>
-          <button class="mini-btn danger" onclick="window._delPlayer('${p.qq}')">删除</button>
+          <button class="mini-btn" onclick="window._adjBal('${(p.qq || p.openid || '').replace(/'/g, "\\'")}')">调灵石</button>
+          <button class="mini-btn danger" onclick="window._delPlayer('${(p.qq || p.openid || '').replace(/'/g, "\\'")}')">删除</button>
         </td>`;
       tbody.appendChild(tr);
     }
     if (!players.length) {
-      tbody.innerHTML = '<tr><td colspan="9" class="table-empty">🌙 今夜尚无人入场，静候嘉宾</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="table-empty">🌙 今夜尚无人入场，静候嘉宾</td></tr>';
     }
   }
 
@@ -222,23 +227,28 @@
     return p.status;
   }
 
+  function escId(s) {
+    s = s || '';
+    if (s.length > 16) return s.slice(0, 6) + '…' + s.slice(-6);
+    return s;
+  }
   function renderMatches() {
     const tbody = $('matchesTable').querySelector('tbody');
     tbody.innerHTML = '';
     const seen = new Set();
-    for (const qq in data.players) {
-      const p = data.players[qq];
-      if (p.status !== 'matched' || !p.partner || seen.has(qq)) continue;
+    for (const key in data.players) {
+      const p = data.players[key];
+      if (p.status !== 'matched' || !p.partner || seen.has(key)) continue;
       const spouse = data.players[p.partner];
       if (!spouse) continue;
       seen.add(p.partner);
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${p.majia}</td><td>${p.qq}</td>
-        <td>${spouse.majia}</td><td>${spouse.qq}</td>
+        <td>${p.majia}</td><td title="${esc(p.qq||p.openid||'')}">${escId(p.qq||p.openid)}</td>
+        <td>${spouse.majia}</td><td title="${esc(spouse.qq||spouse.openid||'')}">${escId(spouse.qq||spouse.openid)}</td>
         <td>缘分 ${p.matchScore || 0}</td>
         <td>${p.locked ? '🔒' : '❌'}</td>
-        <td><button class="mini-btn danger" onclick="window._forceDivorce('${qq}','${p.partner}')">强制解除</button></td>`;
+        <td><button class="mini-btn danger" onclick="window._forceDivorce('${key.replace(/'/g, "\\'")}','${p.partner.replace(/'/g, "\\'")}')">强制解除</button></td>`;
       tbody.appendChild(tr);
     }
     if (!tbody.children.length) {

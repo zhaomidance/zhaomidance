@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>蒙面舞会 · 婚配玩法</title>
-<link rel="stylesheet" href="style.css?v=20261024f">
+<link rel="stylesheet" href="style.css?v=20261024g">
 </head>
 <body>
 
@@ -145,17 +145,20 @@
     <button class="modal-close" id="closeRegister">✕</button>
     <div class="modal-title">入 场 券</div>
 
-    <!-- QQ 获取：按钮 + 手动输入默认展开（自动拿不到就直接手填） -->
-    <div class="qq-fetch-row" id="qqFetchRow">
-      <span class="qq-state" id="qqState">未获取</span>
-      <button class="btn btn-ghost btn-sm btn-qq" id="fetchQqBtn" type="button">🔄 尝试自动获取</button>
-    </div>
-    <div class="qq-manual" id="qqManual">
-      <div class="form-group" style="margin-bottom:6px">
-        <label>手动填写 QQ 号</label>
-        <input type="text" id="qqManualInput" placeholder="请输入你的 QQ 号（5-12 位）" maxlength="12" autocomplete="off">
+    <!-- 身份区：OAuth 为主，手动填 QQ 为降级 -->
+    <div id="authArea">
+      <!-- OAuth 模式（如果配置了 qqAppId） -->
+      <div class="qq-fetch-row oauth-row" id="oauthRow" style="display:none">
+        <button class="btn btn-gold btn-block btn-qq-oauth" id="qqOauthBtn">🔐 QQ 一键登录 · 自动获取身份</button>
       </div>
-      <button class="btn btn-primary btn-sm" id="qqManualBtn">确认使用这个 QQ</button>
+      <!-- 手动填写（任何模式都可以用，作为降级） -->
+      <div class="qq-manual" id="qqManual">
+        <div class="form-group" style="margin-bottom:6px">
+          <label>手动填写身份 <span class="opt">(非 QQ 互联模式)</span></label>
+          <input type="text" id="qqManualInput" placeholder="请输入 QQ 号（5-12 位）" maxlength="12" autocomplete="off">
+        </div>
+        <button class="btn btn-ghost btn-sm" id="qqManualBtn">确认使用</button>
+      </div>
     </div>
 
     <div class="form-group">
@@ -198,6 +201,16 @@
   </div>
 </div>
 
+<!-- ============ OAuth 加载中 ============ -->
+<div class="modal" id="oauthLoading" style="display:none">
+  <div class="modal-card" style="text-align:center; padding:30px 24px">
+    <div style="font-size:36px;margin-bottom:12px">🎭</div>
+    <h3>正在连接 QQ 身份</h3>
+    <p style="color:var(--text-dim);margin-top:8px;font-size:13px">腾讯官方通道，安全无冒充</p>
+    <div id="oauthLoadErr" style="color:var(--red);margin-top:12px;display:none;font-size:12px"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="config.js"></script>
@@ -214,7 +227,12 @@
     final:       { title: '最终匹配', desc: '曲终人未散，命中注定的人已在灯火阑珊处', badge: '💍 最终匹配' }
   };
 
-  let myQQ = null;
+  // 是否开启了 OAuth（qqAppId + vercelApiBase 都填了才算）
+  const OAUTH_ON = !!(C.qqAppId && C.vercelApiBase);
+
+  let myId = null;          // openid（OAuth 模式）或 QQ 号（手动模式），玩家唯一主键
+  let myNick = null;        // OAuth 模式下腾讯返回的昵称
+  let myAvatar = null;      // OAuth 模式下腾讯返回的头像
   let myPlayer = null;
   let chosenGender = null;
   let toastTimer = null;
@@ -229,158 +247,66 @@
   function openModal(id) { $(id).style.display = 'flex'; }
   function closeModal(id) { $(id).style.display = 'none'; }
 
-  // ===== QQ 自动获取（激进重试 + 多桥接兜底） =====
-  // QQ 内打开？
-  function isInQQ() {
-    const ua = (navigator.userAgent || '') + ' ' + (navigator.vendor || '');
-    return /MQQBrowser|\bQQ\b|TencentQQ|AQQ/i.test(ua);
+  // ===== OAuth：跳转腾讯登录 =====
+  function oauthRedirect() {
+    const redirect = location.origin + location.pathname;
+    const authUrl = 'https://graph.qq.com/oauth2.0/authorize'
+      + '?response_type=code'
+      + '&client_id=' + encodeURIComponent(C.qqAppId)
+      + '&redirect_uri=' + encodeURIComponent(redirect)
+      + '&scope=get_user_info'
+      + '&state=zmd'
+      + '&display=mobile';  // QQ 内打开时用 mobile 样式更好看
+    location.href = authUrl;
   }
-  // 找 bridge：兼容不同容器挂载位置
-  function getBridge() {
-    const cands = [window, parent, top, self];
-    for (const w of cands) {
-      if (!w) continue;
-      if (w !== window) { try { if (w.mqq) return w.mqq; } catch(e) {} }
-      if (w.mqq) return w.mqq;
-      if (w.MQQBrowser && w.MQQBrowser.jsBridge) return w.MQQBrowser.jsBridge;
-      if (w.__JSBRIDGE__) return w.__JSBRIDGE__;
-    }
-    return null;
-  }
-  const qqValid = s => /^\d{5,12}$/.test(String(s || '').trim());
 
-  // 一次性尝试所有 bridge 方法
-  let qqFired = false;
-  function callAllBridgeMethods(mqq) {
-    const tryFill = qq => {
-      if (qqFired) return;
-      if (qqValid(qq)) { qqFired = true; fillQQ(qq); return true; }
-      return false;
-    };
+  // ===== OAuth：回调处理（页面加载时如果 URL 带 code 就自动处理）=====
+  async function handleOauthCallback() {
+    const sp = new URLSearchParams(location.search);
+    const code = sp.get('code');
+    if (!code) return false;
+    if (sp.get('state') !== 'zmd') return false;
+
+    openModal('oauthLoading');
     try {
-      // 官方 mqq.invoke 体系
-      if (typeof mqq.invoke === 'function') {
-        // 先试试 openLogin（部分容器需先授权）
-        try {
-          mqq.invoke('ui', 'openLogin', r => {
-            if (r && (r.qq || r.uin || r.userId)) tryFill(r.qq || r.uin || r.userId);
-          });
-        } catch(e) {}
-        // data 域
-        mqq.invoke('data', 'getQQNumber', r => tryFill(r && (r.qq_number || r.qq || r.uin)));
-        mqq.invoke('data', 'getUserInfo', r => tryFill(r && (r.uin || r.qq || r.qq_number)));
-        mqq.invoke('data', 'getLoginInfo', r => tryFill(r && (r.qq || r.uin)));
-        // account 域
-        mqq.invoke('account', 'getUserAccount', r => tryFill(r && (r.qq_number || r.qq || r.uin)));
-        mqq.invoke('account', 'getAccount', r => tryFill(r && (r.qq || r.uin || r.account)));
-        // ui 域（部分版本）
-        mqq.invoke('ui', 'getUserInfo', r => tryFill(r && (r.qq || r.uin)));
-        // 另外：getAppInfo 也可能携带
-        mqq.invoke('app', 'getAppInfo', r => tryFill(r && (r.qq || r.uin)));
-      }
-      // mqq.data 直挂
-      if (mqq.data) {
-        ['getQQNumber','getUserInfo','getLoginInfo','getAccount'].forEach(m => {
-          try {
-            if (typeof mqq.data[m] === 'function') {
-              mqq.data[m](r => tryFill(r && (r.qq_number || r.qq || r.uin || r.account)));
-            }
-          } catch(e) {}
-        });
-      }
-      // mqq.account 直挂
-      if (mqq.account) {
-        ['getAccount','getUserAccount','getLoginInfo'].forEach(m => {
-          try {
-            if (typeof mqq.account[m] === 'function') {
-              mqq.account[m](r => tryFill(r && (r.qq || r.uin || r.account)));
-            }
-          } catch(e) {}
-        });
-      }
-      // mqq.ui 直挂
-      if (mqq.ui) {
-        ['getUserInfo','openLogin'].forEach(m => {
-          try {
-            if (typeof mqq.ui[m] === 'function')
-              mqq.ui[m](r => tryFill(r && (r.qq || r.uin || r.userId)));
-          } catch(e) {}
-        });
-      }
-      // mqq.getQQNumber 直接挂在根上（极少数老版本）
-      ['getQQNumber','getUserInfo','getAccount'].forEach(m => {
-        try {
-          if (typeof mqq[m] === 'function')
-            mqq[m](r => tryFill(r && (r.qq_number || r.qq || r.uin || r.account)));
-        } catch(e) {}
+      const res = await fetch(C.vercelApiBase + '/oauth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
       });
-    } catch(e) {}
-  }
+      if (!res.ok) throw new Error('服务错误 ' + res.status);
+      const data = await res.json();
+      if (!data.openid) throw new Error('未获取到身份');
 
-  // 启动 bridge 轮询：最多轮询 5 秒，每 200ms 试一次
-  function startBridgePolling() {
-    const start = Date.now();
-    const timer = setInterval(() => {
-      if (qqFired) { clearInterval(timer); return; }
-      const mqq = getBridge();
-      if (mqq) { callAllBridgeMethods(mqq); }
-      if (Date.now() - start > 5000) clearInterval(timer);
-    }, 200);
-  }
+      myId = data.openid;
+      myNick = data.nick || null;
+      myAvatar = data.avatar || null;
+      localStorage.setItem('zmd_id', myId);
+      if (myNick) localStorage.setItem('zmd_nick', myNick);
+      if (myAvatar) localStorage.setItem('zmd_avatar', myAvatar);
 
-  // 入口：返回同步可得的 QQ（URL / localStorage），同时异步启动 bridge 尝试
-  function detectQQ() {
-    // 1) URL 参数（最快）
-    const urlQq = new URLSearchParams(location.search).get('qq');
-    if (qqValid(urlQq)) return urlQq;
-    // 2) localStorage 缓存（回来不用重填）
-    const cache = localStorage.getItem('zmd_qq');
-    if (qqValid(cache)) return cache;
+      // 清理 URL（去掉 code，避免刷新重复触发）
+      const clean = location.origin + location.pathname;
+      history.replaceState({}, '', clean);
 
-    // 3) bridge 同步可见吗？可见则立刻调用一次全部方法
-    const mqq = getBridge();
-    if (mqq) { callAllBridgeMethods(mqq); }
-    // 4) 不论是否同步可见，都启动轮询（bridge 可能稍后才注入）
-    startBridgePolling();
-    return null;
-  }
+      closeModal('oauthLoading');
+      toast('✅ QQ 身份已识别', 'success');
 
-  function fillQQ(qq) {
-    const q = String(qq).trim();
-    localStorage.setItem('zmd_qq', q);
-    myQQ = q;
-    // 同步更新弹窗（已打开的情况下）
-    const btn = $('fetchQqBtn'), state = $('qqState');
-    if (btn) { btn.textContent = '✅ 已获取：' + q; btn.disabled = true; }
-    if (state) { state.textContent = '已获取'; state.style.color = 'var(--green)'; }
-    // 自动折叠手动输入（如果弹窗已开）
-    const manual = $('qqManual');
-    if (manual) manual.style.display = 'none';
-  }
-
-  // 弹窗里点按钮主动获取
-  function fetchQqFromBtn() {
-    const btn = $('fetchQqBtn'), state = $('qqState');
-    btn.disabled = true; btn.textContent = '🔄 正在获取...';
-    state.textContent = '识别 QQ 桥接中（最多 5 秒）'; state.style.color = '';
-
-    qqFired = false;
-    const direct = detectQQ(); // URL/cache 可能同步命中
-    if (direct) { fillQQ(direct); return; }
-
-    // 等最多 5 秒，期间 bridge 轮询在跑，只要回调一次就能填上
-    const start = Date.now();
-    const waiter = setInterval(() => {
-      if (myQQ) { clearInterval(waiter); return; } // fillQQ 已触发
-      if (Date.now() - start > 5500) {
-        clearInterval(waiter);
-        btn.disabled = false; btn.textContent = '🔄 再次尝试';
-        state.textContent = '自动获取失败'; state.style.color = 'var(--red)';
-        toast('自动获取未成功，请在下方手动填写 QQ 号', 'error');
-        // 确保手动输入可见
-        const m = $('qqManual'); if (m) m.style.display = '';
+      // 自动预填马甲（昵称截前2字）
+      if (myNick && myNick.length >= 2 && !$('majiaInput').value) {
+        $('majiaInput').value = myNick.slice(0, 2);
       }
-    }, 250);
+      // 自动弹报名框（如果还没弹）
+      if (!$('registerModal').style.display || $('registerModal').style.display === 'none') {
+        $('openRegisterBtn').click();
+      }
+      refresh(true);
+      return true;
+    } catch (e) {
+      $('oauthLoadErr').style.display = '';
+      $('oauthLoadErr').textContent = '登录失败：' + e.message;
+      return false;
+    }
   }
 
   // ===== 大屏渲染 =====
@@ -390,19 +316,16 @@
     const males = waiting.filter(p => p.gender === 'male');
     const females = waiting.filter(p => p.gender === 'female');
 
-    // 阶段
     const stage = STAGES[data.stage] || STAGES.registering;
     $('stageTitle').textContent = stage.title;
     $('stageDesc').textContent = stage.desc;
     $('roundText').textContent = '第 ' + (data.round || 1) + ' 轮';
 
-    // 统计
     $('maleWaitNum').textContent = males.length;
     $('femaleWaitNum').textContent = females.length;
     $('maleNum').textContent = males.length;
     $('femaleNum').textContent = females.length;
 
-    // 待匹配
     const mChips = $('maleChips'), fChips = $('femaleChips');
     mChips.innerHTML = ''; fChips.innerHTML = '';
     if (!males.length) mChips.innerHTML = '<span class="chip-empty">虚位以待…</span>';
@@ -420,14 +343,13 @@
       fChips.appendChild(c);
     });
 
-    // 已匹配（大卡片）
     const grid = $('coupleGrid');
     grid.innerHTML = '';
     const seen = new Set();
     let coupleCount = 0;
-    for (const qq in data.players) {
-      const p = data.players[qq];
-      if (p.status !== 'matched' || !p.partner || seen.has(qq)) continue;
+    for (const key in data.players) {
+      const p = data.players[key];
+      if (p.status !== 'matched' || !p.partner || seen.has(key)) continue;
       const spouse = data.players[p.partner];
       if (!spouse) continue;
       seen.add(p.partner);
@@ -453,7 +375,6 @@
       grid.innerHTML = '<div class="empty-tip">🌙 今夜尚无佳偶<br>静待红娘摇铃，缘分自来</div>';
     }
 
-    // 任务（匹配成功后统一展示）
     if (coupleCount > 0) {
       $('taskBoard').style.display = '';
       const ul = $('taskList');
@@ -519,7 +440,7 @@
     try {
       const data = await ZMD.load(force === true);
       renderBoard(data);
-      const me = (myQQ && data.players[myQQ]) ? data.players[myQQ] : null;
+      const me = (myId && data.players[myId]) ? data.players[myId] : null;
       if (me) {
         renderMyStatus(data, me);
       } else {
@@ -536,31 +457,37 @@
 
   // ===== 报名 =====
   async function register() {
-    const qq = myQQ;
     const majia = $('majiaInput').value.trim();
     const wish = $('wishInput').value.trim();
     const about = $('aboutInput').value.trim();
 
-    if (!qq || !/^\d{5,12}$/.test(qq)) { toast('请先点击按钮获取 QQ 号', 'error'); return; }
+    if (!myId) { toast(OAUTH_ON ? '请先点 QQ 一键登录' : '请先填写身份', 'error'); return; }
     if (!majia || majia.length !== 2) { toast('马甲必须是两个字', 'error'); return; }
     if (!chosenGender) { toast('请选择性别', 'error'); return; }
 
-    localStorage.setItem('zmd_qq', qq);
+    localStorage.setItem('zmd_id', myId);
     localStorage.setItem('zmd_majia', majia);
 
     $('registerBtn').disabled = true;
     try {
       const data = await ZMD.load();
-      if (data.players[qq]) {
-        const p = data.players[qq];
+      if (data.players[myId]) {
+        const p = data.players[myId];
         p.majia = majia; p.gender = chosenGender;
         p.wish = wish; p.about = about;
+        if (myNick) p.nick = myNick;
+        if (myAvatar) p.avatar = myAvatar;
         await ZMD.save(data, `玩家 ${majia} 更新信息`);
         toast('欢迎回来，面具已为你保留', 'success');
       } else {
-        data.players[qq] = {
-          qq, majia, gender: chosenGender,
+        data.players[myId] = {
+          id: myId,           // 冗余字段，方便识别是 openid 还是 qq
+          qq: myId,           // 兼容老代码（用 .qq 字段的地方不受影响）
+          openid: myId,       // OAuth 模式下真实 openid
+          majia, gender: chosenGender,
           wish, about,
+          nick: myNick || null,
+          avatar: myAvatar || null,
           balance: C.startBalance - C.costs.register,
           status: 'registered',
           partner: null, locked: false,
@@ -581,7 +508,7 @@
   // ===== 婚配操作 =====
   async function doAction(action) {
     const data = await ZMD.load();
-    const me = data.players[myQQ];
+    const me = data.players[myId];
     if (!me || me.status !== 'matched' || !me.partner) {
       toast('当前没有婚配关系', 'error'); return;
     }
@@ -612,7 +539,7 @@
         spouse.divorceRequested = false; spouse.divorcePending = false; spouse.matchScore = 0;
       }
       data.matches = (data.matches || []).filter(m =>
-        !(m.includes(myQQ) || (spouse && m.includes(spouse.qq)))
+        !(m.includes(myId) || (spouse && m.includes(spouse.qq)))
       );
       await ZMD.save(data, `${me.majia} 强制解除婚配`);
       toast('⚡ 已强行斩断红线', 'success');
@@ -622,14 +549,14 @@
 
   async function handleDivorceRequest(agree) {
     const data = await ZMD.load();
-    const me = data.players[myQQ];
+    const me = data.players[myId];
     const spouse = me && me.partner ? data.players[me.partner] : null;
     if (!spouse) { toast('没有待处理的申请', 'error'); return; }
     if (agree) {
       me.partner = null; me.status = 'registered'; me.divorcePending = false; me.matchScore = 0;
       spouse.partner = null; spouse.status = 'registered'; spouse.divorceRequested = false; spouse.matchScore = 0;
       me.locked = false; spouse.locked = false;
-      data.matches = (data.matches || []).filter(m => !m.includes(myQQ) && !m.includes(spouse.qq));
+      data.matches = (data.matches || []).filter(m => !m.includes(myId) && !m.includes(spouse.qq));
       await ZMD.save(data, `${me.majia} 同意离婚`);
       toast('💔 红线已断', 'success');
     } else {
@@ -659,30 +586,37 @@
       });
     });
 
-    $('fetchQqBtn').addEventListener('click', fetchQqFromBtn);
-
-    // 手动填写 QQ（默认展开）
+    // 手动填写身份（任何模式都可用）
     $('qqManualBtn').addEventListener('click', () => {
       const v = $('qqManualInput').value.trim();
-      if (!qqValid(v)) { toast('请输入 5-12 位 QQ 号', 'error'); return; }
-      fillQQ(v);
-      toast('已使用手动填写的 QQ 号', 'success');
+      if (!v) { toast('请输入身份标识', 'error'); return; }
+      // OAuth 模式下也允许手动填（降级），但会弹提示
+      if (OAUTH_ON && !/^\d{5,12}$/.test(v)) {
+        toast('提示：当前是 QQ 互联模式，推荐用一键登录', 'error');
+        return;
+      }
+      myId = v;
+      localStorage.setItem('zmd_id', v);
+      toast('已确认身份：' + v, 'success');
     });
 
+    // OAuth 按钮
+    $('qqOauthBtn').addEventListener('click', oauthRedirect);
+
     $('openRegisterBtn').addEventListener('click', () => {
-      // 同步弹窗里的 QQ 状态
-      if (myQQ) {
-        $('fetchQqBtn').textContent = '✅ 已获取：' + myQQ;
-        $('fetchQqBtn').disabled = true;
-        $('qqState').textContent = '已获取';
-        $('qqState').style.color = 'var(--green)';
+      // 同步身份状态到弹窗
+      if (myId) {
+        // 已经有身份了，隐藏 OAuth 按钮，显示确认信息
+        const oauthBtn = $('qqOauthBtn');
+        if (oauthBtn) oauthBtn.textContent = '✅ 已登录：' + (myNick || myId.slice(0, 12));
+        oauthBtn.disabled = true;
         $('qqManual').style.display = 'none';
       } else {
-        $('fetchQqBtn').textContent = '🔄 尝试自动获取';
-        $('fetchQqBtn').disabled = false;
-        $('qqState').textContent = '未获取（可直接在下方手动填写）';
-        $('qqState').style.color = '';
-        $('qqManual').style.display = ''; // 默认展开
+        if (OAUTH_ON) {
+          $('qqOauthBtn').textContent = '🔐 QQ 一键登录 · 自动获取身份';
+          $('qqOauthBtn').disabled = false;
+          $('qqManual').style.display = ''; // 折叠降级
+        }
       }
       const me = myPlayer;
       if (me) {
@@ -714,14 +648,17 @@
     $('forceBtn').addEventListener('click', () =>
       confirmBox('强制解除', '扣除 5555 灵石，无需对方同意，单方面斩断红线', () => doAction('forceUnbind')));
     $('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('zmd_qq');
+      localStorage.removeItem('zmd_id');
+      localStorage.removeItem('zmd_nick');
+      localStorage.removeItem('zmd_avatar');
       localStorage.removeItem('zmd_majia');
+      myId = myNick = myAvatar = myPlayer = null;
       location.href = location.pathname;
     });
 
     // 离婚申请轮询
     setInterval(async () => {
-      if (!myQQ || !myPlayer || !myPlayer.divorcePending) return;
+      if (!myId || !myPlayer || !myPlayer.divorcePending) return;
       if ($('confirmModal').style.display === 'flex') return;
       myPlayer.divorcePending = false;
       confirmBox('离婚申请', '舞伴向你递交了离婚申请，是否同意斩断红线？', (agree) => handleDivorceRequest(agree));
@@ -730,20 +667,31 @@
     // 大屏自动刷新
     setInterval(() => refresh(false), 20000);
 
-    // 首次进入自动尝试一次抓 QQ
-    const qq = detectQQ();
-    if (qq) {
-      fillQQ(qq);
-      const savedMajia = localStorage.getItem('zmd_majia');
-      if (savedMajia) $('majiaInput').value = savedMajia;
-    }
-    // 5 秒后还没拿到——主动给用户一个提醒（bridge 轮询还在后台跑）
-    setTimeout(() => {
-      if (!myQQ) {
-        toast('自动获取 QQ 未成功，报名时可手动填写', 'error');
+    // ===== 启动流程 =====
+    // 1. 先处理 OAuth 回调（如果 URL 带 code）
+    // 2. 再尝试从 localStorage 恢复身份
+    // 3. OAuth 模式下，弹窗默认显示一键登录按钮
+    // 4. 最后刷新大屏
+    (async () => {
+      const handled = OAUTH_ON ? await handleOauthCallback() : false;
+
+      if (!handled) {
+        // 从 localStorage 恢复
+        const savedId = localStorage.getItem('zmd_id');
+        if (savedId) {
+          myId = savedId;
+          myNick = localStorage.getItem('zmd_nick');
+          myAvatar = localStorage.getItem('zmd_avatar');
+        }
       }
-    }, 5000);
-    refresh(false);
+
+      // 根据 OAUTH_ON 决定弹窗里显示什么
+      $('oauthRow').style.display = OAUTH_ON ? '' : 'none';
+      // OAuth 模式下，手动输入默认折叠（只在没登录时才显示，供降级）
+      $('qqManual').style.display = (OAUTH_ON && myId) ? 'none' : '';
+
+      refresh(false);
+    })();
   }
   init();
 })();
