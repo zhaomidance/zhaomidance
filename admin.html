@@ -30,8 +30,7 @@
       <span class="user-majia">管理后台</span>
     </div>
     <div class="topbar-right">
-      <button class="link-btn" onclick="location.href='index.html'">👤用户页</button>
-      <button class="link-btn" onclick="location.href='screen.html'">📺大屏</button>
+      <button class="link-btn" onclick="location.href='index.html'">👤用户页/大屏</button>
       <button class="link-btn" id="logoutBtn">退出</button>
     </div>
   </header>
@@ -44,8 +43,12 @@
         <div class="stat-label">报名人数</div>
       </div>
       <div class="stat-card">
-        <div class="stat-num" id="statWaiting">0</div>
-        <div class="stat-label">待匹配</div>
+        <div class="stat-num" id="statMale">0</div>
+        <div class="stat-label">男待匹配</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statFemale">0</div>
+        <div class="stat-label">女待匹配</div>
       </div>
       <div class="stat-card">
         <div class="stat-num" id="statMatched">0</div>
@@ -61,7 +64,7 @@
       <table class="data-table" id="playersTable">
         <thead>
           <tr>
-            <th>QQ号</th><th>马甲</th><th>灵石</th><th>状态</th><th>舞伴</th><th>操作</th>
+            <th>QQ号</th><th>马甲</th><th>性别</th><th>灵石</th><th>状态</th><th>舞伴</th><th>操作</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -144,9 +147,17 @@
 
   function renderStats() {
     const players = Object.values(data.players);
+    const waiting = players.filter(p => p.status === 'registered');
     $('statTotal').textContent = players.length;
-    $('statWaiting').textContent = players.filter(p => p.status === 'registered').length;
+    $('statMale').textContent = waiting.filter(p => p.gender === 'male').length;
+    $('statFemale').textContent = waiting.filter(p => p.gender === 'female').length;
     $('statMatched').textContent = players.filter(p => p.status === 'matched').length;
+  }
+
+  function genderText(p) {
+    if (p.gender === 'male') return '<span style="color:#60a5fa">👦 男</span>';
+    if (p.gender === 'female') return '<span style="color:var(--pink)">👧 女</span>';
+    return '<span style="color:var(--text-dim)">?</span>';
   }
 
   function renderPlayers() {
@@ -159,6 +170,7 @@
       tr.innerHTML = `
         <td>${p.qq}</td>
         <td>${p.majia}</td>
+        <td>${genderText(p)}</td>
         <td><b>${p.balance}</b> 💎</td>
         <td>${statusText(p)}</td>
         <td>${spouse ? spouse.majia : '-'}</td>
@@ -210,19 +222,22 @@
     });
   }
 
-  // 开始匹配
+  // 开始匹配（男女配对）
   async function startMatch() {
     const waiting = Object.values(data.players).filter(p => p.status === 'registered');
-    if (waiting.length < 2) { toast('至少需要2人才能匹配', 'error'); return; }
-    if (!confirm(`当前 ${waiting.length} 人待匹配，确定开始摇骰配对？`)) return;
-
-    ZMD.shuffle(waiting);
-    const pairs = [];
-    for (let i = 0; i + 1 < waiting.length; i += 2) {
-      pairs.push([waiting[i], waiting[i + 1]]);
+    const males = ZMD.shuffle(waiting.filter(p => p.gender === 'male'));
+    const females = ZMD.shuffle(waiting.filter(p => p.gender === 'female'));
+    const n = Math.min(males.length, females.length);
+    if (n < 1) {
+      toast(`男女各需至少1人（当前男 ${males.length} / 女 ${females.length}）`, 'error');
+      return;
     }
-    // 如果奇数，最后一人轮空
-    let msg = `匹配结果：\n`;
+    if (!confirm(`男嘉宾 ${males.length} 人 / 女嘉宾 ${females.length} 人\n将配对 ${n} 对，确定开始摇骰？`)) return;
+
+    const pairs = [];
+    for (let i = 0; i < n; i++) pairs.push([males[i], females[i]]);
+
+    let msg = '匹配结果：\n';
     for (const [a, b] of pairs) {
       const da = ZMD.rollDice(), db = ZMD.rollDice();
       a.status = 'matched'; b.status = 'matched';
@@ -232,9 +247,12 @@
       data.matches.push([a.qq, b.qq]);
       msg += `${a.majia}(${da}) ❤ ${b.majia}(${db})\n`;
     }
-    if (waiting.length % 2 === 1) {
-      const last = waiting[waiting.length - 1];
-      msg += `${last.majia} 轮空，继续等待\n`;
+    // 人数多出的一方轮空
+    if (males.length > n) {
+      males.slice(n).forEach(p => { msg += `${p.majia}（男）轮空，继续等待\n`; });
+    }
+    if (females.length > n) {
+      females.slice(n).forEach(p => { msg += `${p.majia}（女）轮空，继续等待\n`; });
     }
     await ZMD.save(data, `管理员开始匹配，生成${pairs.length}对`);
     alert(msg);

@@ -10,7 +10,7 @@ const ZMD = (function () {
 
   // 读取数据
   async function load(force) {
-    if (!force && cache && Date.now() - cacheTime < 3000) return cache;
+    if (!force && cache && Date.now() - cacheTime < 10000) return cache;
     const res = await fetch(API, {
       headers: {
         Authorization: `token ${C.token}`,

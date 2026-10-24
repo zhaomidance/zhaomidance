@@ -8,59 +8,69 @@
 </head>
 <body>
 
-<!-- 登录/报名页 -->
-<div id="loginPage" class="page active">
-  <div class="login-bg"></div>
-  <div class="login-card">
-    <div class="logo">🎭</div>
-    <h1 class="title">蒙面舞会</h1>
-    <p class="subtitle">匿名婚配 · 缘分摇骰</p>
-    <div id="qqSection">
-      <div class="form-group">
-        <label>QQ 号</label>
-        <input type="text" id="qqInput" placeholder="正在自动获取 QQ 号..." readonly>
-        <span class="hint" id="qqHint">如未自动获取，请手动输入</span>
-      </div>
-      <div class="form-group">
-        <label>群内二字马甲</label>
-        <input type="text" id="majiaInput" placeholder="请输入两个字的马甲" maxlength="2" autocomplete="off">
-        <span class="hint">用于舞会中的匿名称呼</span>
-      </div>
-      <button class="btn btn-primary" id="loginBtn">报名进入舞会</button>
-    </div>
-    <div class="rules-mini">
-      <p>报名 999 · 锁定 1314 · 离婚 1111 · 强制解除 5555</p>
+<header class="app-header">
+  <div class="h-left">
+    <span class="logo-sm">🎭</span>
+    <div>
+      <div class="h-title">蒙面舞会</div>
+      <div class="h-sub" id="roundText">第 1 轮舞会</div>
     </div>
   </div>
-</div>
+  <div class="h-right">
+    <span class="balance-pill" id="balancePill" style="display:none">💎 0</span>
+    <button class="link-btn" id="logoutBtn" style="display:none">换号</button>
+  </div>
+</header>
 
-<!-- 主页面 -->
-<div id="gamePage" class="page">
-  <header class="topbar">
-    <div class="topbar-left">
-      <span class="mask-icon">🎭</span>
-      <span class="user-majia" id="topMajia"></span>
-    </div>
-    <div class="topbar-right">
-      <span class="balance" id="balance">💎 0</span>
-      <button class="link-btn" id="screenBtn" onclick="location.href='screen.html'">📺大屏</button>
-    </div>
-  </header>
+<main class="app-main">
 
-  <main class="content">
-    <!-- 已报名未配对 -->
-    <section id="stateWaiting" class="state-panel active">
-      <div class="big-emoji">⏳</div>
-      <h2>已报名，等待匹配</h2>
-      <p class="desc">管理员开始匹配后，将为你摇骰配对<br>请耐心等待，可随时关闭页面</p>
-      <div class="spinner"></div>
-      <p class="desc" id="waitRound">第 <b>1</b> 轮舞会</p>
-    </section>
+  <!-- 报名卡（未报名时显示） -->
+  <section class="card register-card" id="registerCard">
+    <h2>报名进入舞会</h2>
+    <p class="card-sub">全程匿名 · 报名费 999 灵石</p>
+    <div class="form-group">
+      <label>QQ 号</label>
+      <input type="text" id="qqInput" placeholder="正在自动获取 QQ 号..." readonly>
+      <span class="hint" id="qqHint">如未自动获取，请手动输入</span>
+    </div>
+    <div class="form-group">
+      <label>群内二字马甲</label>
+      <input type="text" id="majiaInput" placeholder="请输入两个字的马甲" maxlength="2" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label>性别</label>
+      <div class="gender-select">
+        <button class="gender-btn" data-g="male">👦 男嘉宾</button>
+        <button class="gender-btn" data-g="female">👧 女嘉宾</button>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="registerBtn">报名进入舞会</button>
+    <p class="rules-mini">报名 999 · 锁定 1314 · 离婚 1111 · 强制解除 5555</p>
+  </section>
+
+  <!-- 我的状态卡（已报名后显示） -->
+  <section class="card my-card" id="myCard" style="display:none">
+    <!-- 等待匹配 -->
+    <div id="myWaiting">
+      <div class="my-state-head">
+        <span class="big-emoji">⏳</span>
+        <div>
+          <h2>已报名，等待匹配</h2>
+          <p class="card-sub">管理员开始匹配后会为你摇骰配对，可随时关闭页面</p>
+        </div>
+      </div>
+      <div class="progress-track"><div class="progress-bar"></div></div>
+    </div>
 
     <!-- 已配对 -->
-    <section id="stateMatched" class="state-panel">
-      <div class="big-emoji">💍</div>
-      <h2>婚配成功！</h2>
+    <div id="myMatched" style="display:none">
+      <div class="my-state-head">
+        <span class="big-emoji">💍</span>
+        <div>
+          <h2>婚配成功！</h2>
+          <p class="card-sub" id="lockStatus">关系未锁定</p>
+        </div>
+      </div>
       <div class="couple-card">
         <div class="couple-name">
           <span id="myName">-</span>
@@ -68,7 +78,6 @@
           <span id="spouseName">-</span>
         </div>
         <div class="dice-result" id="diceResult"></div>
-        <div class="couple-status" id="lockStatus">关系未锁定</div>
       </div>
       <div class="marriage-actions">
         <button class="btn btn-lock" id="lockBtn">
@@ -85,20 +94,65 @@
         </button>
       </div>
       <p class="warn-tip" id="marriageTip"></p>
-    </section>
+    </div>
+  </section>
 
-    <!-- 离婚确认弹窗 -->
-    <div class="modal" id="confirmModal" style="display:none">
-      <div class="modal-card">
-        <h3 id="confirmTitle">确认操作</h3>
-        <p id="confirmText"></p>
-        <div class="modal-btns">
-          <button class="btn btn-primary" id="confirmOk">确定</button>
-          <button class="btn btn-ghost" id="confirmCancel">取消</button>
-        </div>
+  <!-- 大屏看板（所有人可见） -->
+  <section class="card board-card">
+    <div class="board-head">
+      <h2>📺 舞会大屏</h2>
+      <span class="live-dot">LIVE</span>
+    </div>
+
+    <div class="board-stats">
+      <div class="stat-box male">
+        <div class="stat-num" id="maleWaitNum">0</div>
+        <div class="stat-label">男嘉宾待匹配</div>
+      </div>
+      <div class="stat-box female">
+        <div class="stat-num" id="femaleWaitNum">0</div>
+        <div class="stat-label">女嘉宾待匹配</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="coupleCount">0</div>
+        <div class="stat-label">已配对</div>
       </div>
     </div>
-  </main>
+
+    <h3 class="board-title">⏳ 待匹配舞伴</h3>
+    <div class="waiting-columns">
+      <div class="wait-col">
+        <div class="wait-col-head male">👦 男嘉宾</div>
+        <div class="chips" id="maleChips"></div>
+      </div>
+      <div class="wait-col">
+        <div class="wait-col-head female">👧 女嘉宾</div>
+        <div class="chips" id="femaleChips"></div>
+      </div>
+    </div>
+
+    <h3 class="board-title">💑 婚配列表</h3>
+    <div class="couple-grid" id="coupleGrid"></div>
+
+    <!-- 任务：匹配成功后同时展示所有人的任务 -->
+    <div id="taskBoard" style="display:none">
+      <h3 class="board-title">📝 本轮任务（全体婚配）</h3>
+      <ul class="task-list-screen" id="taskList"></ul>
+    </div>
+  </section>
+
+</main>
+
+<!-- 确认弹窗 -->
+<div class="modal" id="confirmModal" style="display:none">
+  <div class="modal-card">
+    <h3 id="confirmTitle">确认操作</h3>
+    <p id="confirmText"></p>
+    <div class="modal-btns">
+      <button class="btn btn-primary" id="confirmOk">确定</button>
+      <button class="btn btn-ghost" id="confirmCancel">取消</button>
+    </div>
+  </div>
 </div>
 
 <!-- Toast -->
@@ -111,7 +165,8 @@
   const $ = id => document.getElementById(id);
   const C = ZMD.config;
   let myQQ = null;
-  let myData = null;
+  let myPlayer = null;
+  let chosenGender = null;
 
   let toastTimer = null;
   function toast(msg, type) {
@@ -122,7 +177,7 @@
     toastTimer = setTimeout(() => t.className = 'toast', 2500);
   }
 
-  // QQ 自动获取
+  // ===== QQ 自动获取 =====
   function detectQQ() {
     const urlQq = new URLSearchParams(location.search).get('qq');
     if (urlQq && /^\d{5,12}$/.test(urlQq)) return urlQq;
@@ -150,70 +205,151 @@
     $('qqInput').value = qq;
     $('qqInput').setAttribute('readonly', 'readonly');
     localStorage.setItem('zmd_qq', qq);
+    myQQ = qq;
     $('qqHint').textContent = '已自动获取 QQ 号';
     $('qqHint').style.color = 'var(--green)';
   }
 
-  function showPage(id) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    $(id).classList.add('active');
-  }
-  function showState(id) {
-    document.querySelectorAll('.state-panel').forEach(p => p.classList.remove('active'));
-    $(id).classList.add('active');
+  // ===== 渲染大屏 =====
+  function renderBoard(data) {
+    const players = Object.values(data.players);
+    const waiting = players.filter(p => p.status === 'registered');
+    const males = waiting.filter(p => p.gender === 'male');
+    const females = waiting.filter(p => p.gender === 'female');
+
+    $('maleWaitNum').textContent = males.length;
+    $('femaleWaitNum').textContent = females.length;
+    $('roundText').textContent = '第 ' + data.round + ' 轮舞会';
+
+    // 男女待匹配列
+    const mChips = $('maleChips');
+    const fChips = $('femaleChips');
+    mChips.innerHTML = '';
+    fChips.innerHTML = '';
+    if (!males.length) mChips.innerHTML = '<span class="chip-empty">暂无男嘉宾</span>';
+    if (!females.length) fChips.innerHTML = '<span class="chip-empty">暂无女嘉宾</span>';
+    males.forEach(p => {
+      const c = document.createElement('span');
+      c.className = 'chip male';
+      c.textContent = p.majia;
+      mChips.appendChild(c);
+    });
+    females.forEach(p => {
+      const c = document.createElement('span');
+      c.className = 'chip female';
+      c.textContent = p.majia;
+      fChips.appendChild(c);
+    });
+
+    // 婚配列表
+    const grid = $('coupleGrid');
+    grid.innerHTML = '';
+    const seen = new Set();
+    let coupleCount = 0;
+    for (const qq in data.players) {
+      const p = data.players[qq];
+      if (p.status !== 'matched' || !p.partner || seen.has(qq)) continue;
+      const spouse = data.players[p.partner];
+      if (!spouse) continue;
+      seen.add(p.partner);
+      coupleCount++;
+      const div = document.createElement('div');
+      div.className = 'couple-box' + (p.locked ? ' locked' : '');
+      div.innerHTML = `
+        <div class="couple-names">${p.majia}<span class="heart">❤</span>${spouse.majia}</div>
+        <div class="couple-dice">🎲 ${p.dice} : ${spouse.dice}</div>
+        <div class="couple-bal">平均灵石：${Math.floor((p.balance + spouse.balance) / 2)} 💎</div>
+        ${p.locked ? '<div class="lock-badge">🔒 关系已锁定</div>' : ''}`;
+      grid.appendChild(div);
+    }
+    $('coupleCount').textContent = coupleCount;
+    if (!coupleCount) grid.innerHTML = '<div class="empty-tip">暂无婚配，等待管理员开始匹配...</div>';
+
+    // 任务：匹配成功后才同时展示
+    if (coupleCount > 0) {
+      $('taskBoard').style.display = '';
+      const ul = $('taskList');
+      ul.innerHTML = '';
+      const tasks = data.tasks || [];
+      if (!tasks.length) {
+        ul.innerHTML = '<li class="empty-tip">暂无任务</li>';
+      }
+      tasks.forEach(t => {
+        const li = document.createElement('li');
+        if (t.done) li.className = 'done';
+        li.innerHTML = `<span>${t.done ? '✅' : '⬜'}</span><span>${t.title}</span>`;
+        ul.appendChild(li);
+      });
+    } else {
+      $('taskBoard').style.display = 'none';
+    }
   }
 
-  // 加载并渲染用户状态
-  async function refresh() {
-    try {
-      const data = await ZMD.load(true);
-      const me = data.players[myQQ];
-      if (!me) { showPage('loginPage'); return; }
-      myData = me;
-      $('topMajia').textContent = me.majia;
-      $('balance').textContent = '💎 ' + me.balance;
-      $('myName').textContent = me.majia;
-      $('waitRound').innerHTML = `第 <b>${data.round}</b> 轮舞会`;
+  // ===== 渲染我的状态 =====
+  function renderMyStatus(data, me) {
+    myPlayer = me;
+    $('balancePill').style.display = '';
+    $('balancePill').textContent = '💎 ' + me.balance;
+    $('logoutBtn').style.display = '';
+    $('myCard').style.display = '';
+    $('myName').textContent = me.majia;
 
-      if (me.status === 'registered' || me.status === 'waiting') {
-        showState('stateWaiting');
-      } else if (me.status === 'matched' && me.partner) {
-        const spouse = data.players[me.partner];
-        $('spouseName').textContent = spouse ? spouse.majia : '?';
-        $('diceResult').textContent = (me.dice && spouse) ? `🎲 你 ${me.dice} : ${spouse.dice} 舞伴` : '';
-        const lockEl = $('lockStatus');
-        if (me.locked) {
-          lockEl.textContent = '🔒 关系已锁定';
-          lockEl.className = 'couple-status locked';
-          $('lockBtn').disabled = true;
-        } else {
-          lockEl.textContent = '关系未锁定，可被替换';
-          lockEl.className = 'couple-status';
-          $('lockBtn').disabled = false;
-        }
-        // 离婚请求状态
-        if (me.divorceRequested) {
-          $('marriageTip').textContent = '你已发起离婚申请，等待对方回应...';
-        } else if (me.divorcePending) {
-          $('marriageTip').textContent = '舞伴向你申请离婚，请处理';
-        } else {
-          $('marriageTip').textContent = '';
-        }
-        showState('stateMatched');
+    if (me.status === 'matched' && me.partner) {
+      const spouse = data.players[me.partner];
+      $('myWaiting').style.display = 'none';
+      $('myMatched').style.display = '';
+      $('spouseName').textContent = spouse ? spouse.majia : '?';
+      $('diceResult').textContent = (me.dice && spouse) ? `🎲 你 ${me.dice} : ${spouse.dice} 舞伴` : '';
+      const lockEl = $('lockStatus');
+      if (me.locked) {
+        lockEl.textContent = '🔒 关系已锁定，本次舞会不可被替换';
+        lockEl.style.color = 'var(--green)';
+        $('lockBtn').disabled = true;
       } else {
-        showState('stateWaiting');
+        lockEl.textContent = '关系未锁定，可被替换';
+        lockEl.style.color = 'var(--text-dim)';
+        $('lockBtn').disabled = false;
+      }
+      if (me.divorceRequested) {
+        $('marriageTip').textContent = '你已发起离婚申请，等待对方回应...';
+      } else if (me.divorcePending) {
+        $('marriageTip').textContent = '舞伴向你申请离婚，请处理';
+      } else {
+        $('marriageTip').textContent = '';
+      }
+    } else {
+      $('myWaiting').style.display = '';
+      $('myMatched').style.display = 'none';
+    }
+  }
+
+  // ===== 刷新 =====
+  async function refresh(force) {
+    try {
+      const data = await ZMD.load(force !== false);
+      renderBoard(data);
+      const me = (myQQ && data.players[myQQ]) ? data.players[myQQ] : null;
+      if (me) {
+        $('registerCard').style.display = 'none';
+        renderMyStatus(data, me);
+      } else {
+        $('registerCard').style.display = '';
+        $('myCard').style.display = 'none';
+        $('balancePill').style.display = 'none';
+        $('logoutBtn').style.display = 'none';
       }
     } catch (e) {
       toast('加载失败: ' + e.message, 'error');
     }
   }
 
-  // 报名
+  // ===== 报名 =====
   async function register() {
     const qq = $('qqInput').value.trim();
     const majia = $('majiaInput').value.trim();
     if (!qq || !/^\d{5,12}$/.test(qq)) { toast('QQ号格式不正确', 'error'); return; }
     if (!majia || majia.length !== 2) { toast('马甲必须是两个字', 'error'); return; }
+    if (!chosenGender) { toast('请选择性别', 'error'); return; }
 
     myQQ = qq;
     localStorage.setItem('zmd_qq', qq);
@@ -222,33 +358,28 @@
     try {
       const data = await ZMD.load();
       if (data.players[qq]) {
-        // 已注册，更新马甲
         data.players[qq].majia = majia;
+        data.players[qq].gender = chosenGender;
         await ZMD.save(data, `玩家 ${majia} 更新信息`);
         toast('欢迎回来！', 'success');
       } else {
-        // 新注册：检查余额够不够报名费
-        if (C.startBalance < C.costs.register) {
-          toast('初始灵石不足', 'error'); return;
-        }
         data.players[qq] = {
-          qq, majia,
+          qq, majia, gender: chosenGender,
           balance: C.startBalance - C.costs.register,
           status: 'registered',
-          partner: null, locked: false,
-          dice: null, registeredAt: Date.now(),
+          partner: null, locked: false, dice: null,
+          registeredAt: Date.now(),
         };
         await ZMD.save(data, `新玩家报名: ${majia}`);
         toast('报名成功！扣除999灵石', 'success');
       }
-      showPage('gamePage');
-      refresh();
+      refresh(true);
     } catch (e) {
       toast('报名失败: ' + e.message, 'error');
     }
   }
 
-  // 婚配操作
+  // ===== 婚配操作 =====
   async function doAction(action) {
     const data = await ZMD.load();
     const me = data.players[myQQ];
@@ -256,16 +387,14 @@
       toast('当前没有婚配关系', 'error'); return;
     }
     const cost = C.costs[action];
-    if (me.balance < cost) {
-      toast(`灵石不足，需要${cost}`, 'error'); return;
-    }
+    if (me.balance < cost) { toast(`灵石不足，需要${cost}`, 'error'); return; }
     const spouse = data.players[me.partner];
 
     if (action === 'lock') {
       if (me.locked) { toast('关系已锁定', 'error'); return; }
       me.balance -= cost;
       me.locked = true;
-      if (spouse) { spouse.locked = true; }
+      if (spouse) spouse.locked = true;
       await ZMD.save(data, `${me.majia} 锁定关系`);
       toast('🔒 关系已锁定！', 'success');
     } else if (action === 'divorce') {
@@ -283,21 +412,19 @@
         spouse.locked = false; spouse.partner = null; spouse.status = 'registered';
         spouse.divorceRequested = false; spouse.divorcePending = false; spouse.dice = null;
       }
-      // 从matches中移除
       data.matches = data.matches.filter(m =>
         !(m.includes(myQQ) || (spouse && m.includes(spouse.qq)))
       );
       await ZMD.save(data, `${me.majia} 强制解除婚配`);
       toast('⚡ 已强制解除婚配关系', 'success');
     }
-    refresh();
+    refresh(true);
   }
 
-  // 处理离婚请求（如果对方发起）
   async function handleDivorceRequest(agree) {
     const data = await ZMD.load();
     const me = data.players[myQQ];
-    const spouse = me.partner ? data.players[me.partner] : null;
+    const spouse = me && me.partner ? data.players[me.partner] : null;
     if (!spouse) { toast('没有待处理的请求', 'error'); return; }
     if (agree) {
       me.partner = null; me.status = 'registered'; me.divorcePending = false; me.dice = null;
@@ -312,10 +439,10 @@
       await ZMD.save(data, `${me.majia} 拒绝离婚`);
       toast('已拒绝离婚申请', 'success');
     }
-    refresh();
+    refresh(true);
   }
 
-  function confirm(title, text, onOk) {
+  function confirmBox(title, text, onOk) {
     $('confirmTitle').textContent = title;
     $('confirmText').textContent = text;
     $('confirmModal').style.display = 'flex';
@@ -323,50 +450,54 @@
     $('confirmCancel').onclick = () => $('confirmModal').style.display = 'none';
   }
 
-  // 初始化
+  // ===== 初始化 =====
   function init() {
-    // 绑定事件
-    $('loginBtn').addEventListener('click', register);
+    // 性别选择
+    document.querySelectorAll('.gender-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.gender-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        chosenGender = b.dataset.g;
+      });
+    });
+
+    $('registerBtn').addEventListener('click', register);
     $('majiaInput').addEventListener('input', () => {
       $('majiaInput').value = $('majiaInput').value.slice(0, 2);
     });
     $('lockBtn').addEventListener('click', () =>
-      confirm('锁定关系', '确定锁定？扣除1314灵石，锁定后不可替换', () => doAction('lock')));
+      confirmBox('锁定关系', '确定锁定？扣除1314灵石，锁定后不可替换', () => doAction('lock')));
     $('divorceBtn').addEventListener('click', () =>
-      confirm('申请离婚', '确定申请离婚？扣除1111灵石，对方同意后生效', () => doAction('divorce')));
+      confirmBox('申请离婚', '确定申请离婚？扣除1111灵石，对方同意后生效', () => doAction('divorce')));
     $('forceBtn').addEventListener('click', () =>
-      confirm('强制解除', '确定强制解除？扣除5555灵石，无需对方同意', () => doAction('forceUnbind')));
+      confirmBox('强制解除', '确定强制解除？扣除5555灵石，无需对方同意', () => doAction('forceUnbind')));
+    $('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('zmd_qq');
+      localStorage.removeItem('zmd_majia');
+      location.href = location.pathname;
+    });
 
-    // 检查是否有离婚请求待处理
+    // 离婚请求轮询
     setInterval(async () => {
-      if (myQQ && myData && myData.divorcePending) {
-        confirm('离婚申请', `舞伴向你申请离婚，是否同意？`, (agree) => handleDivorceRequest(agree));
-        myData.divorcePending = false; // 防止重复弹窗
-      }
+      if (!myQQ || !myPlayer || !myPlayer.divorcePending) return;
+      if ($('confirmModal').style.display === 'flex') return;
+      myPlayer.divorcePending = false;
+      confirmBox('离婚申请', '舞伴向你申请离婚，是否同意？', (agree) => handleDivorceRequest(agree));
     }, 5000);
 
-    // 自动刷新
-    setInterval(() => { if (myQQ) refresh(); }, 8000);
+    // 大屏自动刷新（20秒）
+    setInterval(() => refresh(false), 20000);
 
-    // 检测QQ
     const qq = detectQQ();
     if (qq) {
       fillQQ(qq);
-      myQQ = qq;
-      // 尝试自动加载
       const savedMajia = localStorage.getItem('zmd_majia');
       if (savedMajia) $('majiaInput').value = savedMajia;
-      // 直接尝试加载用户数据
-      ZMD.load().then(data => {
-        if (data.players[qq]) {
-          showPage('gamePage');
-          refresh();
-        }
-      }).catch(()=>{});
     } else {
       $('qqInput').removeAttribute('readonly');
       $('qqInput').placeholder = '请输入你的 QQ 号';
     }
+    refresh(false);
   }
   init();
 })();
