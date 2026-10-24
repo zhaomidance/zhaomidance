@@ -68,6 +68,7 @@
       </div>
       <button class="btn btn-gold btn-match" id="matchBtn">🌹 系统匹配</button>
       <button class="btn btn-ghost" id="newRoundBtn">🔄 新一轮</button>
+      <button class="btn btn-primary" id="reportBtn">📊 灵石流水报表</button>
     </div>
 
     <!-- 白名单录入 -->
@@ -133,6 +134,19 @@
   </div>
 </div>
 
+<!-- 灵石流水报表弹窗 -->
+<div class="modal" id="reportModal" style="display:none">
+  <div class="modal-card wide">
+    <h3>📊 灵石流水报表</h3>
+    <p class="report-sub">全部分行文本，可直接复制到别处用于加减灵石</p>
+    <textarea id="reportText" readonly></textarea>
+    <div class="modal-btns">
+      <button class="btn btn-primary" id="reportCopyBtn">📋 复制全部</button>
+      <button class="btn btn-ghost" id="reportCloseBtn">关闭</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script src="config.js"></script>
@@ -143,6 +157,17 @@
   const C = ZMD.config;
   let data = null;
   let targetMajia = null;
+
+  // 灵石流水日志
+  function addLog(actor, action, amount) {
+    if (!data.logs) data.logs = [];
+    const p = data.players[actor];
+    data.logs.push({
+      time: new Date().toISOString(),
+      actor, action, amount,
+      balance: p ? p.balance : null,
+    });
+  }
 
   let toastTimer = null;
   function toast(msg, type) {
@@ -444,6 +469,7 @@
     if (isNaN(num)) { toast('请输入数字', 'error'); return; }
     data = await ZMD.load(true);
     data.players[targetMajia].balance += num;
+    addLog(targetMajia, '后台调整灵石', num);
     await ZMD.save(data, `调整 ${data.players[targetMajia].majia} 灵石 ${num}`);
     $('balanceModal').style.display = 'none';
     toast('已调整', 'success');
@@ -472,8 +498,8 @@
     if (!confirm(`确定强制解除 ${a} ❤ ${b}？`)) return;
     data = await ZMD.load(true);
     const pa = data.players[a], pb = data.players[b];
-    if (pa) { pa.partner = null; pa.status = 'registered'; pa.myConfirmed = false; pa.deposit = 0; pa.matchScore = 0; }
-    if (pb) { pb.partner = null; pb.status = 'registered'; pb.myConfirmed = false; pb.deposit = 0; pb.matchScore = 0; }
+    if (pa) { pa.partner = null; pa.status = 'registered'; pa.myConfirmed = false; pa.deposit = 0; pa.matchScore = 0; pa.divorceRequested = false; }
+    if (pb) { pb.partner = null; pb.status = 'registered'; pb.myConfirmed = false; pb.deposit = 0; pb.matchScore = 0; pb.divorceRequested = false; }
     data.matches = (data.matches || []).filter(m => !m.includes(a) && !m.includes(b));
     await ZMD.save(data, '管理员强制解除婚配');
     refresh();
@@ -534,6 +560,78 @@
       }
     };
   });
+
+  // ===== 灵石流水报表 =====
+  function fmtTime(iso) {
+    try {
+      const d = new Date(iso);
+      const pad = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    } catch (e) { return iso; }
+  }
+  function generateReport() {
+    if (!data) return '';
+    const lines = [];
+    lines.push('=== 蒙面舞会 · 灵石流水报表 ===');
+    lines.push('生成时间：' + fmtTime(new Date().toISOString()));
+    lines.push('');
+
+    // 门票 / 白名单
+    lines.push('【门票白名单】');
+    const wl = data.whitelist || [];
+    if (!wl.length) lines.push('（暂无）');
+    wl.forEach(w => {
+      const player = data.players[w.majia];
+      const state = player ? '已报名' : (w.claimed ? '已占用' : '待入场');
+      lines.push(`${w.majia}\t门票 ${w.ticket}\t${state}`);
+    });
+    lines.push('');
+
+    // 操作流水
+    lines.push('【灵石操作流水】');
+    const logs = data.logs || [];
+    if (!logs.length) lines.push('（暂无操作记录）');
+    logs.forEach(l => {
+      const amt = (l.amount > 0 ? '+' : '') + l.amount;
+      lines.push(`${fmtTime(l.time)}\t${l.actor}\t${l.action}\t${amt} 💎\t余额 ${l.balance}`);
+    });
+    lines.push('');
+
+    // 当前各玩家余额
+    lines.push('【当前各舞宾余额】');
+    const players = Object.values(data.players || {});
+    if (!players.length) lines.push('（暂无）');
+    players.sort((a,b) => (a.gender === b.gender ? 0 : a.gender === 'male' ? -1 : 1)).forEach(p => {
+      const spouse = p.partner ? data.players[p.partner] : null;
+      lines.push(`${p.majia}\t门票 ${p.ticket}\t${p.gender === 'male' ? '男' : '女'}\t余额 ${p.balance} 💎\t已投入 ${p.deposit || 0} 💎\t${p.status}${spouse ? ' · 舞伴 ' + spouse.majia : ''}`);
+    });
+    lines.push('');
+
+    // 统计
+    const totalBal = players.reduce((s,p) => s + (p.balance||0), 0);
+    const totalDeposit = players.reduce((s,p) => s + (p.deposit||0), 0);
+    lines.push('【合计】');
+    lines.push(`舞宾总数：${players.length}\t灵石结余总和：${totalBal} 💎\t任务共池总和：${totalDeposit} 💎`);
+
+    return lines.join('\n');
+  }
+  $('reportBtn').onclick = async () => {
+    data = await ZMD.load(true);
+    $('reportText').value = generateReport();
+    $('reportModal').style.display = 'flex';
+  };
+  $('reportCopyBtn').onclick = async () => {
+    const txt = $('reportText');
+    txt.select();
+    try {
+      await navigator.clipboard.writeText(txt.value);
+      toast('已复制全部报表', 'success');
+    } catch (e) {
+      document.execCommand('copy');
+      toast('已复制（回退方式）', 'success');
+    }
+  };
+  $('reportCloseBtn').onclick = () => { $('reportModal').style.display = 'none'; };
 
   // ===== 登录 =====
   $('adminLoginBtn').onclick = () => {

@@ -104,10 +104,20 @@
             <div class="act-title">💍 确认舞伴</div>
             <div class="act-cost">1314 💎</div>
           </button>
-          <button class="act-btn divorce" id="releaseBtn">
-            <div class="act-title">💔 解除舞伴</div>
-            <div class="act-cost">1111 💎</div>
+          <button class="act-btn divorce" id="applyReleaseBtn">
+            <div class="act-title">💔 申请解除</div>
+            <div class="act-cost">双方同意各扣 1111 💎</div>
           </button>
+          <button class="act-btn force" id="forceReleaseBtn">
+            <div class="act-title">⚡ 单方强制解除</div>
+            <div class="act-cost">2888 💎</div>
+          </button>
+        </div>
+
+        <div class="identity-row">
+          <button class="btn btn-ghost btn-sm" id="publicToggleBtn">🎭 匿名身份</button>
+          <button class="btn btn-primary btn-sm" id="agreeReleaseBtn" style="display:none">✅ 同意对方解除申请</button>
+          <button class="btn btn-ghost btn-sm" id="cancelApplyBtn" style="display:none">↩️ 撤销我的解除申请</button>
         </div>
         <p class="warn-tip" id="marriageTip"></p>
 
@@ -215,7 +225,8 @@
     </div>
 
     <div class="modal-rules">
-      报名 999 · 确认舞伴 1314 · 解除舞伴 1111<br>
+      报名 999 · 确认舞伴 1314<br>
+      双方同意解除 各 1111 · 单方强制解除 2888<br>
       灵石一经缴纳，除特殊说明外不退
     </div>
   </div>
@@ -308,8 +319,7 @@
     const grid = $('coupleGrid');
     grid.innerHTML = '';
     const seen = new Set();
-    let coupleCount = 0;
-    let confirmedCount = 0;
+    const couples = [];
     for (const key in data.players) {
       const p = data.players[key];
       if ((p.status !== 'matched' && p.status !== 'confirmed') || !p.partner || seen.has(key)) continue;
@@ -317,11 +327,26 @@
       if (!spouse) continue;
       seen.add(key);
       seen.add(p.partner);
-      coupleCount++;
-      const isConfirmed = p.status === 'confirmed' && spouse.status === 'confirmed';
-      if (isConfirmed) confirmedCount++;
+      // 把男宾放前面，方便编号
+      const a = p.gender === 'male' ? p : spouse;
+      const b = a === p ? spouse : p;
+      couples.push({ a, b });
+    }
+    // 匿名编号：按出现顺序，男舞宾1/女舞宾1…
+    const maleMap = {}, femaleMap = {};
+    let maleIdx = 0, femaleIdx = 0;
+    couples.forEach(c => { maleMap[c.a.majia] = ++maleIdx; femaleMap[c.b.majia] = ++femaleIdx; });
+    const anon = (p) => (p.gender === 'male' ? '男舞宾' : '女舞宾') + (p.gender === 'male' ? maleMap[p.majia] : femaleMap[p.majia]);
 
-      const pool = (p.deposit || 0) + (spouse.deposit || 0);
+    let coupleCount = couples.length;
+    let confirmedCount = 0;
+    couples.forEach(({ a, b }) => {
+      const isConfirmed = a.status === 'confirmed' && b.status === 'confirmed';
+      if (isConfirmed) confirmedCount++;
+      const bothPublic = a.public && b.public;
+      const nameA = bothPublic ? a.majia : anon(a);
+      const nameB = bothPublic ? b.majia : anon(b);
+      const pool = (a.deposit || 0) + (b.deposit || 0);
       const card = document.createElement('div');
       card.className = 'couple-card' + (isConfirmed ? ' locked' : '');
       const bondText = isConfirmed
@@ -329,16 +354,16 @@
         : '🌙 红线初系 · 今夜共舞';
       card.innerHTML = `
         <div class="couple-names">
-          ${p.majia}<span class="heart">❤</span>${spouse.majia}
-          <span class="vs">MASKED &nbsp;PAIR</span>
+          ${nameA}<span class="heart">❤</span>${nameB}
+          <span class="vs">${bothPublic ? 'MASKED &nbsp;PAIR' : '匿 名 舞 伴'}</span>
         </div>
         <div class="couple-bond">${bondText}</div>
         <div class="couple-wish">
-          ${p.wish ? `<span class="tag gold">${p.majia}许愿：${p.wish}</span>` : ''}
-          ${spouse.wish ? `<span class="tag rose">${spouse.majia}许愿：${spouse.wish}</span>` : ''}
+          ${bothPublic && a.wish ? `<span class="tag gold">${a.majia}许愿：${a.wish}</span>` : ''}
+          ${bothPublic && b.wish ? `<span class="tag rose">${b.majia}许愿：${b.wish}</span>` : ''}
         </div>`;
       grid.appendChild(card);
-    }
+    });
     $('coupleCount').textContent = coupleCount;
     if (!coupleCount) {
       grid.innerHTML = '<div class="empty-tip">🌙 今夜尚无佳偶<br>静待红娘摇铃，佳偶自来</div>';
@@ -446,9 +471,28 @@
         ul.appendChild(li);
       });
 
-      $('marriageTip').textContent = me.divorceRequested
-        ? '你已递交解除申请，等待对方回应…'
-        : '';
+      // 公开身份按钮
+      const pubBtn = $('publicToggleBtn');
+      if (me.public) {
+        pubBtn.textContent = '🌐 已公开身份（点击匿名）';
+        pubBtn.classList.add('btn-gold');
+      } else {
+        pubBtn.textContent = '🎭 匿名身份（点击公开）';
+        pubBtn.classList.remove('btn-gold');
+      }
+
+      // 解除相关按钮状态
+      const spouse = data.players[me.partner];
+      const spouseApplied = spouse && spouse.divorceRequested;
+      const myApplied = !!me.divorceRequested;
+      $('applyReleaseBtn').style.display = myApplied ? 'none' : '';
+      $('cancelApplyBtn').style.display = myApplied ? '' : 'none';
+      $('agreeReleaseBtn').style.display = (!myApplied && spouseApplied) ? '' : 'none';
+
+      let tip = '';
+      if (myApplied) tip = '你已递交解除申请，等待对方回应…';
+      else if (spouseApplied) tip = '⚠️ 对方已申请解除，请选择是否同意（同意后双方各扣 1111 灵石）';
+      $('marriageTip').textContent = tip;
     } else {
       $('myWaiting').style.display = '';
       $('myMatched').style.display = 'none';
@@ -590,6 +634,7 @@
         };
         item.claimed = true;
         item.claimedAt = Date.now();
+        addLog(data, majia, '报名入场', -C.costs.register);
         await ZMD.save(data, `新舞宾入场: ${majia}`);
         toast('入场成功！面具之下，静候红线', 'success');
       }
@@ -604,7 +649,18 @@
     }
   }
 
-  // ===== 确认舞伴 / 解除舞伴 =====
+  // 灵石流水日志
+  function addLog(data, actor, action, amount) {
+    if (!data.logs) data.logs = [];
+    const p = data.players[actor];
+    data.logs.push({
+      time: new Date().toISOString(),
+      actor, action, amount,
+      balance: p ? p.balance : null,
+    });
+  }
+
+  // ===== 确认舞伴 =====
   async function confirmPartner() {
     const data = await ZMD.load();
     const me = data.players[myMajia];
@@ -617,6 +673,7 @@
 
     me.balance -= cost;
     me.myConfirmed = true;
+    addLog(data, me.majia, '确认舞伴', -cost);
 
     const spouse = data.players[me.partner];
     if (spouse && spouse.myConfirmed) {
@@ -630,36 +687,87 @@
     refresh(true);
   }
 
-  async function releasePartner() {
+  // ===== 申请解除（不扣费，需对方同意后双方各扣 1111）=====
+  async function applyRelease() {
     const data = await ZMD.load();
     const me = data.players[myMajia];
     if (!me || !me.partner) { toast('当前没有舞伴', 'error'); return; }
+    if (me.divorceRequested) { toast('你已递交解除申请', 'error'); return; }
+    me.divorceRequested = true;
+    await ZMD.save(data, `${me.majia} 申请解除舞伴`);
+    toast('已递交解除申请，等待对方回应', 'success');
+    refresh(true);
+  }
+
+  // 撤销申请
+  async function cancelApplyRelease() {
+    const data = await ZMD.load();
+    const me = data.players[myMajia];
+    if (!me) return;
+    me.divorceRequested = false;
+    await ZMD.save(data, `${me.majia} 撤销解除申请`);
+    toast('已撤销解除申请', 'success');
+    refresh(true);
+  }
+
+  // 同意对方解除申请 → 双方各扣 1111
+  async function agreeRelease() {
+    const data = await ZMD.load();
+    const me = data.players[myMajia];
+    if (!me || !me.partner) { toast('当前没有舞伴', 'error'); return; }
+    const spouse = data.players[me.partner];
+    if (!spouse || !spouse.divorceRequested) { toast('对方未申请解除', 'error'); return; }
     const cost = C.costs.release;
     if (me.balance < cost) { toast(`灵石不足，需要 ${cost}`, 'error'); return; }
+    if (spouse.balance < cost) { toast('对方灵石不足，无法同意解除', 'error'); return; }
 
-    const spouse = data.players[me.partner];
+    me.balance -= cost; spouse.balance -= cost;
+    addLog(data, me.majia, '同意解除舞伴', -cost);
+    addLog(data, spouse.majia, '同意解除舞伴', -cost);
+    doRelease(data, me, spouse);
+    await ZMD.save(data, `${me.majia} 与 ${spouse.majia} 双方同意解除舞伴`);
+    toast(`双方各扣除 ${cost} 灵石，红线已断`, 'success');
+    refresh(true);
+  }
+
+  // 单方强制解除 2888
+  async function forceRelease() {
+    const data = await ZMD.load();
+    const me = data.players[myMajia];
+    if (!me || !me.partner) { toast('当前没有舞伴', 'error'); return; }
+    const cost = C.costs.forceRelease;
+    if (me.balance < cost) { toast(`灵石不足，需要 ${cost}`, 'error'); return; }
     me.balance -= cost;
-    me.partner = null;
-    me.status = 'registered';
-    me.myConfirmed = false;
-    me.deposit = 0;
-    me.matchScore = 0;
-    me.divorceRequested = false;
-    me.divorcePending = false;
-
-    if (spouse) {
-      spouse.partner = null;
-      spouse.status = 'registered';
-      spouse.myConfirmed = false;
-      spouse.deposit = 0;
-      spouse.matchScore = 0;
-      spouse.divorceRequested = false;
-      spouse.divorcePending = false;
-    }
-    const partnerMajia = spouse ? spouse.majia : null;
-    data.matches = (data.matches || []).filter(m => !m.includes(me.majia) && !(partnerMajia && m.includes(partnerMajia)));
-    await ZMD.save(data, `${me.majia} 解除舞伴`);
+    addLog(data, me.majia, '单方强制解除舞伴', -cost);
+    const spouse = data.players[me.partner];
+    doRelease(data, me, spouse);
+    await ZMD.save(data, `${me.majia} 单方强制解除舞伴`);
     toast(`已扣除 ${cost} 灵石，红线已断`, 'success');
+    refresh(true);
+  }
+
+  // 解除关系的公共清理
+  function doRelease(data, me, spouse) {
+    me.partner = null; me.status = 'registered';
+    me.myConfirmed = false; me.deposit = 0; me.matchScore = 0;
+    me.divorceRequested = false;
+    if (spouse) {
+      spouse.partner = null; spouse.status = 'registered';
+      spouse.myConfirmed = false; spouse.deposit = 0; spouse.matchScore = 0;
+      spouse.divorceRequested = false;
+    }
+    const pm = spouse ? spouse.majia : null;
+    data.matches = (data.matches || []).filter(m => !m.includes(me.majia) && !(pm && m.includes(pm)));
+  }
+
+  // 切换公开身份
+  async function togglePublic() {
+    const data = await ZMD.load();
+    const me = data.players[myMajia];
+    if (!me) return;
+    me.public = !me.public;
+    await ZMD.save(data, `${me.majia} ${me.public ? '公开' : '匿名'}身份`);
+    toast(me.public ? '已公开身份，大屏将显示你的名字' : '已匿名，大屏将隐藏你的名字', 'success');
     refresh(true);
   }
 
@@ -675,6 +783,7 @@
 
     me.balance -= val;
     me.deposit = (me.deposit || 0) + val;
+    addLog(data, me.majia, `投入灵石(任务共池)`, -val);
     const spouse = data.players[me.partner];
     const pool = (me.deposit || 0) + (spouse ? (spouse.deposit || 0) : 0);
 
@@ -741,8 +850,14 @@
 
     $('confirmBtn').addEventListener('click', () =>
       confirmBox('确认舞伴', `扣除 ${C.costs.confirm} 灵石，双方都确认后舞伴关系正式确立`, confirmPartner));
-    $('releaseBtn').addEventListener('click', () =>
-      confirmBox('解除舞伴', `扣除 ${C.costs.release} 灵石，舞伴关系立即解除（已投入灵石不退）`, releasePartner));
+    $('applyReleaseBtn').addEventListener('click', () =>
+      confirmBox('申请解除', `向对方递交解除申请，对方同意后双方各扣 ${C.costs.release} 灵石`, applyRelease));
+    $('cancelApplyBtn').addEventListener('click', cancelApplyRelease);
+    $('agreeReleaseBtn').addEventListener('click', () =>
+      confirmBox('同意解除', `将扣除你与对方各 ${C.costs.release} 灵石，舞伴关系立即解除`, agreeRelease));
+    $('forceReleaseBtn').addEventListener('click', () =>
+      confirmBox('单方强制解除', `扣除 ${C.costs.forceRelease} 灵石，无需对方同意即可立即解除`, forceRelease));
+    $('publicToggleBtn').addEventListener('click', togglePublic);
     $('depositBtn').addEventListener('click', depositStones);
     $('depositInput').addEventListener('keydown', e => {
       if (e.key === 'Enter') depositStones();
