@@ -1,0 +1,309 @@
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg: #0f0a1e;
+  --bg2: #1a0f2e;
+  --gold: #f5c542;
+  --gold2: #e0a800;
+  --purple: #7c3aed;
+  --purple-light: #a855f7;
+  --pink: #ec4899;
+  --red: #ef4444;
+  --green: #22c55e;
+  --text: #f0e6ff;
+  --text-dim: #b8a9d4;
+  --card: rgba(255,255,255,0.06);
+  --border: rgba(245,197,66,0.25);
+}
+
+html, body {
+  height: 100%;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+.page { display: none; min-height: 100vh; }
+.page.active { display: block; }
+
+/* ========== 登录页 ========== */
+#loginPage {
+  background: radial-gradient(ellipse at top, #2d1b4e 0%, var(--bg) 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.login-bg {
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(124,58,237,0.15), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(236,72,153,0.12), transparent 40%);
+  pointer-events: none;
+}
+.login-card {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 24px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  text-align: center;
+}
+.logo { font-size: 56px; margin-bottom: 8px; }
+.title {
+  font-size: 30px; font-weight: 800;
+  background: linear-gradient(135deg, var(--gold), var(--pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 2px;
+}
+.subtitle { color: var(--text-dim); font-size: 14px; margin: 6px 0 28px; }
+
+.form-group { text-align: left; margin-bottom: 20px; }
+.form-group label { display: block; font-size: 13px; color: var(--gold); margin-bottom: 6px; font-weight: 600; }
+.form-group input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 16px;
+  outline: none;
+  transition: border-color .2s;
+}
+.form-group input:focus { border-color: var(--gold); }
+.form-group input[readonly] { color: var(--text-dim); }
+.hint { display: block; font-size: 12px; color: var(--text-dim); margin-top: 6px; }
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .1s, opacity .2s;
+  font-family: inherit;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  color: white;
+  box-shadow: 0 6px 20px rgba(124,58,237,0.4);
+}
+.btn-lg { padding: 16px; font-size: 18px; }
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  margin-top: 12px;
+}
+.btn-danger {
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+  color: white;
+}
+.btn-lock {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: white;
+}
+.btn-divorce {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+}
+.btn-force {
+  background: linear-gradient(135deg, #dc2626, #7f1d1d);
+  color: white;
+}
+
+.rules-mini { margin-top: 24px; font-size: 12px; color: var(--text-dim); line-height: 1.8; }
+
+/* ========== 游戏页 ========== */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: rgba(0,0,0,0.4);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+.topbar-left { display: flex; align-items: center; gap: 8px; }
+.mask-icon { font-size: 20px; }
+.user-majia { font-weight: 700; color: var(--gold); font-size: 17px; }
+.topbar-right { display: flex; gap: 14px; font-size: 14px; }
+.balance { color: var(--gold); font-weight: 700; }
+.online { color: var(--text-dim); }
+
+.content { padding: 20px 16px; max-width: 480px; margin: 0 auto; }
+.state-panel { display: none; text-align: center; padding: 20px 0; }
+.state-panel.active { display: block; animation: fadeIn .3s; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.big-emoji { font-size: 72px; margin-bottom: 16px; }
+.state-panel h2 { font-size: 24px; margin-bottom: 12px; color: var(--text); }
+.desc { color: var(--text-dim); font-size: 14px; line-height: 1.8; margin-bottom: 24px; }
+.desc b { color: var(--gold); }
+
+/* 排队 */
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid rgba(245,197,66,0.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  margin: 24px auto;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* 骰子 */
+.partner-bar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 20px;
+  font-size: 15px;
+}
+.partner-name { color: var(--gold); font-weight: 700; }
+.dice-arena {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 28px 0;
+}
+.dice-side { text-align: center; }
+.dice-label { font-size: 13px; color: var(--text-dim); margin-bottom: 8px; }
+.dice {
+  width: 80px; height: 80px;
+  background: linear-gradient(135deg, #fff, #e5e7eb);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  font-weight: 900;
+  color: #1a0f2e;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.dice.rolling { animation: diceRoll .6s ease-in-out; }
+@keyframes diceRoll {
+  0% { transform: rotate(0) scale(1); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+.vs { color: var(--gold); font-weight: 900; font-size: 18px; }
+.roll-status { color: var(--text-dim); margin: 16px 0; font-size: 14px; }
+
+/* 选择 */
+.result-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.result-title { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+.dice-mini { display: flex; justify-content: space-around; font-size: 18px; }
+.dice-mini b { color: var(--gold); font-size: 26px; display: block; margin-top: 4px; }
+.choice-btns { display: flex; gap: 12px; margin: 24px 0; }
+.choice-btns .btn { flex: 1; }
+.waiting { color: var(--gold); font-size: 14px; }
+
+/* 婚配 */
+.couple-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 20px 0;
+}
+.couple-name {
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.heart { color: var(--red); animation: beat 1s infinite; }
+@keyframes beat { 0%,100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+.couple-status { margin-top: 12px; color: var(--text-dim); font-size: 14px; }
+.couple-status.locked { color: var(--green); font-weight: 700; }
+
+.marriage-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+}
+.marriage-actions .btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+}
+.act-title { font-size: 16px; }
+.act-cost { font-size: 14px; opacity: 0.9; }
+.warn-tip { color: var(--gold); font-size: 13px; margin-top: 12px; min-height: 18px; }
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.modal-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+}
+.modal-card-wide { max-width: 420px; text-align: left; }
+.modal-card h3 { color: var(--gold); margin-bottom: 16px; font-size: 20px; }
+.modal-card p { color: var(--text-dim); line-height: 1.7; font-size: 14px; }
+.modal-btns { display: flex; gap: 12px; margin-top: 24px; }
+.modal-btns .btn { flex: 1; }
+.rules-body { max-height: 60vh; overflow-y: auto; }
+.rules-body p { margin-bottom: 8px; }
+.rules-body b { color: var(--gold); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: rgba(0,0,0,0.9);
+  border: 1px solid var(--gold);
+  color: var(--text);
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  z-index: 200;
+  transition: transform .3s;
+  max-width: 90%;
+  text-align: center;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.error { border-color: var(--red); }
+.toast.success { border-color: var(--green); }
