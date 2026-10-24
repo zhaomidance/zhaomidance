@@ -156,42 +156,31 @@ body::after {
   display: flex; flex-direction: column; gap: 22px;
 }
 
-/* 阶段横幅 */
+/* 阶段横幅（极致压缩） */
 .stage-banner {
   position: relative; text-align: center;
-  padding: 22px 18px 18px;
-  border-radius: 22px;
+  padding: 10px 14px;
+  border-radius: 12px;
   background:
-    linear-gradient(180deg, rgba(139,92,246,.16), rgba(157,23,77,.08) 60%, transparent),
+    linear-gradient(180deg, rgba(139,92,246,.14), rgba(157,23,77,.06) 60%, transparent),
     rgba(255,255,255,.02);
   border: 1px solid var(--line);
-  box-shadow: 0 20px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.07);
+  box-shadow: 0 6px 18px rgba(0,0,0,.3);
   overflow: hidden;
 }
-.stage-banner::after {
-  content: '';
-  position: absolute; inset: 8px; border-radius: 16px;
-  border: 1px solid rgba(232,198,106,.12);
-  pointer-events: none;
-}
+.stage-banner::after { display: none; }
 .stage-kicker {
-  font-size: 11px; letter-spacing: 5px; color: var(--gold-soft); opacity: .8;
-  text-transform: uppercase;
+  font-size: 10px; letter-spacing: 2px; color: var(--gold-soft); opacity: .7;
 }
 .stage-title {
   font-family: var(--serif);
-  font-size: 34px; font-weight: 900; letter-spacing: 8px;
-  margin: 12px 0 8px;
+  font-size: 20px; font-weight: 900; letter-spacing: 4px;
+  margin: 3px 0 2px;
   background: linear-gradient(120deg, #fff6da, var(--gold) 50%, #b98a2e);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 40px rgba(232,198,106,.25);
 }
-.stage-desc { font-size: 13px; color: var(--text-dim); letter-spacing: 1px; line-height: 1.8; }
-.stage-orn {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  margin-top: 16px; color: var(--gold); opacity: .6; font-size: 11px;
-}
-.stage-orn span.line { width: 56px; height: 1px; background: linear-gradient(90deg, transparent, var(--line), transparent); }
+.stage-desc { font-size: 10px; color: var(--text-dim); letter-spacing: 0; line-height: 1.4; }
+.stage-orn { display: none; }
 
 /* 统计条（极致压缩，一行扁平横条） */
 .stats {
@@ -560,13 +549,31 @@ body::after {
   box-shadow: 0 8px 22px rgba(232,198,106,.3);
 }
 
-/* 报名弹窗紧凑排布，避免小屏需要长距离滚动 */
-#registerModal .modal-card { padding: 22px 20px; }
-#registerModal .modal-sub { margin: 6px 0 14px; }
-#registerModal .form-group { margin-bottom: 12px; }
-#registerModal .form-group input, #registerModal .form-group textarea { padding: 10px 12px; }
-#registerModal .form-group textarea { min-height: 52px; }
-#registerModal .modal-rules { margin-top: 12px; padding-top: 10px; }
+/* 报名弹窗极致紧凑 */
+#registerModal .modal-card { padding: 16px 16px; max-width: 360px; }
+#registerModal .modal-title { font-size: 18px; letter-spacing: 3px; margin-bottom: 10px; }
+#registerModal .form-group { margin-bottom: 9px; }
+#registerModal .form-group label { font-size: 11px; letter-spacing: 1px; margin-bottom: 4px; }
+#registerModal .form-group input,
+#registerModal .form-group textarea { padding: 8px 10px; font-size: 13px; }
+#registerModal .form-group textarea { min-height: 42px; }
+#registerModal .modal-rules { margin-top: 8px; padding-top: 6px; font-size: 10px; line-height: 1.6; }
+
+/* QQ 获取行 */
+.qq-fetch-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 8px 10px; margin-bottom: 10px;
+  border-radius: 10px;
+  background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.1);
+}
+.btn-qq {
+  border: 1px solid rgba(232,198,106,.5); color: var(--gold-soft);
+  background: rgba(232,198,106,.08); padding: 7px 12px; font-size: 12px;
+}
+.btn-qq:hover:not(:disabled) { background: rgba(232,198,106,.2); }
+.btn-qq:disabled { opacity: .85; cursor: default; }
+.qq-state { font-size: 11px; color: var(--text-dim); }
+.qq-state[style*="var(--green)"] { color: var(--green); }
 .section-title {
   font-family: var(--serif); font-size: 13px; letter-spacing: 2px;
   color: var(--gold-soft); margin: 14px 0 6px;

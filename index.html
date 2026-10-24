@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>蒙面舞会 · 婚配玩法</title>
-<link rel="stylesheet" href="style.css?v=20261024c">
+<link rel="stylesheet" href="style.css?v=20261024d">
 </head>
 <body>
 
@@ -36,7 +36,6 @@
       <div class="stage-kicker">Masked Ball · <span id="roundText">第 1 轮</span></div>
       <h1 class="stage-title" id="stageTitle">报 名 中</h1>
       <p class="stage-desc" id="stageDesc">舞会序幕已拉开，静候各位戴上面具入场</p>
-      <div class="stage-orn"><span class="line"></span><span>✦</span><span class="line"></span></div>
     </section>
 
     <!-- 统计 -->
@@ -144,15 +143,14 @@
 <div class="modal" id="registerModal">
   <div class="modal-card">
     <button class="modal-close" id="closeRegister">✕</button>
-    <div class="modal-mask">🎭</div>
     <div class="modal-title">入 场 券</div>
-    <p class="modal-sub">戴上假面 · 以名相认 · 不问来处</p>
 
-    <div class="form-group">
-      <label>QQ 号</label>
-      <input type="text" id="qqInput" placeholder="正在自动获取 QQ 号..." readonly>
-      <span class="hint" id="qqHint">如未自动获取，请手动填写</span>
+    <!-- QQ 获取：按钮 + 状态行，无输入框 -->
+    <div class="qq-fetch-row" id="qqFetchRow">
+      <button class="btn btn-ghost btn-sm btn-qq" id="fetchQqBtn">🔍 点击自动获取 QQ 号</button>
+      <span class="qq-state" id="qqState">未获取</span>
     </div>
+
     <div class="form-group">
       <label>群内二字马甲</label>
       <input type="text" id="majiaInput" placeholder="请输入两个字的马甲" maxlength="2" autocomplete="off">
@@ -166,13 +164,11 @@
     </div>
     <div class="form-group">
       <label>许愿对象 <span class="opt">（选填）</span></label>
-      <textarea id="wishInput" maxlength="40" placeholder="你希望遇见怎样的舞伴？如：温柔、幽默、会唱歌"></textarea>
-      <span class="hint">系统会参考你的许愿为你牵引红线</span>
+      <textarea id="wishInput" maxlength="40" placeholder="你希望遇见怎样的舞伴？"></textarea>
     </div>
     <div class="form-group">
       <label>我的模样 <span class="opt">（选填）</span></label>
-      <textarea id="aboutInput" maxlength="40" placeholder="用几个词描述自己，如：安静、爱看书、慢热"></textarea>
-      <span class="hint">让别人许愿时能认出你</span>
+      <textarea id="aboutInput" maxlength="40" placeholder="用几个词描述自己"></textarea>
     </div>
 
     <button class="btn btn-gold btn-block" id="registerBtn">缴纳 999 灵石 · 入场</button>
@@ -281,12 +277,32 @@
     return null;
   }
   function fillQQ(qq) {
-    $('qqInput').value = qq;
-    $('qqInput').setAttribute('readonly', 'readonly');
     localStorage.setItem('zmd_qq', qq);
     myQQ = qq;
-    $('qqHint').textContent = '已自动获取 QQ 号';
-    $('qqHint').style.color = 'var(--green)';
+    // 同时更新弹窗里的按钮/状态（如果已打开）
+    const btn = $('fetchQqBtn'), state = $('qqState');
+    if (btn) { btn.textContent = '✅ 已获取：' + qq; btn.disabled = true; }
+    if (state) { state.textContent = '已获取'; state.style.color = 'var(--green)'; }
+  }
+
+  // 弹窗里手动点按钮获取（含超时兜底）
+  function fetchQqFromBtn() {
+    const btn = $('fetchQqBtn'), state = $('qqState');
+    btn.disabled = true;
+    btn.textContent = '🔄 正在获取...';
+    state.textContent = '识别 QQ 桥接中';
+    state.style.color = '';
+    const direct = detectQQ();
+    if (direct) { fillQQ(direct); return; }
+    // 异步桥接回调
+    setTimeout(() => {
+      if (myQQ) return; // 已被回调填上
+      btn.disabled = false;
+      btn.textContent = '🔍 点击自动获取 QQ 号';
+      state.textContent = '获取失败，请确认在 QQ 内打开';
+      state.style.color = 'var(--red)';
+      toast('未能自动获取 QQ，请确认在 QQ 内打开或稍后重试', 'error');
+    }, 2500);
   }
 
   // ===== 大屏渲染 =====
@@ -442,16 +458,15 @@
 
   // ===== 报名 =====
   async function register() {
-    const qq = $('qqInput').value.trim();
+    const qq = myQQ;
     const majia = $('majiaInput').value.trim();
     const wish = $('wishInput').value.trim();
     const about = $('aboutInput').value.trim();
 
-    if (!qq || !/^\d{5,12}$/.test(qq)) { toast('QQ号格式不正确', 'error'); return; }
+    if (!qq || !/^\d{5,12}$/.test(qq)) { toast('请先点击按钮获取 QQ 号', 'error'); return; }
     if (!majia || majia.length !== 2) { toast('马甲必须是两个字', 'error'); return; }
     if (!chosenGender) { toast('请选择性别', 'error'); return; }
 
-    myQQ = qq;
     localStorage.setItem('zmd_qq', qq);
     localStorage.setItem('zmd_majia', majia);
 
@@ -566,13 +581,23 @@
       });
     });
 
+    $('fetchQqBtn').addEventListener('click', fetchQqFromBtn);
+
     $('openRegisterBtn').addEventListener('click', () => {
-      // 点报名时再试一次自动抓 QQ（bridge 可能在 init 之后才 ready）
-      if (!myQQ) {
+      // 弹窗前先同步一下按钮状态
+      if (myQQ) {
+        $('fetchQqBtn').textContent = '✅ 已获取：' + myQQ;
+        $('fetchQqBtn').disabled = true;
+        $('qqState').textContent = '已获取';
+        $('qqState').style.color = 'var(--green)';
+      } else {
+        $('fetchQqBtn').textContent = '🔍 点击自动获取 QQ 号';
+        $('fetchQqBtn').disabled = false;
+        $('qqState').textContent = '未获取';
+        $('qqState').style.color = '';
+        // 弹窗内补抓一次（bridge 可能 init 后才 ready）
         const retry = detectQQ();
-        if (retry) { fillQQ(retry); }
-        // 同时重新锁回 readonly
-        if (myQQ) $('qqInput').setAttribute('readonly', 'readonly');
+        if (retry) fillQQ(retry);
       }
       const me = myPlayer;
       if (me) {
@@ -620,14 +645,12 @@
     // 大屏自动刷新
     setInterval(() => refresh(false), 20000);
 
+    // 首次进入自动尝试一次抓 QQ
     const qq = detectQQ();
     if (qq) {
       fillQQ(qq);
       const savedMajia = localStorage.getItem('zmd_majia');
       if (savedMajia) $('majiaInput').value = savedMajia;
-    } else {
-      $('qqInput').removeAttribute('readonly');
-      $('qqInput').placeholder = '请输入你的 QQ 号';
     }
     refresh(false);
   }
