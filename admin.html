@@ -250,6 +250,7 @@
 
   // ===== 系统缘分匹配（参考许愿偏好，非骰子） =====
   async function startMatch() {
+    data = await ZMD.load(true);
     const waiting = Object.values(data.players).filter(p => p.status === 'registered');
     const males = waiting.filter(p => p.gender === 'male');
     const females = waiting.filter(p => p.gender === 'female');
