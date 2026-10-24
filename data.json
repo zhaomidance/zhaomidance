@@ -21,11 +21,11 @@
       "wish": "温柔体贴",
       "about": "沉稳",
       "balance": 9001,
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "乙乙",
       "myConfirmed": false,
       "deposit": 0,
-      "matchScore": 0,
+      "matchScore": 3,
       "registeredAt": 1792853105561
     },
     "乙乙": {
@@ -35,17 +35,22 @@
       "wish": "成熟稳重",
       "about": "温柔",
       "balance": 9001,
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "甲甲",
       "myConfirmed": false,
       "deposit": 0,
-      "matchScore": 0,
+      "matchScore": 3,
       "registeredAt": 1792853162761
     }
   },
-  "matches": [],
+  "matches": [
+    [
+      "甲甲",
+      "乙乙"
+    ]
+  ],
   "round": 1,
-  "stage": "registering",
+  "stage": "round1",
   "tasks": [
     {
       "id": 1,
