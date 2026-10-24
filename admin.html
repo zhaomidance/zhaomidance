@@ -66,7 +66,7 @@
         <div class="stat-num" id="statMatched">0</div>
         <div class="stat-label">今夜佳偶</div>
       </div>
-      <button class="btn btn-gold btn-match" id="matchBtn">🌹 系统缘分匹配</button>
+      <button class="btn btn-gold btn-match" id="matchBtn">🌹 系统匹配</button>
       <button class="btn btn-ghost" id="newRoundBtn">🔄 新一轮</button>
     </div>
 
@@ -83,25 +83,25 @@
       <div class="wl-list" id="wlList"></div>
     </div>
 
-    <!-- 玩家列表 -->
-    <h2 class="section-title">📋 已报名舞宾</h2>
+    <!-- 待匹配玩家列表 -->
+    <h2 class="section-title">📋 待匹配舞宾</h2>
     <div class="table-wrap">
       <table class="data-table" id="playersTable">
         <thead>
           <tr>
-            <th>马甲</th><th>门票</th><th>性别</th><th>灵石</th><th>已投入</th><th>状态</th><th>舞伴</th><th>许愿</th><th>自述</th><th>操作</th>
+            <th>马甲</th><th>性别</th><th>状态</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
 
-    <!-- 配对列表 -->
-    <h2 class="section-title">💑 婚配列表</h2>
+    <!-- 结伴列表 -->
+    <h2 class="section-title">💑 结伴舞宾</h2>
     <div class="table-wrap">
       <table class="data-table" id="matchesTable">
         <thead>
-          <tr><th>马甲A</th><th>马甲B</th><th>缘分</th><th>确认</th><th>共池灵石</th><th>操作</th></tr>
+          <tr><th>马甲A</th><th>马甲B</th><th>确认</th><th>共池灵石</th><th>操作</th></tr>
         </thead>
         <tbody></tbody>
       </table>
@@ -302,28 +302,19 @@
   function renderPlayers() {
     const tbody = $('playersTable').querySelector('tbody');
     tbody.innerHTML = '';
-    const players = Object.values(data.players || {}).sort((a,b) => (b.registeredAt||0) - (a.registeredAt||0));
+    const players = Object.values(data.players || {})
+      .filter(p => p.status === 'registered')
+      .sort((a,b) => (b.registeredAt||0) - (a.registeredAt||0));
     for (const p of players) {
-      const spouse = p.partner ? data.players[p.partner] : null;
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td><b>${esc(p.majia)}</b></td>
-        <td>${esc(p.ticket)}</td>
         <td>${genderText(p)}</td>
-        <td>${p.balance} 💎</td>
-        <td>${p.deposit || 0} 💎</td>
-        <td>${statusText(p)}</td>
-        <td>${spouse ? esc(spouse.majia) : '-'}</td>
-        <td>${esc(p.wish) || '<span style="opacity:.4">-</span>'}</td>
-        <td>${esc(p.about) || '<span style="opacity:.4">-</span>'}</td>
-        <td>
-          <button class="mini-btn" onclick="window._adjBal('${esc(p.majia)}')">调灵石</button>
-          <button class="mini-btn danger" onclick="window._delPlayer('${esc(p.majia)}')">删除</button>
-        </td>`;
+        <td>${statusText(p)}</td>`;
       tbody.appendChild(tr);
     }
     if (!players.length) {
-      tbody.innerHTML = '<tr><td colspan="10" class="table-empty">🌙 今夜尚无人入场，静候嘉宾</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="3" class="table-empty">🌙 暂无待匹配舞宾</td></tr>';
     }
   }
 
@@ -344,14 +335,13 @@
       tr.innerHTML = `
         <td>${esc(p.majia)}</td>
         <td>${esc(spouse.majia)}</td>
-        <td>${p.matchScore || 0}</td>
         <td>${confirmed ? '✅ 双方已确认' : (p.myConfirmed ? '⏳ 一方已确认' : '❌ 未确认')}</td>
         <td>${pool} 💎</td>
         <td><button class="mini-btn danger" onclick="window._forceDivorce('${esc(p.majia)}','${esc(spouse.majia)}')">强制解除</button></td>`;
       tbody.appendChild(tr);
     }
     if (!tbody.children.length) {
-      tbody.innerHTML = '<tr><td colspan="6" class="table-empty">🥀 今夜尚无佳偶</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="table-empty">🥀 暂无结伴舞宾</td></tr>';
     }
   }
 
@@ -377,7 +367,7 @@
     }
   }
 
-  // ===== 系统缘分匹配 =====
+  // ===== 系统匹配 =====
   async function startMatch() {
     data = await ZMD.load(true);
     const waiting = Object.values(data.players).filter(p => p.status === 'registered');
@@ -391,7 +381,7 @@
     if (!confirm(`男宾 ${males.length} 人 / 女宾 ${females.length} 人\n系统将参考许愿偏好配对 ${n} 对，确定？`)) return;
 
     const pairs = ZMD.fateMatch(males, females);
-    let msg = '缘分匹配结果：\n';
+    let msg = '匹配结果：\n';
     for (const pr of pairs) {
       const a = pr.a, b = pr.b;
       a.status = 'matched'; b.status = 'matched';
@@ -401,7 +391,7 @@
       a.matchScore = pr.score; b.matchScore = pr.score;
       if (!data.matches) data.matches = [];
       data.matches.push([a.majia, b.majia]);
-      msg += `${a.majia} ❤ ${b.majia}（缘分 ${pr.score}）\n`;
+      msg += `${a.majia} ❤ ${b.majia}\n`;
     }
     const usedM = new Set(pairs.map(p => p.a.majia));
     const usedF = new Set(pairs.map(p => p.b.majia));
@@ -409,7 +399,7 @@
     females.filter(p => !usedF.has(p.majia)).forEach(p => { msg += `${p.majia}（女宾）轮空\n`; });
 
     data.stage = nextStage(data.stage || 'registering');
-    await ZMD.save(data, `系统缘分匹配，生成${pairs.length}对`);
+    await ZMD.save(data, `系统匹配，生成${pairs.length}对`);
     alert(msg);
     refresh();
   }

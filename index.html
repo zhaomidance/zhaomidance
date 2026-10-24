@@ -96,7 +96,7 @@
             <span class="heart">❤</span>
             <span id="spouseName">-</span>
           </div>
-          <div class="bond" id="myBond">缘分牵引 · 今夜共舞</div>
+          <div class="bond" id="myBond">红线牵引 · 今夜共舞</div>
         </div>
 
         <div class="marriage-actions">
@@ -326,7 +326,7 @@
       card.className = 'couple-card' + (isConfirmed ? ' locked' : '');
       const bondText = isConfirmed
         ? '💍 舞伴已确认 · 共池 ' + pool + ' 灵石'
-        : '🌙 红线初系 · 缘分 ' + (p.matchScore || 0);
+        : '🌙 红线初系 · 今夜共舞';
       card.innerHTML = `
         <div class="couple-names">
           ${p.majia}<span class="heart">❤</span>${spouse.majia}
@@ -341,7 +341,7 @@
     }
     $('coupleCount').textContent = coupleCount;
     if (!coupleCount) {
-      grid.innerHTML = '<div class="empty-tip">🌙 今夜尚无佳偶<br>静待红娘摇铃，缘分自来</div>';
+      grid.innerHTML = '<div class="empty-tip">🌙 今夜尚无佳偶<br>静待红娘摇铃，佳偶自来</div>';
     }
 
     // 任务板
@@ -409,7 +409,7 @@
         const myDone = !!me.myConfirmed;
         $('lockStatus').textContent = myDone ? '你已确认，等待对方确认…' : '尚未确认舞伴';
         $('lockStatus').style.color = myDone ? 'var(--gold-soft)' : '';
-        $('myBond').textContent = '缘分牵引 · 今夜共舞（缘分 ' + (me.matchScore || 0) + '）';
+        $('myBond').textContent = '红线牵引 · 今夜共舞';
         $('confirmBtn').disabled = myDone;
         $('confirmBtn').querySelector('.act-title').textContent = myDone ? '⏳ 等待对方确认' : '💍 确认舞伴';
       }
@@ -591,7 +591,7 @@
         item.claimed = true;
         item.claimedAt = Date.now();
         await ZMD.save(data, `新舞宾入场: ${majia}`);
-        toast('入场成功！面具之下，缘分已启', 'success');
+        toast('入场成功！面具之下，静候红线', 'success');
       }
       myMajia = majia;
       myTicket = ticket;
