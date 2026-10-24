@@ -9,7 +9,8 @@
     {
       "majia": "新郎",
       "ticket": "999",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1792856857616
     }
   ],
   "players": {
@@ -26,6 +27,20 @@
       "deposit": 0,
       "matchScore": 0,
       "registeredAt": 1792856742180
+    },
+    "新郎": {
+      "majia": "新郎",
+      "ticket": "999",
+      "gender": "male",
+      "wish": "温柔",
+      "about": "帅气",
+      "balance": 9001,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "matchScore": 0,
+      "registeredAt": 1792856857616
     }
   },
   "matches": [],
