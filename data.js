@@ -7,9 +7,12 @@ const ZMD = (function () {
   let cache = null;
   let cacheSha = null;
   let cacheTime = 0;
+  let lastWrite = 0;
 
   // 读取数据
   async function load(force) {
+    // 刚写入后优先用本地最新数据，避免读到 GitHub 的旧缓存
+    if (lastWrite && Date.now() - lastWrite < 5000) return cache;
     if (!force && cache && Date.now() - cacheTime < 10000) return cache;
     const res = await fetch(API, {
       headers: {
@@ -51,6 +54,7 @@ const ZMD = (function () {
     cacheSha = json.content.sha;
     cache = data;
     cacheTime = Date.now();
+    lastWrite = Date.now();
     return data;
   }
 
