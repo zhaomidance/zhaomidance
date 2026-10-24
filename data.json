@@ -21,12 +21,14 @@
       "wish": "温柔体贴",
       "about": "沉稳",
       "balance": 7687,
-      "status": "confirmed",
-      "partner": "乙乙",
-      "myConfirmed": true,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
       "deposit": 0,
-      "matchScore": 3,
-      "registeredAt": 1792853105561
+      "matchScore": 0,
+      "registeredAt": 1792853105561,
+      "divorceRequested": false,
+      "divorcePending": false
     },
     "乙乙": {
       "majia": "乙乙",
@@ -34,21 +36,18 @@
       "gender": "female",
       "wish": "成熟稳重",
       "about": "温柔",
-      "balance": 6487,
-      "status": "confirmed",
-      "partner": "甲甲",
-      "myConfirmed": true,
-      "deposit": 1200,
-      "matchScore": 3,
-      "registeredAt": 1792853162761
+      "balance": 5376,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "matchScore": 0,
+      "registeredAt": 1792853162761,
+      "divorceRequested": false,
+      "divorcePending": false
     }
   },
-  "matches": [
-    [
-      "甲甲",
-      "乙乙"
-    ]
-  ],
+  "matches": [],
   "round": 1,
   "stage": "round1",
   "tasks": [
