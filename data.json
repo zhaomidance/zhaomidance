@@ -9,7 +9,8 @@
     {
       "majia": "女二",
       "ticket": "666",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1792861346953
     },
     {
       "majia": "女三",
@@ -51,6 +52,20 @@
       "deposit": 0,
       "matchScore": 0,
       "registeredAt": 1792861318396
+    },
+    "女二": {
+      "majia": "女二",
+      "ticket": "666",
+      "gender": "female",
+      "wish": "",
+      "about": "",
+      "balance": 9001,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "matchScore": 0,
+      "registeredAt": 1792861346953
     }
   },
   "matches": [],
@@ -92,6 +107,13 @@
     {
       "time": "2026-10-24T17:01:58.396Z",
       "actor": "女一",
+      "action": "报名入场",
+      "amount": -999,
+      "balance": 9001
+    },
+    {
+      "time": "2026-10-24T17:02:26.953Z",
+      "actor": "女二",
       "action": "报名入场",
       "amount": -999,
       "balance": 9001
