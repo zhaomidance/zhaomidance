@@ -11,7 +11,7 @@ window.ZMD_CONFIG = {
   // 拆分存储以避免被 GitHub 密钥扫描自动吊销
   token: 'ghp_' + 'P0fZwi0eI9yio6KFxsLCjbGkjpi3171GJof1',
   // 管理员密码（后台页面用）
-  adminPassword: 'zhaomidance2024',
+  adminPassword: 'dance520',
   // 游戏参数
   startBalance: 10000,
   costs: { register: 999, lock: 1314, divorce: 1111, forceUnbind: 5555 },

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>蒙面舞会 · 婚配玩法</title>
-<link rel="stylesheet" href="style.css?v=20261024b">
+<link rel="stylesheet" href="style.css?v=20261024c">
 </head>
 <body>
 
@@ -567,6 +567,13 @@
     });
 
     $('openRegisterBtn').addEventListener('click', () => {
+      // 点报名时再试一次自动抓 QQ（bridge 可能在 init 之后才 ready）
+      if (!myQQ) {
+        const retry = detectQQ();
+        if (retry) { fillQQ(retry); }
+        // 同时重新锁回 readonly
+        if (myQQ) $('qqInput').setAttribute('readonly', 'readonly');
+      }
       const me = myPlayer;
       if (me) {
         $('majiaInput').value = me.majia || '';
