@@ -34,10 +34,10 @@
       "gender": "male",
       "wish": "温柔",
       "about": "帅气",
-      "balance": 9001,
+      "balance": 7687,
       "status": "matched",
       "partner": "新娘",
-      "myConfirmed": false,
+      "myConfirmed": true,
       "deposit": 0,
       "matchScore": 6,
       "registeredAt": 1792856857616
