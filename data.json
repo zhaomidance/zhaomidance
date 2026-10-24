@@ -3,7 +3,8 @@
     {
       "majia": "甲甲",
       "ticket": "T001",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1792853105561
     },
     {
       "majia": "乙乙",
@@ -11,7 +12,22 @@
       "claimed": false
     }
   ],
-  "players": {},
+  "players": {
+    "甲甲": {
+      "majia": "甲甲",
+      "ticket": "T001",
+      "gender": "male",
+      "wish": "温柔体贴",
+      "about": "沉稳",
+      "balance": 9001,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "matchScore": 0,
+      "registeredAt": 1792853105561
+    }
+  },
   "matches": [],
   "round": 1,
   "stage": "registering",
