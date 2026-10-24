@@ -17,12 +17,6 @@
   "stage": "registering",
   "tasks": [
     {
-      "id": 2,
-      "title": "共舞一曲",
-      "unlock": 1200,
-      "done": false
-    },
-    {
       "id": 3,
       "title": "互相表白",
       "unlock": 2000,
