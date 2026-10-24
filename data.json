@@ -1,34 +1,7 @@
 {
-  "players": {
-    "111111111": {
-      "qq": "111111111",
-      "majia": "阿强",
-      "gender": "male",
-      "balance": 9001,
-      "status": "matched",
-      "partner": "222222222",
-      "locked": false,
-      "dice": 3,
-      "registeredAt": 1792822370304
-    },
-    "222222222": {
-      "qq": "222222222",
-      "majia": "小美",
-      "gender": "female",
-      "balance": 9001,
-      "status": "matched",
-      "partner": "111111111",
-      "locked": false,
-      "dice": 3,
-      "registeredAt": 1792822625262
-    }
-  },
-  "matches": [
-    [
-      "111111111",
-      "222222222"
-    ]
-  ],
+  "players": {},
+  "matches": [],
+  "round": 1,
   "tasks": [
     {
       "id": 1,
@@ -45,6 +18,5 @@
       "title": "互相表白",
       "done": false
     }
-  ],
-  "round": 1
+  ]
 }
