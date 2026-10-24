@@ -63,11 +63,6 @@ const ZMD = (function () {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   }
 
-  // 工具：骰子
-  function rollDice() {
-    return Math.floor(Math.random() * 6) + 1;
-  }
-
   // 工具：打乱数组
   function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -103,6 +98,7 @@ const ZMD = (function () {
   }
 
   // 全局缘分配对：所有男女组合按缘分分排序后贪心配对
+  // 以二字马甲作为玩家唯一主键
   function fateMatch(males, females) {
     const cand = [];
     for (const m of males) {
@@ -114,15 +110,15 @@ const ZMD = (function () {
     const usedM = new Set(), usedF = new Set();
     const pairs = [];
     for (const c of cand) {
-      if (usedM.has(c.m.qq) || usedF.has(c.f.qq)) continue;
-      usedM.add(c.m.qq); usedF.add(c.f.qq);
+      if (usedM.has(c.m.majia) || usedF.has(c.f.majia)) continue;
+      usedM.add(c.m.majia); usedF.add(c.f.majia);
       pairs.push({ a: c.m, b: c.f, score: affinity(c.m, c.f) });
     }
     return pairs;
   }
 
   return {
-    load, save, uid, rollDice, shuffle,
+    load, save, uid, shuffle,
     keywords, affinity, fateMatch,
     get config() { return C; }
   };

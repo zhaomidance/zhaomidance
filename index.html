@@ -4,12 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>蒙面舞会 · 婚配玩法</title>
-<link rel="stylesheet" href="style.css?v=20261024g">
+<link rel="stylesheet" href="style.css?v=20261025a">
 </head>
 <body>
 
 <span class="ambient-mask">🎭</span>
 <span class="ambient-mask left">🌹</span>
+<span class="ambient-orn feather">🪶</span>
+<span class="ambient-orn candle">🕯️</span>
 
 <div class="page active" id="mainPage">
 
@@ -25,15 +27,24 @@
       <span class="identity-pill" id="identityPill" style="display:none"></span>
       <span class="balance-pill" id="balancePill" style="display:none">💎 0</span>
       <button class="btn btn-gold btn-sm" id="openRegisterBtn">我要报名</button>
-      <button class="link-btn" id="logoutBtn" style="display:none">换号</button>
+      <button class="link-btn" id="logoutBtn" style="display:none">离场</button>
     </div>
   </header>
+
+  <!-- 舞会装饰带 -->
+  <div class="ball-strip">
+    <span>✦</span><span>🪶</span><span>🎭</span><span>🕯️</span><span>🌹</span><span>🍷</span><span>✦</span>
+  </div>
 
   <main class="app-main">
 
     <!-- 阶段横幅 -->
     <section class="stage-banner">
-      <div class="stage-kicker">Masked Ball · <span id="roundText">第 1 轮</span></div>
+      <span class="corner tl">❦</span>
+      <span class="corner tr">❦</span>
+      <span class="corner bl">❦</span>
+      <span class="corner br">❦</span>
+      <div class="stage-kicker">MASKED BALL · <span id="roundText">第 1 轮</span></div>
       <h1 class="stage-title" id="stageTitle">报 名 中</h1>
       <p class="stage-desc" id="stageDesc">舞会序幕已拉开，静候各位戴上面具入场</p>
     </section>
@@ -56,25 +67,29 @@
 
     <!-- 我的状态 -->
     <section class="my-card" id="myCard" style="display:none">
+
+      <!-- 待匹配 -->
       <div id="myWaiting">
         <div class="my-state-head">
           <span class="big-emoji">🕯️</span>
           <div>
             <h2>已入席，静候良人</h2>
-            <p>命运正在为你牵引红线，可随时离开，回来再看结果</p>
+            <p>烛火摇曳，命运正在为你牵引红线，可随时离席，回来再看结果</p>
           </div>
         </div>
         <div class="progress-track"><div class="progress-bar"></div></div>
       </div>
 
+      <!-- 已匹配 -->
       <div id="myMatched" style="display:none">
         <div class="my-state-head">
-          <span class="big-emoji">💍</span>
+          <span class="big-emoji" id="myStateEmoji">💍</span>
           <div>
-            <h2>良缘既定</h2>
-            <p id="lockStatus">红线未锁，尚可更换</p>
+            <h2 id="myStateTitle">红线已系</h2>
+            <p id="lockStatus">尚未确认舞伴</p>
           </div>
         </div>
+
         <div class="my-couple">
           <div class="names">
             <span id="myName">-</span>
@@ -83,21 +98,32 @@
           </div>
           <div class="bond" id="myBond">缘分牵引 · 今夜共舞</div>
         </div>
+
         <div class="marriage-actions">
-          <button class="act-btn lock" id="lockBtn">
-            <div class="act-title">🔒 锁定</div>
+          <button class="act-btn lock" id="confirmBtn">
+            <div class="act-title">💍 确认舞伴</div>
             <div class="act-cost">1314 💎</div>
           </button>
-          <button class="act-btn divorce" id="divorceBtn">
-            <div class="act-title">💔 离婚</div>
+          <button class="act-btn divorce" id="releaseBtn">
+            <div class="act-title">💔 解除舞伴</div>
             <div class="act-cost">1111 💎</div>
-          </button>
-          <button class="act-btn force" id="forceBtn">
-            <div class="act-title">⚡ 强解</div>
-            <div class="act-cost">5555 💎</div>
           </button>
         </div>
         <p class="warn-tip" id="marriageTip"></p>
+
+        <!-- 灵石共池 · 解锁任务 -->
+        <div class="deposit-box" id="depositBox">
+          <div class="deposit-head">
+            <span>🕯️ 灵石共池</span>
+            <span class="pool-amount">已投入 <b id="poolTotal">0</b> 灵石（双方合计）</span>
+          </div>
+          <div class="deposit-tip" id="depositTip"></div>
+          <div class="deposit-row" id="depositRow">
+            <input type="number" id="depositInput" placeholder="投入灵石数量" min="1">
+            <button class="btn btn-gold btn-sm" id="depositBtn">投入</button>
+          </div>
+          <ul class="pool-tasks" id="poolTasks"></ul>
+        </div>
       </div>
     </section>
 
@@ -143,47 +169,53 @@
 <div class="modal" id="registerModal">
   <div class="modal-card">
     <button class="modal-close" id="closeRegister">✕</button>
+
+    <div class="modal-mask">🎭</div>
     <div class="modal-title">入 场 券</div>
+    <div class="modal-sub">MASKED BALL ADMISSION</div>
 
-    <!-- 身份区：OAuth 为主，手动填 QQ 为降级 -->
-    <div id="authArea">
-      <!-- OAuth 模式（如果配置了 qqAppId） -->
-      <div class="qq-fetch-row oauth-row" id="oauthRow" style="display:none">
-        <button class="btn btn-gold btn-block btn-qq-oauth" id="qqOauthBtn">🔐 QQ 一键登录 · 自动获取身份</button>
+    <!-- 第一步：验票 -->
+    <div id="verifyStep">
+      <div class="verify-hint">凭「二字马甲 + 门票编号」核对身份，方可入场</div>
+      <div class="form-group">
+        <label>二 字 马 甲</label>
+        <input type="text" id="vMajia" placeholder="请输入两个字的马甲" maxlength="2" autocomplete="off">
       </div>
-      <!-- 手动填写（任何模式都可以用，作为降级） -->
-      <div class="qq-manual" id="qqManual">
-        <div class="form-group" style="margin-bottom:6px">
-          <label>手动填写身份 <span class="opt">(非 QQ 互联模式)</span></label>
-          <input type="text" id="qqManualInput" placeholder="请输入 QQ 号（5-12 位）" maxlength="12" autocomplete="off">
+      <div class="form-group">
+        <label>门 票 编 号</label>
+        <input type="text" id="vTicket" placeholder="请输入门票编号" maxlength="16" autocomplete="off">
+      </div>
+      <button class="btn btn-gold btn-block" id="verifyBtn">核 对 入 场 资 格</button>
+      <p class="verify-msg" id="verifyMsg"></p>
+    </div>
+
+    <!-- 第二步：报名信息 -->
+    <div id="infoStep" style="display:none">
+      <div class="verify-ok">
+        <span class="ok-icon">✓</span>
+        <span>身份核对成功：<b id="okMajia">-</b> · 门票 <b id="okTicket">-</b></span>
+      </div>
+      <div class="form-group">
+        <label>性别</label>
+        <div class="gender-select">
+          <button class="gender-btn" data-g="male">👦 男宾</button>
+          <button class="gender-btn" data-g="female">👧 女宾</button>
         </div>
-        <button class="btn btn-ghost btn-sm" id="qqManualBtn">确认使用</button>
       </div>
+      <div class="form-group">
+        <label>许愿对象 <span class="opt">（选填）</span></label>
+        <textarea id="wishInput" maxlength="40" placeholder="你希望遇见怎样的舞伴？"></textarea>
+      </div>
+      <div class="form-group">
+        <label>我的模样 <span class="opt">（选填）</span></label>
+        <textarea id="aboutInput" maxlength="40" placeholder="用几个词描述自己"></textarea>
+      </div>
+      <button class="btn btn-gold btn-block" id="registerBtn">缴纳 999 灵石 · 入场</button>
+      <button class="link-btn back-btn" id="backVerifyBtn">← 重新核对身份</button>
     </div>
 
-    <div class="form-group">
-      <label>群内二字马甲</label>
-      <input type="text" id="majiaInput" placeholder="请输入两个字的马甲" maxlength="2" autocomplete="off">
-    </div>
-    <div class="form-group">
-      <label>性别</label>
-      <div class="gender-select">
-        <button class="gender-btn" data-g="male">👦 男宾</button>
-        <button class="gender-btn" data-g="female">👧 女宾</button>
-      </div>
-    </div>
-    <div class="form-group">
-      <label>许愿对象 <span class="opt">（选填）</span></label>
-      <textarea id="wishInput" maxlength="40" placeholder="你希望遇见怎样的舞伴？"></textarea>
-    </div>
-    <div class="form-group">
-      <label>我的模样 <span class="opt">（选填）</span></label>
-      <textarea id="aboutInput" maxlength="40" placeholder="用几个词描述自己"></textarea>
-    </div>
-
-    <button class="btn btn-gold btn-block" id="registerBtn">缴纳 999 灵石 · 入场</button>
     <div class="modal-rules">
-      报名 999 · 锁定 1314 · 离婚 1111 · 强制解除 5555<br>
+      报名 999 · 确认舞伴 1314 · 解除舞伴 1111<br>
       灵石一经缴纳，除特殊说明外不退
     </div>
   </div>
@@ -201,16 +233,6 @@
   </div>
 </div>
 
-<!-- ============ OAuth 加载中 ============ -->
-<div class="modal" id="oauthLoading" style="display:none">
-  <div class="modal-card" style="text-align:center; padding:30px 24px">
-    <div style="font-size:36px;margin-bottom:12px">🎭</div>
-    <h3>正在连接 QQ 身份</h3>
-    <p style="color:var(--text-dim);margin-top:8px;font-size:13px">腾讯官方通道，安全无冒充</p>
-    <div id="oauthLoadErr" style="color:var(--red);margin-top:12px;display:none;font-size:12px"></div>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script src="config.js"></script>
@@ -221,20 +243,21 @@
   const C = ZMD.config;
 
   const STAGES = {
-    registering: { title: '报 名 中', desc: '舞会序幕已拉开，静候各位戴上面具入场', badge: '🔮 报名中' },
-    round1:      { title: '第一次匹配', desc: '第一缕目光交汇，红线初系', badge: '💫 第一次匹配' },
-    round2:      { title: '第二次匹配', desc: '心弦暗动，情愫暗生', badge: '💫 第二次匹配' },
-    final:       { title: '最终匹配', desc: '曲终人未散，命中注定的人已在灯火阑珊处', badge: '💍 最终匹配' }
+    registering: { title: '报 名 中', desc: '舞会序幕已拉开，静候各位戴上面具入场' },
+    round1:      { title: '第一次匹配', desc: '第一缕目光交汇，红线初系' },
+    round2:      { title: '第二次匹配', desc: '心弦暗动，情愫暗生' },
+    final:       { title: '最终匹配', desc: '曲终人未散，命中注定的人已在灯火阑珊处' }
   };
 
-  // 是否开启了 OAuth（qqAppId + vercelApiBase 都填了才算）
-  const OAUTH_ON = !!(C.qqAppId && C.vercelApiBase);
+  const K_MAJIA = 'zmd_majia';
+  const K_TICKET = 'zmd_ticket';
 
-  let myId = null;          // openid（OAuth 模式）或 QQ 号（手动模式），玩家唯一主键
-  let myNick = null;        // OAuth 模式下腾讯返回的昵称
-  let myAvatar = null;      // OAuth 模式下腾讯返回的头像
+  let myMajia = null;       // 玩家唯一主键（二字马甲）
+  let myTicket = null;      // 门票编号
   let myPlayer = null;
   let chosenGender = null;
+  let verifiedMajia = null;
+  let verifiedTicket = null;
   let toastTimer = null;
 
   function toast(msg, type) {
@@ -242,72 +265,10 @@
     t.textContent = msg;
     t.className = 'toast show' + (type ? ' ' + type : '');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.className = 'toast', 2600);
+    toastTimer = setTimeout(() => t.className = 'toast', 2800);
   }
   function openModal(id) { $(id).style.display = 'flex'; }
   function closeModal(id) { $(id).style.display = 'none'; }
-
-  // ===== OAuth：跳转腾讯登录 =====
-  function oauthRedirect() {
-    const redirect = location.origin + location.pathname;
-    const authUrl = 'https://graph.qq.com/oauth2.0/authorize'
-      + '?response_type=code'
-      + '&client_id=' + encodeURIComponent(C.qqAppId)
-      + '&redirect_uri=' + encodeURIComponent(redirect)
-      + '&scope=get_user_info'
-      + '&state=zmd'
-      + '&display=mobile';  // QQ 内打开时用 mobile 样式更好看
-    location.href = authUrl;
-  }
-
-  // ===== OAuth：回调处理（页面加载时如果 URL 带 code 就自动处理）=====
-  async function handleOauthCallback() {
-    const sp = new URLSearchParams(location.search);
-    const code = sp.get('code');
-    if (!code) return false;
-    if (sp.get('state') !== 'zmd') return false;
-
-    openModal('oauthLoading');
-    try {
-      const res = await fetch(C.vercelApiBase + '/oauth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
-      });
-      if (!res.ok) throw new Error('服务错误 ' + res.status);
-      const data = await res.json();
-      if (!data.openid) throw new Error('未获取到身份');
-
-      myId = data.openid;
-      myNick = data.nick || null;
-      myAvatar = data.avatar || null;
-      localStorage.setItem('zmd_id', myId);
-      if (myNick) localStorage.setItem('zmd_nick', myNick);
-      if (myAvatar) localStorage.setItem('zmd_avatar', myAvatar);
-
-      // 清理 URL（去掉 code，避免刷新重复触发）
-      const clean = location.origin + location.pathname;
-      history.replaceState({}, '', clean);
-
-      closeModal('oauthLoading');
-      toast('✅ QQ 身份已识别', 'success');
-
-      // 自动预填马甲（昵称截前2字）
-      if (myNick && myNick.length >= 2 && !$('majiaInput').value) {
-        $('majiaInput').value = myNick.slice(0, 2);
-      }
-      // 自动弹报名框（如果还没弹）
-      if (!$('registerModal').style.display || $('registerModal').style.display === 'none') {
-        $('openRegisterBtn').click();
-      }
-      refresh(true);
-      return true;
-    } catch (e) {
-      $('oauthLoadErr').style.display = '';
-      $('oauthLoadErr').textContent = '登录失败：' + e.message;
-      return false;
-    }
-  }
 
   // ===== 大屏渲染 =====
   function renderBoard(data) {
@@ -328,8 +289,8 @@
 
     const mChips = $('maleChips'), fChips = $('femaleChips');
     mChips.innerHTML = ''; fChips.innerHTML = '';
-    if (!males.length) mChips.innerHTML = '<span class="chip-empty">虚位以待…</span>';
-    if (!females.length) fChips.innerHTML = '<span class="chip-empty">虚位以待…</span>';
+    if (!males.length) mChips.innerHTML = '<span class="chip-empty">🕯️ 虚位以待…</span>';
+    if (!females.length) fChips.innerHTML = '<span class="chip-empty">🕯️ 虚位以待…</span>';
     males.forEach(p => {
       const c = document.createElement('span');
       c.className = 'chip male';
@@ -343,21 +304,29 @@
       fChips.appendChild(c);
     });
 
+    // 已匹配
     const grid = $('coupleGrid');
     grid.innerHTML = '';
     const seen = new Set();
     let coupleCount = 0;
+    let confirmedCount = 0;
     for (const key in data.players) {
       const p = data.players[key];
-      if (p.status !== 'matched' || !p.partner || seen.has(key)) continue;
+      if ((p.status !== 'matched' && p.status !== 'confirmed') || !p.partner || seen.has(key)) continue;
       const spouse = data.players[p.partner];
       if (!spouse) continue;
+      seen.add(key);
       seen.add(p.partner);
       coupleCount++;
+      const isConfirmed = p.status === 'confirmed' && spouse.status === 'confirmed';
+      if (isConfirmed) confirmedCount++;
 
+      const pool = (p.deposit || 0) + (spouse.deposit || 0);
       const card = document.createElement('div');
-      card.className = 'couple-card' + (p.locked ? ' locked' : '');
-      const bondText = p.locked ? '🔒 红线已锁 · 此情不换' : '今夜共舞 · 缘分 ' + (p.matchScore || 0);
+      card.className = 'couple-card' + (isConfirmed ? ' locked' : '');
+      const bondText = isConfirmed
+        ? '💍 舞伴已确认 · 共池 ' + pool + ' 灵石'
+        : '🌙 红线初系 · 缘分 ' + (p.matchScore || 0);
       card.innerHTML = `
         <div class="couple-names">
           ${p.majia}<span class="heart">❤</span>${spouse.majia}
@@ -375,16 +344,32 @@
       grid.innerHTML = '<div class="empty-tip">🌙 今夜尚无佳偶<br>静待红娘摇铃，缘分自来</div>';
     }
 
+    // 任务板
     if (coupleCount > 0) {
       $('taskBoard').style.display = '';
       const ul = $('taskList');
       ul.innerHTML = '';
-      const tasks = data.tasks || [];
+      const tasks = (data.tasks || []).slice().sort((a, b) => (a.unlock || 0) - (b.unlock || 0));
       if (!tasks.length) ul.innerHTML = '<li class="empty-tip">今夜暂无任务</li>';
       tasks.forEach(t => {
+        // 统计有多少对已解锁此任务
+        let unlockedPairs = 0;
+        const counted = new Set();
+        for (const key in data.players) {
+          const p = data.players[key];
+          if (p.status !== 'confirmed' || !p.partner || counted.has(key)) continue;
+          const sp = data.players[p.partner];
+          if (!sp || sp.status !== 'confirmed') continue;
+          counted.add(key); counted.add(p.partner);
+          if ((p.deposit || 0) + (sp.deposit || 0) >= (t.unlock || 0)) unlockedPairs++;
+        }
         const li = document.createElement('li');
         if (t.done) li.className = 'done';
-        li.innerHTML = `<span class="t-dot">${t.done ? '✦' : '❖'}</span><span>${t.title}</span>`;
+        li.innerHTML = `
+          <span class="t-dot">${t.done ? '✦' : '❖'}</span>
+          <span class="t-title-text">${t.title}</span>
+          <span class="t-unlock">🔓 ${t.unlock || 0} 💎</span>
+          <span class="t-count">${unlockedPairs}/${confirmedCount} 对解锁</span>`;
         ul.appendChild(li);
       });
     } else {
@@ -404,31 +389,66 @@
     $('balancePill').textContent = '💎 ' + me.balance;
     $('myName').textContent = me.majia;
 
-    if (me.status === 'matched' && me.partner) {
+    if (me.status === 'matched' || me.status === 'confirmed') {
       const spouse = data.players[me.partner];
       $('myWaiting').style.display = 'none';
       $('myMatched').style.display = '';
       $('spouseName').textContent = spouse ? spouse.majia : '?';
-      $('myBond').textContent = me.locked
-        ? '🔒 红线已锁 · 此情不换'
-        : '缘分牵引 · 今夜共舞（缘分 ' + (me.matchScore || 0) + '）';
-      const lockEl = $('lockStatus');
-      if (me.locked) {
-        lockEl.textContent = '🔒 关系已锁定，本次舞会不可被替换';
-        lockEl.style.color = 'var(--green)';
-        $('lockBtn').disabled = true;
+      const isConfirmed = me.status === 'confirmed';
+
+      $('myStateEmoji').textContent = isConfirmed ? '💍' : '🎭';
+      $('myStateTitle').textContent = isConfirmed ? '良缘既定' : '红线初系';
+
+      if (isConfirmed) {
+        $('lockStatus').textContent = '双方已确认舞伴 · 可共投入灵石解锁任务';
+        $('lockStatus').style.color = 'var(--green)';
+        $('myBond').textContent = '💍 舞伴已确认 · 今夜共舞';
+        $('confirmBtn').disabled = true;
+        $('confirmBtn').querySelector('.act-title').textContent = '💍 已确认舞伴';
       } else {
-        lockEl.textContent = '红线未锁，尚可更换';
-        lockEl.style.color = '';
-        $('lockBtn').disabled = false;
+        const myDone = !!me.myConfirmed;
+        $('lockStatus').textContent = myDone ? '你已确认，等待对方确认…' : '尚未确认舞伴';
+        $('lockStatus').style.color = myDone ? 'var(--gold-soft)' : '';
+        $('myBond').textContent = '缘分牵引 · 今夜共舞（缘分 ' + (me.matchScore || 0) + '）';
+        $('confirmBtn').disabled = myDone;
+        $('confirmBtn').querySelector('.act-title').textContent = myDone ? '⏳ 等待对方确认' : '💍 确认舞伴';
       }
-      if (me.divorceRequested) {
-        $('marriageTip').textContent = '你已递交离婚申请，等待对方回应…';
-      } else if (me.divorcePending) {
-        $('marriageTip').textContent = '舞伴向你递交了离婚申请，请处理';
+
+      // 共池与任务
+      const pool = (me.deposit || 0) + (spouse ? (spouse.deposit || 0) : 0);
+      $('poolTotal').textContent = pool;
+      if (isConfirmed) {
+        $('depositTip').textContent = '双方灵石合计达标，即可点亮对应任务';
+        $('depositRow').style.display = '';
       } else {
-        $('marriageTip').textContent = '';
+        $('depositTip').textContent = '双方都确认舞伴后，方可投入灵石';
+        $('depositRow').style.display = 'none';
       }
+
+      const ul = $('poolTasks');
+      ul.innerHTML = '';
+      const tasks = (data.tasks || []).slice().sort((a, b) => (a.unlock || 0) - (b.unlock || 0));
+      if (!tasks.length) {
+        ul.innerHTML = '<li class="pool-empty">今夜暂无任务</li>';
+      }
+      tasks.forEach(t => {
+        const need = t.unlock || 0;
+        const unlocked = pool >= need;
+        const pct = need > 0 ? Math.min(100, Math.round(pool / need * 100)) : 100;
+        const li = document.createElement('li');
+        li.className = 'pool-task' + (unlocked ? ' unlocked' : '');
+        li.innerHTML = `
+          <div class="pt-head">
+            <span class="pt-title">${unlocked ? '🔓' : '🔒'} ${t.title}</span>
+            <span class="pt-need">${pool} / ${need} 💎</span>
+          </div>
+          <div class="pt-bar"><div class="pt-fill" style="width:${pct}%"></div></div>`;
+        ul.appendChild(li);
+      });
+
+      $('marriageTip').textContent = me.divorceRequested
+        ? '你已递交解除申请，等待对方回应…'
+        : '';
     } else {
       $('myWaiting').style.display = '';
       $('myMatched').style.display = 'none';
@@ -440,7 +460,7 @@
     try {
       const data = await ZMD.load(force === true);
       renderBoard(data);
-      const me = (myId && data.players[myId]) ? data.players[myId] : null;
+      const me = (myMajia && data.players[myMajia]) ? data.players[myMajia] : null;
       if (me) {
         renderMyStatus(data, me);
       } else {
@@ -455,47 +475,123 @@
     }
   }
 
+  // ===== 验票 =====
+  function showVerifyStep() {
+    $('verifyStep').style.display = '';
+    $('infoStep').style.display = 'none';
+    $('verifyMsg').textContent = '';
+    $('verifyMsg').className = 'verify-msg';
+  }
+  function showInfoStep(majia, ticket) {
+    verifiedMajia = majia;
+    verifiedTicket = ticket;
+    $('verifyStep').style.display = 'none';
+    $('infoStep').style.display = '';
+    $('okMajia').textContent = majia;
+    $('okTicket').textContent = ticket;
+  }
+
+  async function verifyTicket() {
+    const majia = $('vMajia').value.trim();
+    const ticket = $('vTicket').value.trim();
+    const msg = $('verifyMsg');
+
+    if (majia.length !== 2) { msg.textContent = '马甲必须是两个字'; msg.className = 'verify-msg err'; return; }
+    if (!ticket) { msg.textContent = '请输入门票编号'; msg.className = 'verify-msg err'; return; }
+
+    msg.textContent = '核对中…'; msg.className = 'verify-msg';
+    $('verifyBtn').disabled = true;
+    try {
+      const data = await ZMD.load(true);
+      const wl = data.whitelist || [];
+      const item = wl.find(w => w.majia === majia && String(w.ticket) === ticket);
+
+      if (!item) {
+        msg.textContent = '✗ 未找到该「马甲 + 门票」记录，请核对后重试';
+        msg.className = 'verify-msg err';
+        return;
+      }
+      if (item.claimed && !data.players[majia]) {
+        msg.textContent = '✗ 该门票已被使用，请联系红娘';
+        msg.className = 'verify-msg err';
+        return;
+      }
+      // 已报名玩家的马甲被占用（同一马甲只能一号）
+      const existing = data.players[majia];
+      if (existing && existing.ticket !== ticket) {
+        msg.textContent = '✗ 该马甲已被他人占用';
+        msg.className = 'verify-msg err';
+        return;
+      }
+
+      msg.textContent = '✓ 核对成功，请填写报名信息';
+      msg.className = 'verify-msg ok';
+      showInfoStep(majia, ticket);
+      if (existing) {
+        chosenGender = existing.gender || null;
+        $('wishInput').value = existing.wish || '';
+        $('aboutInput').value = existing.about || '';
+        if (chosenGender) {
+          document.querySelectorAll('.gender-btn').forEach(x => {
+            x.classList.toggle('active', x.dataset.g === chosenGender);
+          });
+        }
+      }
+    } catch (e) {
+      msg.textContent = '✗ 核对失败：' + e.message;
+      msg.className = 'verify-msg err';
+    } finally {
+      $('verifyBtn').disabled = false;
+    }
+  }
+
   // ===== 报名 =====
   async function register() {
-    const majia = $('majiaInput').value.trim();
+    const majia = verifiedMajia;
+    const ticket = verifiedTicket;
     const wish = $('wishInput').value.trim();
     const about = $('aboutInput').value.trim();
 
-    if (!myId) { toast(OAUTH_ON ? '请先点 QQ 一键登录' : '请先填写身份', 'error'); return; }
-    if (!majia || majia.length !== 2) { toast('马甲必须是两个字', 'error'); return; }
+    if (!majia || !ticket) { toast('请先核对入场资格', 'error'); return; }
     if (!chosenGender) { toast('请选择性别', 'error'); return; }
 
-    localStorage.setItem('zmd_id', myId);
-    localStorage.setItem('zmd_majia', majia);
+    localStorage.setItem(K_MAJIA, majia);
+    localStorage.setItem(K_TICKET, ticket);
 
     $('registerBtn').disabled = true;
     try {
       const data = await ZMD.load();
-      if (data.players[myId]) {
-        const p = data.players[myId];
-        p.majia = majia; p.gender = chosenGender;
-        p.wish = wish; p.about = about;
-        if (myNick) p.nick = myNick;
-        if (myAvatar) p.avatar = myAvatar;
-        await ZMD.save(data, `玩家 ${majia} 更新信息`);
+      if (!data.whitelist) data.whitelist = [];
+      const item = data.whitelist.find(w => w.majia === majia && String(w.ticket) === ticket);
+      if (!item) { toast('门票无效', 'error'); return; }
+
+      if (data.players[majia]) {
+        const p = data.players[majia];
+        p.gender = chosenGender;
+        p.wish = wish;
+        p.about = about;
+        await ZMD.save(data, `舞宾 ${majia} 更新信息`);
         toast('欢迎回来，面具已为你保留', 'success');
       } else {
-        data.players[myId] = {
-          id: myId,           // 冗余字段，方便识别是 openid 还是 qq
-          qq: myId,           // 兼容老代码（用 .qq 字段的地方不受影响）
-          openid: myId,       // OAuth 模式下真实 openid
-          majia, gender: chosenGender,
+        data.players[majia] = {
+          majia, ticket,
+          gender: chosenGender,
           wish, about,
-          nick: myNick || null,
-          avatar: myAvatar || null,
           balance: C.startBalance - C.costs.register,
           status: 'registered',
-          partner: null, locked: false,
-          matchScore: 0, registeredAt: Date.now()
+          partner: null,
+          myConfirmed: false,
+          deposit: 0,
+          matchScore: 0,
+          registeredAt: Date.now()
         };
-        await ZMD.save(data, `新玩家入场: ${majia}`);
+        item.claimed = true;
+        item.claimedAt = Date.now();
+        await ZMD.save(data, `新舞宾入场: ${majia}`);
         toast('入场成功！面具之下，缘分已启', 'success');
       }
+      myMajia = majia;
+      myTicket = ticket;
       closeModal('registerModal');
       refresh(true);
     } catch (e) {
@@ -505,65 +601,89 @@
     }
   }
 
-  // ===== 婚配操作 =====
-  async function doAction(action) {
+  // ===== 确认舞伴 / 解除舞伴 =====
+  async function confirmPartner() {
     const data = await ZMD.load();
-    const me = data.players[myId];
-    if (!me || me.status !== 'matched' || !me.partner) {
+    const me = data.players[myMajia];
+    if (!me || (me.status !== 'matched' && me.status !== 'confirmed')) {
       toast('当前没有婚配关系', 'error'); return;
     }
-    const cost = C.costs[action];
+    if (me.myConfirmed || me.status === 'confirmed') { toast('你已确认过舞伴', 'error'); return; }
+    const cost = C.costs.confirm;
     if (me.balance < cost) { toast(`灵石不足，需要 ${cost}`, 'error'); return; }
-    const spouse = data.players[me.partner];
 
-    if (action === 'lock') {
-      if (me.locked) { toast('关系已锁定', 'error'); return; }
-      me.balance -= cost;
-      me.locked = true;
-      if (spouse) spouse.locked = true;
-      await ZMD.save(data, `${me.majia} 锁定关系`);
-      toast('🔒 红线已锁，此情不换', 'success');
-    } else if (action === 'divorce') {
-      if (me.divorceRequested) { toast('你已递交离婚申请', 'error'); return; }
-      me.balance -= cost;
-      me.divorceRequested = true;
-      if (spouse) spouse.divorcePending = true;
-      await ZMD.save(data, `${me.majia} 申请离婚`);
-      toast('离婚申请已递交，等待对方回应', 'success');
-    } else if (action === 'forceUnbind') {
-      me.balance -= cost;
-      me.locked = false; me.partner = null; me.status = 'registered';
-      me.divorceRequested = false; me.divorcePending = false; me.matchScore = 0;
-      if (spouse) {
-        spouse.locked = false; spouse.partner = null; spouse.status = 'registered';
-        spouse.divorceRequested = false; spouse.divorcePending = false; spouse.matchScore = 0;
-      }
-      data.matches = (data.matches || []).filter(m =>
-        !(m.includes(myId) || (spouse && m.includes(spouse.qq)))
-      );
-      await ZMD.save(data, `${me.majia} 强制解除婚配`);
-      toast('⚡ 已强行斩断红线', 'success');
+    me.balance -= cost;
+    me.myConfirmed = true;
+
+    const spouse = data.players[me.partner];
+    if (spouse && spouse.myConfirmed) {
+      me.status = 'confirmed';
+      spouse.status = 'confirmed';
+      toast('💍 双方心意已定，舞伴关系确立', 'success');
+    } else {
+      toast(`已扣除 ${cost} 灵石，等待对方确认`, 'success');
     }
+    await ZMD.save(data, `${me.majia} 确认舞伴`);
     refresh(true);
   }
 
-  async function handleDivorceRequest(agree) {
+  async function releasePartner() {
     const data = await ZMD.load();
-    const me = data.players[myId];
-    const spouse = me && me.partner ? data.players[me.partner] : null;
-    if (!spouse) { toast('没有待处理的申请', 'error'); return; }
-    if (agree) {
-      me.partner = null; me.status = 'registered'; me.divorcePending = false; me.matchScore = 0;
-      spouse.partner = null; spouse.status = 'registered'; spouse.divorceRequested = false; spouse.matchScore = 0;
-      me.locked = false; spouse.locked = false;
-      data.matches = (data.matches || []).filter(m => !m.includes(myId) && !m.includes(spouse.qq));
-      await ZMD.save(data, `${me.majia} 同意离婚`);
-      toast('💔 红线已断', 'success');
-    } else {
-      me.divorcePending = false;
+    const me = data.players[myMajia];
+    if (!me || !me.partner) { toast('当前没有舞伴', 'error'); return; }
+    const cost = C.costs.release;
+    if (me.balance < cost) { toast(`灵石不足，需要 ${cost}`, 'error'); return; }
+
+    const spouse = data.players[me.partner];
+    me.balance -= cost;
+    me.partner = null;
+    me.status = 'registered';
+    me.myConfirmed = false;
+    me.deposit = 0;
+    me.matchScore = 0;
+    me.divorceRequested = false;
+    me.divorcePending = false;
+
+    if (spouse) {
+      spouse.partner = null;
+      spouse.status = 'registered';
+      spouse.myConfirmed = false;
+      spouse.deposit = 0;
+      spouse.matchScore = 0;
       spouse.divorceRequested = false;
-      await ZMD.save(data, `${me.majia} 拒绝离婚`);
-      toast('已拒绝离婚申请', 'success');
+      spouse.divorcePending = false;
+    }
+    const partnerMajia = spouse ? spouse.majia : null;
+    data.matches = (data.matches || []).filter(m => !m.includes(me.majia) && !(partnerMajia && m.includes(partnerMajia)));
+    await ZMD.save(data, `${me.majia} 解除舞伴`);
+    toast(`已扣除 ${cost} 灵石，红线已断`, 'success');
+    refresh(true);
+  }
+
+  // ===== 投入灵石 =====
+  async function depositStones() {
+    const val = parseInt($('depositInput').value, 10);
+    if (!val || val <= 0) { toast('请输入有效的灵石数量', 'error'); return; }
+
+    const data = await ZMD.load(true);
+    const me = data.players[myMajia];
+    if (!me || me.status !== 'confirmed') { toast('双方确认舞伴后方可投入', 'error'); return; }
+    if (me.balance < val) { toast(`灵石不足，当前 ${me.balance}`, 'error'); return; }
+
+    me.balance -= val;
+    me.deposit = (me.deposit || 0) + val;
+    const spouse = data.players[me.partner];
+    const pool = (me.deposit || 0) + (spouse ? (spouse.deposit || 0) : 0);
+
+    const tasks = (data.tasks || []).slice().sort((a, b) => (a.unlock || 0) - (b.unlock || 0));
+    const newly = tasks.filter(t => pool >= (t.unlock || 0) && pool - val < (t.unlock || 0));
+
+    await ZMD.save(data, `${me.majia} 投入 ${val} 灵石`);
+    $('depositInput').value = '';
+    if (newly.length) {
+      toast('🔓 解锁任务：' + newly.map(t => t.title).join('、'), 'success');
+    } else {
+      toast(`已投入 ${val} 灵石，共池 ${pool}`, 'success');
     }
     refresh(true);
   }
@@ -586,49 +706,26 @@
       });
     });
 
-    // 手动填写身份（任何模式都可用）
-    $('qqManualBtn').addEventListener('click', () => {
-      const v = $('qqManualInput').value.trim();
-      if (!v) { toast('请输入身份标识', 'error'); return; }
-      // OAuth 模式下也允许手动填（降级），但会弹提示
-      if (OAUTH_ON && !/^\d{5,12}$/.test(v)) {
-        toast('提示：当前是 QQ 互联模式，推荐用一键登录', 'error');
-        return;
-      }
-      myId = v;
-      localStorage.setItem('zmd_id', v);
-      toast('已确认身份：' + v, 'success');
+    $('vMajia').addEventListener('input', () => {
+      $('vMajia').value = $('vMajia').value.slice(0, 2);
     });
-
-    // OAuth 按钮
-    $('qqOauthBtn').addEventListener('click', oauthRedirect);
+    $('verifyBtn').addEventListener('click', verifyTicket);
+    $('backVerifyBtn').addEventListener('click', showVerifyStep);
 
     $('openRegisterBtn').addEventListener('click', () => {
-      // 同步身份状态到弹窗
-      if (myId) {
-        // 已经有身份了，隐藏 OAuth 按钮，显示确认信息
-        const oauthBtn = $('qqOauthBtn');
-        if (oauthBtn) oauthBtn.textContent = '✅ 已登录：' + (myNick || myId.slice(0, 12));
-        oauthBtn.disabled = true;
-        $('qqManual').style.display = 'none';
+      if (myMajia && myPlayer) {
+        // 已报名：直接进入信息页
+        showInfoStep(myPlayer.majia, myPlayer.ticket);
+        chosenGender = myPlayer.gender || null;
+        $('wishInput').value = myPlayer.wish || '';
+        $('aboutInput').value = myPlayer.about || '';
+        document.querySelectorAll('.gender-btn').forEach(x => {
+          x.classList.toggle('active', x.dataset.g === chosenGender);
+        });
       } else {
-        if (OAUTH_ON) {
-          $('qqOauthBtn').textContent = '🔐 QQ 一键登录 · 自动获取身份';
-          $('qqOauthBtn').disabled = false;
-          $('qqManual').style.display = ''; // 折叠降级
-        }
-      }
-      const me = myPlayer;
-      if (me) {
-        $('majiaInput').value = me.majia || '';
-        $('wishInput').value = me.wish || '';
-        $('aboutInput').value = me.about || '';
-        chosenGender = me.gender || null;
-        if (chosenGender) {
-          document.querySelectorAll('.gender-btn').forEach(x => {
-            x.classList.toggle('active', x.dataset.g === chosenGender);
-          });
-        }
+        showVerifyStep();
+        $('vMajia').value = '';
+        $('vTicket').value = '';
       }
       openModal('registerModal');
     });
@@ -638,58 +735,41 @@
     });
 
     $('registerBtn').addEventListener('click', register);
-    $('majiaInput').addEventListener('input', () => {
-      $('majiaInput').value = $('majiaInput').value.slice(0, 2);
-    });
-    $('lockBtn').addEventListener('click', () =>
-      confirmBox('锁定红线', '扣除 1314 灵石，锁定后本次舞会不可被替换', () => doAction('lock')));
-    $('divorceBtn').addEventListener('click', () =>
-      confirmBox('递交离婚申请', '扣除 1111 灵石，需对方同意后生效', () => doAction('divorce')));
-    $('forceBtn').addEventListener('click', () =>
-      confirmBox('强制解除', '扣除 5555 灵石，无需对方同意，单方面斩断红线', () => doAction('forceUnbind')));
-    $('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('zmd_id');
-      localStorage.removeItem('zmd_nick');
-      localStorage.removeItem('zmd_avatar');
-      localStorage.removeItem('zmd_majia');
-      myId = myNick = myAvatar = myPlayer = null;
-      location.href = location.pathname;
+
+    $('confirmBtn').addEventListener('click', () =>
+      confirmBox('确认舞伴', `扣除 ${C.costs.confirm} 灵石，双方都确认后舞伴关系正式确立`, confirmPartner));
+    $('releaseBtn').addEventListener('click', () =>
+      confirmBox('解除舞伴', `扣除 ${C.costs.release} 灵石，舞伴关系立即解除（已投入灵石不退）`, releasePartner));
+    $('depositBtn').addEventListener('click', depositStones);
+    $('depositInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') depositStones();
     });
 
-    // 离婚申请轮询
-    setInterval(async () => {
-      if (!myId || !myPlayer || !myPlayer.divorcePending) return;
-      if ($('confirmModal').style.display === 'flex') return;
-      myPlayer.divorcePending = false;
-      confirmBox('离婚申请', '舞伴向你递交了离婚申请，是否同意斩断红线？', (agree) => handleDivorceRequest(agree));
-    }, 6000);
+    $('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem(K_MAJIA);
+      localStorage.removeItem(K_TICKET);
+      myMajia = myTicket = myPlayer = null;
+      location.href = location.pathname;
+    });
 
     // 大屏自动刷新
     setInterval(() => refresh(false), 20000);
 
-    // ===== 启动流程 =====
-    // 1. 先处理 OAuth 回调（如果 URL 带 code）
-    // 2. 再尝试从 localStorage 恢复身份
-    // 3. OAuth 模式下，弹窗默认显示一键登录按钮
-    // 4. 最后刷新大屏
+    // ===== 启动：从 localStorage 恢复身份（需与白名单匹配）=====
     (async () => {
-      const handled = OAUTH_ON ? await handleOauthCallback() : false;
-
-      if (!handled) {
-        // 从 localStorage 恢复
-        const savedId = localStorage.getItem('zmd_id');
-        if (savedId) {
-          myId = savedId;
-          myNick = localStorage.getItem('zmd_nick');
-          myAvatar = localStorage.getItem('zmd_avatar');
-        }
+      const savedMajia = localStorage.getItem(K_MAJIA);
+      const savedTicket = localStorage.getItem(K_TICKET);
+      if (savedMajia && savedTicket) {
+        try {
+          const data = await ZMD.load(true);
+          const wl = data.whitelist || [];
+          const ok = wl.some(w => w.majia === savedMajia && String(w.ticket) === savedTicket);
+          if (ok || data.players[savedMajia]) {
+            myMajia = savedMajia;
+            myTicket = savedTicket;
+          }
+        } catch (e) {}
       }
-
-      // 根据 OAUTH_ON 决定弹窗里显示什么
-      $('oauthRow').style.display = OAUTH_ON ? '' : 'none';
-      // OAuth 模式下，手动输入默认折叠（只在没登录时才显示，供降级）
-      $('qqManual').style.display = (OAUTH_ON && myId) ? 'none' : '';
-
       refresh(false);
     })();
   }

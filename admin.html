@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>蒙面舞会 · 管理后台</title>
-<link rel="stylesheet" href="style.css?v=20261024d">
+<link rel="stylesheet" href="style.css?v=20261025a">
 </head>
 <body>
 
@@ -28,16 +28,17 @@
 <div id="adminPanel" class="page">
   <header class="topbar">
     <div class="topbar-left">
-      <span class="mask-icon">🛡️</span>
-      <span class="user-majia">管理后台</span>
+      <span class="mask-icon">🎭</span>
+      <span class="user-majia">红娘阁 · 后台</span>
     </div>
     <div class="topbar-right">
-      <button class="link-btn" onclick="location.href='index.html'">👤用户页/大屏</button>
+      <button class="link-btn" onclick="location.href='index.html'">👤 大屏</button>
       <button class="link-btn" id="logoutBtn">退出</button>
     </div>
   </header>
 
-  <main class="content" style="max-width:900px">
+  <main class="content">
+
     <!-- 大屏阶段控制 -->
     <h2 class="section-title">🎬 大屏阶段</h2>
     <div class="stage-row" id="stageRow">
@@ -51,7 +52,7 @@
     <div class="admin-actions">
       <div class="stat-card">
         <div class="stat-num" id="statTotal">0</div>
-        <div class="stat-label">报名人数</div>
+        <div class="stat-label">已报名</div>
       </div>
       <div class="stat-card">
         <div class="stat-num" id="statMale">0</div>
@@ -69,13 +70,26 @@
       <button class="btn btn-ghost" id="newRoundBtn">🔄 新一轮</button>
     </div>
 
+    <!-- 白名单录入 -->
+    <h2 class="section-title">🎫 报名人员录入（门票白名单）</h2>
+    <div class="wl-box">
+      <textarea id="wlInput" placeholder="每行一个人，格式：二字马甲,门票编号&#10;分隔符不限（逗号 / 空格 / 顿号 / 竖线 / 制表符均可）&#10;&#10;例：&#10;阿强,001&#10;小美 002&#10;阿龙|003"></textarea>
+      <div class="wl-actions">
+        <button class="btn btn-primary btn-sm" id="wlImportBtn">导入白名单</button>
+        <button class="btn btn-ghost btn-sm" id="wlDemoBtn">查看示例格式</button>
+        <input type="text" id="wlSearch" class="wl-search" placeholder="搜索马甲 / 门票">
+        <span class="wl-count" id="wlCount">0 人</span>
+      </div>
+      <div class="wl-list" id="wlList"></div>
+    </div>
+
     <!-- 玩家列表 -->
-    <h2 class="section-title">📋 玩家列表</h2>
+    <h2 class="section-title">📋 已报名舞宾</h2>
     <div class="table-wrap">
       <table class="data-table" id="playersTable">
         <thead>
           <tr>
-            <th>身份</th><th>昵称</th><th>马甲</th><th>性别</th><th>灵石</th><th>状态</th><th>舞伴</th><th>许愿</th><th>自述</th><th>操作</th>
+            <th>马甲</th><th>门票</th><th>性别</th><th>灵石</th><th>已投入</th><th>状态</th><th>舞伴</th><th>许愿</th><th>自述</th><th>操作</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -87,7 +101,7 @@
     <div class="table-wrap">
       <table class="data-table" id="matchesTable">
         <thead>
-          <tr><th>马甲A</th><th>身份A</th><th>马甲B</th><th>身份B</th><th>缘分</th><th>锁定</th><th>操作</th></tr>
+          <tr><th>马甲A</th><th>马甲B</th><th>缘分</th><th>确认</th><th>共池灵石</th><th>操作</th></tr>
         </thead>
         <tbody></tbody>
       </table>
@@ -96,8 +110,9 @@
     <!-- 任务管理 -->
     <h2 class="section-title">📝 任务管理</h2>
     <div class="task-add">
-      <input type="text" id="newTaskInput" placeholder="输入新任务内容">
-      <button class="btn btn-primary" id="addTaskBtn">添加</button>
+      <input type="text" id="newTaskInput" placeholder="任务内容">
+      <input type="number" id="newTaskUnlock" class="task-unlock-input" placeholder="解锁灵石" min="0">
+      <button class="btn btn-primary btn-sm" id="addTaskBtn">添加</button>
     </div>
     <ul class="task-list" id="taskList"></ul>
   </main>
@@ -109,7 +124,7 @@
     <h3>调整灵石</h3>
     <p id="balanceModalText"></p>
     <div class="form-group">
-      <input type="number" id="balanceInput" placeholder="输入数量（正数增加，负数减少）">
+      <input type="number" id="balanceInput" placeholder="正数增加，负数减少">
     </div>
     <div class="modal-btns">
       <button class="btn btn-primary" id="balanceOk">确定</button>
@@ -127,7 +142,7 @@
   const $ = id => document.getElementById(id);
   const C = ZMD.config;
   let data = null;
-  let targetQQ = null;
+  let targetMajia = null;
 
   let toastTimer = null;
   function toast(msg, type) {
@@ -143,11 +158,17 @@
     $(id).classList.add('active');
   }
 
-  // 加载数据并渲染
+  function esc(s) {
+    return String(s || '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+  }
+
+  // ===== 加载并渲染 =====
   async function refresh() {
     try {
       data = await ZMD.load(true);
+      if (!data.whitelist) data.whitelist = [];
       renderStats();
+      renderWhitelist();
       renderPlayers();
       renderMatches();
       renderTasks();
@@ -157,16 +178,18 @@
   }
 
   function renderStats() {
-    const players = Object.values(data.players);
+    const players = Object.values(data.players || {});
     const waiting = players.filter(p => p.status === 'registered');
     $('statTotal').textContent = players.length;
     $('statMale').textContent = waiting.filter(p => p.gender === 'male').length;
     $('statFemale').textContent = waiting.filter(p => p.gender === 'female').length;
     let couples = 0;
     const seen = new Set();
-    for (const qq in data.players) {
-      const p = data.players[qq];
-      if (p.status === 'matched' && p.partner && !seen.has(qq)) { seen.add(p.partner); couples++; }
+    for (const key in data.players) {
+      const p = data.players[key];
+      if ((p.status === 'matched' || p.status === 'confirmed') && p.partner && !seen.has(key)) {
+        seen.add(key); seen.add(p.partner); couples++;
+      }
     }
     $('statMatched').textContent = couples;
     renderStage();
@@ -179,40 +202,123 @@
     });
   }
 
+  // ===== 白名单 =====
+  function renderWhitelist() {
+    const kw = ($('wlSearch').value || '').trim();
+    const list = (data.whitelist || []).filter(w =>
+      !kw || w.majia.includes(kw) || String(w.ticket).includes(kw)
+    );
+    const box = $('wlList');
+    box.innerHTML = '';
+    box.innerHTML = list.map(w => {
+      const player = data.players[w.majia];
+      const state = player
+        ? '<span class="wl-tag ok">已报名</span>'
+        : (w.claimed ? '<span class="wl-tag warn">已占用</span>' : '<span class="wl-tag">待入场</span>');
+      return `
+        <div class="wl-item">
+          <span class="wl-majia">${esc(w.majia)}</span>
+          <span class="wl-ticket">${esc(w.ticket)}</span>
+          ${state}
+          <button class="mini-btn danger" onclick="window._delWl('${esc(w.majia)}','${esc(w.ticket)}')">移除</button>
+        </div>`;
+    }).join('');
+    if (!list.length) {
+      box.innerHTML = '<div class="wl-empty">尚未录入报名人员</div>';
+    }
+    $('wlCount').textContent = (data.whitelist || []).length + ' 人';
+  }
+
+  window._delWl = async (majia, ticket) => {
+    if (!confirm(`确定从白名单移除 ${majia}（门票 ${ticket}）？`)) return;
+    data = await ZMD.load(true);
+    data.whitelist = (data.whitelist || []).filter(w => !(w.majia === majia && String(w.ticket) === String(ticket)));
+    await ZMD.save(data, `移除白名单 ${majia}`);
+    toast('已移除', 'success');
+    refresh();
+  };
+
+  // 解析白名单文本：换行即一人，分隔符不限
+  function parseWhitelist(text) {
+    const out = [];
+    (text || '').split(/\r?\n/).forEach(line => {
+      const s = line.trim();
+      if (!s) return;
+      const parts = s.split(/[,，、\s|;；/\\·.。\t]+/).filter(Boolean);
+      if (parts.length < 2) return;
+      const majia = parts[0].slice(0, 2);
+      const ticket = parts[1].trim();
+      if (!majia || !ticket) return;
+      out.push({ majia, ticket });
+    });
+    return out;
+  }
+
+  $('wlImportBtn').onclick = async () => {
+    const raw = $('wlInput').value;
+    const incoming = parseWhitelist(raw);
+    if (!incoming.length) {
+      toast('未解析到有效行，格式应为「二字马甲,门票编号」', 'error');
+      return;
+    }
+    data = await ZMD.load(true);
+    if (!data.whitelist) data.whitelist = [];
+    let added = 0, skipped = 0;
+    for (const item of incoming) {
+      const exists = data.whitelist.some(w => w.majia === item.majia && String(w.ticket) === item.ticket);
+      if (exists) { skipped++; continue; }
+      data.whitelist.push({ majia: item.majia, ticket: item.ticket, claimed: false });
+      added++;
+    }
+    await ZMD.save(data, `导入白名单 ${added} 人`);
+    $('wlInput').value = '';
+    toast(`导入完成：新增 ${added} 人，重复跳过 ${skipped} 人`, 'success');
+    refresh();
+  };
+  $('wlDemoBtn').onclick = () => {
+    $('wlInput').value = '阿强,001\n小美 002\n阿龙|003\n阿雅、004';
+    toast('示例已填入，可直接点「导入白名单」', 'success');
+  };
+  $('wlSearch').addEventListener('input', () => { if (data) renderWhitelist(); });
+
+  // ===== 玩家 =====
   function genderText(p) {
     if (p.gender === 'male') return '<span style="color:#93c5fd">👦 男</span>';
     if (p.gender === 'female') return '<span style="color:#f9a8d4">👧 女</span>';
     return '<span style="color:var(--text-dim)">?</span>';
   }
 
-  function esc(s) {
-    return String(s || '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+  function statusText(p) {
+    if (p.status === 'registered') return '<span style="color:var(--gold)">待匹配</span>';
+    if (p.status === 'matched') {
+      return p.myConfirmed
+        ? '<span style="color:var(--gold-soft)">待对方确认</span>'
+        : '<span style="color:var(--rose)">待确认舞伴</span>';
+    }
+    if (p.status === 'confirmed') return '<span style="color:var(--green)">舞伴已确认</span>';
+    return p.status;
   }
 
   function renderPlayers() {
     const tbody = $('playersTable').querySelector('tbody');
     tbody.innerHTML = '';
-    const players = Object.values(data.players).sort((a,b) => (b.registeredAt||0) - (a.registeredAt||0));
+    const players = Object.values(data.players || {}).sort((a,b) => (b.registeredAt||0) - (a.registeredAt||0));
     for (const p of players) {
       const spouse = p.partner ? data.players[p.partner] : null;
-      // 身份 ID 截断显示（openid 通常很长）
-      const idDisplay = (p.qq || p.openid || '').length > 16
-        ? (p.qq || p.openid).slice(0, 6) + '…' + (p.qq || p.openid).slice(-6)
-        : (p.qq || p.openid || '-');
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td title="${esc(p.qq || p.openid || '')}">${esc(idDisplay)}</td>
-        <td>${esc(p.nick) || '<span style="opacity:.4">-</span>'}</td>
-        <td>${esc(p.majia)}</td>
+        <td><b>${esc(p.majia)}</b></td>
+        <td>${esc(p.ticket)}</td>
         <td>${genderText(p)}</td>
-        <td><b>${p.balance}</b> 💎</td>
+        <td>${p.balance} 💎</td>
+        <td>${p.deposit || 0} 💎</td>
         <td>${statusText(p)}</td>
-        <td>${spouse ? spouse.majia : '-'}</td>
+        <td>${spouse ? esc(spouse.majia) : '-'}</td>
         <td>${esc(p.wish) || '<span style="opacity:.4">-</span>'}</td>
         <td>${esc(p.about) || '<span style="opacity:.4">-</span>'}</td>
         <td>
-          <button class="mini-btn" onclick="window._adjBal('${(p.qq || p.openid || '').replace(/'/g, "\\'")}')">调灵石</button>
-          <button class="mini-btn danger" onclick="window._delPlayer('${(p.qq || p.openid || '').replace(/'/g, "\\'")}')">删除</button>
+          <button class="mini-btn" onclick="window._adjBal('${esc(p.majia)}')">调灵石</button>
+          <button class="mini-btn danger" onclick="window._delPlayer('${esc(p.majia)}')">删除</button>
         </td>`;
       tbody.appendChild(tr);
     }
@@ -221,63 +327,64 @@
     }
   }
 
-  function statusText(p) {
-    if (p.status === 'registered') return '<span style="color:var(--gold)">待匹配</span>';
-    if (p.status === 'matched') return p.locked ? '<span style="color:var(--green)">已锁定</span>' : '<span style="color:var(--rose)">已婚配</span>';
-    return p.status;
-  }
-
-  function escId(s) {
-    s = s || '';
-    if (s.length > 16) return s.slice(0, 6) + '…' + s.slice(-6);
-    return s;
-  }
+  // ===== 婚配 =====
   function renderMatches() {
     const tbody = $('matchesTable').querySelector('tbody');
     tbody.innerHTML = '';
     const seen = new Set();
     for (const key in data.players) {
       const p = data.players[key];
-      if (p.status !== 'matched' || !p.partner || seen.has(key)) continue;
+      if ((p.status !== 'matched' && p.status !== 'confirmed') || !p.partner || seen.has(key)) continue;
       const spouse = data.players[p.partner];
       if (!spouse) continue;
-      seen.add(p.partner);
+      seen.add(key); seen.add(p.partner);
+      const pool = (p.deposit || 0) + (spouse.deposit || 0);
+      const confirmed = p.status === 'confirmed' && spouse.status === 'confirmed';
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${p.majia}</td><td title="${esc(p.qq||p.openid||'')}">${escId(p.qq||p.openid)}</td>
-        <td>${spouse.majia}</td><td title="${esc(spouse.qq||spouse.openid||'')}">${escId(spouse.qq||spouse.openid)}</td>
-        <td>缘分 ${p.matchScore || 0}</td>
-        <td>${p.locked ? '🔒' : '❌'}</td>
-        <td><button class="mini-btn danger" onclick="window._forceDivorce('${key.replace(/'/g, "\\'")}','${p.partner.replace(/'/g, "\\'")}')">强制解除</button></td>`;
+        <td>${esc(p.majia)}</td>
+        <td>${esc(spouse.majia)}</td>
+        <td>${p.matchScore || 0}</td>
+        <td>${confirmed ? '✅ 双方已确认' : (p.myConfirmed ? '⏳ 一方已确认' : '❌ 未确认')}</td>
+        <td>${pool} 💎</td>
+        <td><button class="mini-btn danger" onclick="window._forceDivorce('${esc(p.majia)}','${esc(spouse.majia)}')">强制解除</button></td>`;
       tbody.appendChild(tr);
     }
     if (!tbody.children.length) {
-      tbody.innerHTML = '<tr><td colspan="7" class="table-empty">🥀 今夜尚无佳偶</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="table-empty">🥀 今夜尚无佳偶</td></tr>';
     }
   }
 
+  // ===== 任务 =====
   function renderTasks() {
     const ul = $('taskList');
     ul.innerHTML = '';
-    (data.tasks || []).forEach((t, i) => {
+    const tasks = (data.tasks || []).slice().sort((a,b) => (a.unlock||0) - (b.unlock||0));
+    tasks.forEach((t) => {
+      const idx = data.tasks.indexOf(t);
       const li = document.createElement('li');
       li.className = 'task-item' + (t.done ? ' done' : '');
       li.innerHTML = `
-        <span class="task-check" onclick="window._toggleTask(${i})">${t.done ? '✅' : '⬜'}</span>
-        <span class="task-title">${t.title}</span>
-        <button class="mini-btn danger" onclick="window._delTask(${i})">删除</button>`;
+        <span class="task-check" onclick="window._toggleTask(${idx})">${t.done ? '✅' : '⬜'}</span>
+        <span class="task-title">${esc(t.title)}</span>
+        <span class="task-unlock-badge">🔓 ${t.unlock || 0} 💎</span>
+        <button class="mini-btn" onclick="window._editUnlock(${idx})">改值</button>
+        <button class="mini-btn danger" onclick="window._delTask(${idx})">删除</button>`;
       ul.appendChild(li);
     });
+    if (!tasks.length) {
+      ul.innerHTML = '<li class="table-empty" style="text-align:center;color:var(--text-dim);padding:12px">今夜暂无任务</li>';
+    }
   }
 
-  // ===== 系统缘分匹配（参考许愿偏好，非骰子） =====
+  // ===== 系统缘分匹配 =====
   async function startMatch() {
     data = await ZMD.load(true);
     const waiting = Object.values(data.players).filter(p => p.status === 'registered');
     const males = waiting.filter(p => p.gender === 'male');
     const females = waiting.filter(p => p.gender === 'female');
     if (!males.length || !females.length) {
-      toast(`男女各需至少1人（当前男 ${males.length} / 女 ${females.length}）`, 'error');
+      toast(`男女各需至少 1 人（当前男 ${males.length} / 女 ${females.length}）`, 'error');
       return;
     }
     const n = Math.min(males.length, females.length);
@@ -288,22 +395,19 @@
     for (const pr of pairs) {
       const a = pr.a, b = pr.b;
       a.status = 'matched'; b.status = 'matched';
-      a.partner = b.qq; b.partner = a.qq;
-      a.locked = false; b.locked = false;
+      a.partner = b.majia; b.partner = a.majia;
+      a.myConfirmed = false; b.myConfirmed = false;
+      a.deposit = 0; b.deposit = 0;
       a.matchScore = pr.score; b.matchScore = pr.score;
-      a.divorceRequested = false; a.divorcePending = false;
-      b.divorceRequested = false; b.divorcePending = false;
       if (!data.matches) data.matches = [];
-      data.matches.push([a.qq, b.qq]);
+      data.matches.push([a.majia, b.majia]);
       msg += `${a.majia} ❤ ${b.majia}（缘分 ${pr.score}）\n`;
     }
-    // 轮空提示
-    const usedM = new Set(pairs.map(p => p.a.qq));
-    const usedF = new Set(pairs.map(p => p.b.qq));
-    males.filter(p => !usedM.has(p.qq)).forEach(p => { msg += `${p.majia}（男宾）轮空，继续等待\n`; });
-    females.filter(p => !usedF.has(p.qq)).forEach(p => { msg += `${p.majia}（女宾）轮空，继续等待\n`; });
+    const usedM = new Set(pairs.map(p => p.a.majia));
+    const usedF = new Set(pairs.map(p => p.b.majia));
+    males.filter(p => !usedM.has(p.majia)).forEach(p => { msg += `${p.majia}（男宾）轮空\n`; });
+    females.filter(p => !usedF.has(p.majia)).forEach(p => { msg += `${p.majia}（女宾）轮空\n`; });
 
-    // 匹配后自动推进大屏阶段
     data.stage = nextStage(data.stage || 'registering');
     await ZMD.save(data, `系统缘分匹配，生成${pairs.length}对`);
     alert(msg);
@@ -319,12 +423,14 @@
 
   // 新一轮
   async function newRound() {
-    if (!confirm('确定开启新一轮？所有已婚配将被解除，待匹配玩家保留。')) return;
+    if (!confirm('确定开启新一轮？所有婚配将被解除，待匹配玩家保留。')) return;
+    data = await ZMD.load(true);
     data.round = (data.round || 1) + 1;
-    for (const qq in data.players) {
-      const p = data.players[qq];
-      if (p.status === 'matched') {
-        p.status = 'registered'; p.partner = null; p.locked = false;
+    for (const key in data.players) {
+      const p = data.players[key];
+      if (p.status === 'matched' || p.status === 'confirmed') {
+        p.status = 'registered'; p.partner = null;
+        p.myConfirmed = false; p.deposit = 0;
         p.matchScore = 0; p.divorceRequested = false; p.divorcePending = false;
       }
     }
@@ -335,76 +441,100 @@
     refresh();
   }
 
-  // 调整灵石
-  window._adjBal = (qq) => {
-    targetQQ = qq;
-    const p = data.players[qq];
-    $('balanceModalText').textContent = `${p.majia}（QQ:${qq}）当前灵石：${p.balance}`;
+  // ===== 玩家操作 =====
+  window._adjBal = (majia) => {
+    targetMajia = majia;
+    const p = data.players[majia];
+    $('balanceModalText').textContent = `${p.majia}（门票 ${p.ticket}）当前灵石：${p.balance}`;
     $('balanceInput').value = '';
     $('balanceModal').style.display = 'flex';
   };
   $('balanceOk').onclick = async () => {
     const num = parseInt($('balanceInput').value);
     if (isNaN(num)) { toast('请输入数字', 'error'); return; }
-    data = await ZMD.load();
-    data.players[targetQQ].balance += num;
-    await ZMD.save(data, `调整 ${data.players[targetQQ].majia} 灵石 ${num}`);
+    data = await ZMD.load(true);
+    data.players[targetMajia].balance += num;
+    await ZMD.save(data, `调整 ${data.players[targetMajia].majia} 灵石 ${num}`);
     $('balanceModal').style.display = 'none';
     toast('已调整', 'success');
     refresh();
   };
   $('balanceCancel').onclick = () => $('balanceModal').style.display = 'none';
 
-  // 删除玩家
-  window._delPlayer = async (qq) => {
-    if (!confirm('确定删除该玩家？')) return;
-    const p = data.players[qq];
+  window._delPlayer = async (majia) => {
+    if (!confirm(`确定删除舞宾 ${majia}？`)) return;
+    data = await ZMD.load(true);
+    const p = data.players[majia];
+    if (!p) return;
     if (p.partner) {
       const spouse = data.players[p.partner];
-      if (spouse) { spouse.partner = null; spouse.status = 'registered'; }
+      if (spouse) { spouse.partner = null; spouse.status = 'registered'; spouse.myConfirmed = false; spouse.deposit = 0; }
     }
-    delete data.players[qq];
-    data.matches = (data.matches || []).filter(m => !m.includes(qq));
-    await ZMD.save(data, `删除玩家 ${p.majia}`);
+    delete data.players[majia];
+    data.matches = (data.matches || []).filter(m => !m.includes(majia));
+    const wl = (data.whitelist || []).find(w => w.majia === majia);
+    if (wl) wl.claimed = false;
+    await ZMD.save(data, `删除舞宾 ${majia}`);
     refresh();
   };
 
-  // 强制解除
   window._forceDivorce = async (a, b) => {
-    if (!confirm('确定强制解除这对婚配？')) return;
+    if (!confirm(`确定强制解除 ${a} ❤ ${b}？`)) return;
+    data = await ZMD.load(true);
     const pa = data.players[a], pb = data.players[b];
-    if (pa) { pa.partner = null; pa.status = 'registered'; pa.locked = false; pa.matchScore = 0; }
-    if (pb) { pb.partner = null; pb.status = 'registered'; pb.locked = false; pb.matchScore = 0; }
-    data.matches = data.matches.filter(m => !m.includes(a) && !m.includes(b));
+    if (pa) { pa.partner = null; pa.status = 'registered'; pa.myConfirmed = false; pa.deposit = 0; pa.matchScore = 0; }
+    if (pb) { pb.partner = null; pb.status = 'registered'; pb.myConfirmed = false; pb.deposit = 0; pb.matchScore = 0; }
+    data.matches = (data.matches || []).filter(m => !m.includes(a) && !m.includes(b));
     await ZMD.save(data, '管理员强制解除婚配');
     refresh();
   };
 
-  // 任务
+  // ===== 任务操作 =====
   window._toggleTask = async (i) => {
+    data = await ZMD.load(true);
     data.tasks[i].done = !data.tasks[i].done;
     await ZMD.save(data, '切换任务状态');
     refresh();
   };
   window._delTask = async (i) => {
+    if (!confirm('确定删除该任务？')) return;
+    data = await ZMD.load(true);
     data.tasks.splice(i, 1);
     await ZMD.save(data, '删除任务');
     refresh();
   };
-  $('addTaskBtn').onclick = async () => {
-    const title = $('newTaskInput').value.trim();
-    if (!title) return;
-    data.tasks.push({ id: Date.now(), title, done: false });
-    await ZMD.save(data, '添加任务');
-    $('newTaskInput').value = '';
+  window._editUnlock = async (i) => {
+    data = await ZMD.load(true);
+    const cur = data.tasks[i].unlock || 0;
+    const v = prompt('请输入解锁所需灵石数值：', cur);
+    if (v === null) return;
+    const num = parseInt(v, 10);
+    if (isNaN(num) || num < 0) { toast('请输入有效数字', 'error'); return; }
+    data.tasks[i].unlock = num;
+    await ZMD.save(data, '修改任务解锁灵石');
+    toast('已更新解锁灵石', 'success');
     refresh();
   };
 
-  // 阶段切换
+  $('addTaskBtn').onclick = async () => {
+    const title = $('newTaskInput').value.trim();
+    const unlock = parseInt($('newTaskUnlock').value, 10);
+    if (!title) { toast('请填写任务内容', 'error'); return; }
+    if (isNaN(unlock) || unlock < 0) { toast('请填写解锁灵石数值', 'error'); return; }
+    data = await ZMD.load(true);
+    if (!data.tasks) data.tasks = [];
+    data.tasks.push({ id: Date.now(), title, unlock, done: false });
+    await ZMD.save(data, '添加任务');
+    $('newTaskInput').value = '';
+    $('newTaskUnlock').value = '';
+    refresh();
+  };
+
+  // ===== 阶段切换 =====
   document.querySelectorAll('.stage-btn').forEach(b => {
     b.onclick = async () => {
       try {
-        data = await ZMD.load();
+        data = await ZMD.load(true);
         data.stage = b.dataset.stage;
         await ZMD.save(data, `设置大屏阶段: ${b.dataset.stage}`);
         toast('大屏阶段已更新', 'success');
@@ -415,7 +545,7 @@
     };
   });
 
-  // 登录
+  // ===== 登录 =====
   $('adminLoginBtn').onclick = () => {
     if ($('adminPwd').value === C.adminPassword) {
       showPage('adminPanel');

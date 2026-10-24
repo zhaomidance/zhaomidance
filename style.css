@@ -634,6 +634,220 @@ body::after {
 .task-check { cursor: pointer; font-size: 17px; }
 .task-title { flex: 1; font-size: 14px; }
 
+/* ============================================================
+   面具舞会装饰元素
+   ============================================================ */
+/* 飘浮的羽毛 / 烛台 */
+.ambient-orn {
+  position: fixed; z-index: -1; pointer-events: none;
+  opacity: .07; filter: blur(.4px);
+  animation: drift 12s ease-in-out infinite;
+}
+.ambient-orn.feather { font-size: 15vh; left: 4vw; top: 26vh; transform: rotate(18deg); }
+.ambient-orn.candle { font-size: 11vh; right: 6vw; bottom: 22vh; animation-delay: -5s; opacity: .06; }
+@keyframes drift {
+  0%, 100% { transform: translateY(0) rotate(18deg); }
+  50% { transform: translateY(-16px) rotate(24deg); }
+}
+
+/* 顶部装饰带 */
+.ball-strip {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 6px 12px;
+  font-size: 13px; letter-spacing: 2px;
+  color: var(--gold);
+  opacity: .42;
+  border-bottom: 1px solid rgba(232,198,106,.1);
+  background: linear-gradient(90deg, transparent, rgba(232,198,106,.05), transparent);
+  user-select: none;
+}
+
+/* 阶段横幅四角花饰 */
+.stage-banner .corner {
+  position: absolute; font-size: 12px; color: var(--gold);
+  opacity: .4; line-height: 1; pointer-events: none;
+}
+.stage-banner .corner.tl { top: 4px; left: 6px; }
+.stage-banner .corner.tr { top: 4px; right: 6px; }
+.stage-banner .corner.bl { bottom: 4px; left: 6px; }
+.stage-banner .corner.br { bottom: 4px; right: 6px; }
+
+/* 已匹配卡片额外装饰 */
+.couple-card .couple-names { position: relative; }
+.couple-card::marker { content: none; }
+.couple-card .decree {
+  margin-top: 10px; font-size: 10px; letter-spacing: 3px;
+  color: var(--gold); opacity: .45;
+}
+
+/* ============================================================
+   验票 · 报名弹窗
+   ============================================================ */
+.verify-hint {
+  font-size: 11px; line-height: 1.6; color: var(--text-dim);
+  text-align: center; margin-bottom: 12px;
+  padding: 6px 10px; border-radius: 8px;
+  background: rgba(232,198,106,.06);
+  border: 1px dashed rgba(232,198,106,.22);
+}
+.verify-msg {
+  margin-top: 10px; font-size: 11px; line-height: 1.5;
+  text-align: center; color: var(--text-dim); min-height: 16px;
+}
+.verify-msg.err { color: #fca5a5; }
+.verify-msg.ok { color: var(--green); }
+
+.verify-ok {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; margin-bottom: 12px;
+  border-radius: 10px; font-size: 12px;
+  background: rgba(52,211,153,.1);
+  border: 1px solid rgba(52,211,153,.32);
+  color: #a7f3d0;
+}
+.verify-ok .ok-icon {
+  display: inline-grid; place-items: center;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(52,211,153,.24); color: var(--green);
+  font-size: 11px; flex: 0 0 18px;
+}
+.verify-ok b { color: var(--gold-soft); }
+.back-btn {
+  display: block; margin: 8px auto 0; font-size: 11px;
+  background: none; border: none; color: var(--text-dim); cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.back-btn:hover { color: var(--gold-soft); }
+
+/* ============================================================
+   灵石共池 · 任务解锁
+   ============================================================ */
+.deposit-box {
+  margin-top: 10px; padding: 10px 12px;
+  border-radius: 12px;
+  background: linear-gradient(160deg, rgba(232,198,106,.08), rgba(157,23,77,.06));
+  border: 1px solid rgba(232,198,106,.22);
+}
+.deposit-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; flex-wrap: wrap;
+  font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  color: var(--gold-soft);
+}
+.deposit-head .pool-amount { font-weight: 400; color: var(--text-dim); letter-spacing: 0; }
+.deposit-head .pool-amount b { color: var(--gold); font-size: 14px; }
+.deposit-tip { font-size: 10px; color: var(--text-dim); margin: 5px 0 7px; line-height: 1.5; }
+
+.deposit-row { display: flex; gap: 6px; margin-bottom: 8px; }
+.deposit-row input {
+  flex: 1; min-width: 0;
+  padding: 7px 10px; font-size: 12px;
+  background: rgba(0,0,0,.44);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 8px; color: var(--text); font-family: inherit; outline: none;
+}
+.deposit-row input:focus { border-color: rgba(232,198,106,.6); }
+.deposit-row .btn { white-space: nowrap; }
+
+.pool-tasks { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.pool-empty { font-size: 11px; color: var(--text-dim); text-align: center; padding: 4px; }
+.pool-task {
+  padding: 6px 9px; border-radius: 8px;
+  background: rgba(0,0,0,.26);
+  border: 1px solid rgba(255,255,255,.07);
+  transition: all .3s;
+}
+.pool-task.unlocked {
+  border-color: rgba(52,211,153,.4);
+  background: rgba(52,211,153,.08);
+  box-shadow: 0 0 14px rgba(52,211,153,.1);
+}
+.pt-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; font-size: 11px; margin-bottom: 4px;
+}
+.pt-title { color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pool-task.unlocked .pt-title { color: #a7f3d0; font-weight: 600; }
+.pt-need { font-size: 10px; color: var(--gold); white-space: nowrap; }
+.pt-bar { height: 3px; border-radius: 2px; background: rgba(255,255,255,.09); overflow: hidden; }
+.pt-fill {
+  height: 100%; border-radius: 2px;
+  background: linear-gradient(90deg, var(--violet), var(--rose));
+  transition: width .5s ease;
+}
+.pool-task.unlocked .pt-fill { background: linear-gradient(90deg, #34d399, #a7f3d0); }
+
+/* 大屏任务条目右侧徽章 */
+.task-list-screen .t-title-text { flex: 1; min-width: 0; }
+.task-list-screen .t-unlock {
+  font-size: 11px; color: var(--gold); white-space: nowrap;
+  padding: 2px 8px; border-radius: 999px;
+  border: 1px solid rgba(232,198,106,.28);
+  background: rgba(232,198,106,.07);
+}
+.task-list-screen .t-count {
+  font-size: 10px; color: var(--text-dim); white-space: nowrap;
+}
+
+/* ============================================================
+   后台 · 白名单录入
+   ============================================================ */
+.wl-box {
+  border-radius: 12px; padding: 10px 12px;
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(255,255,255,.1);
+  margin-bottom: 4px;
+}
+.wl-box textarea {
+  width: 100%; min-height: 90px; resize: vertical;
+  padding: 8px 10px; margin-bottom: 8px;
+  background: rgba(0,0,0,.44);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 8px; color: var(--text);
+  font-size: 12px; line-height: 1.7; font-family: inherit; outline: none;
+}
+.wl-box textarea:focus { border-color: rgba(232,198,106,.6); }
+.wl-box textarea::placeholder { color: rgba(163,150,191,.55); font-size: 11px; }
+.wl-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.wl-search {
+  flex: 1; min-width: 90px; max-width: 180px;
+  padding: 6px 9px; font-size: 11px;
+  background: rgba(0,0,0,.4);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 7px; color: var(--text); font-family: inherit; outline: none;
+}
+.wl-count { font-size: 11px; color: var(--text-dim); margin-left: auto; }
+
+.wl-list {
+  margin-top: 8px; max-height: 220px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.wl-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 9px; border-radius: 7px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  font-size: 11px;
+}
+.wl-majia { font-weight: 700; color: var(--gold-soft); min-width: 34px; }
+.wl-ticket { color: var(--text-dim); flex: 1; font-family: ui-monospace, monospace; }
+.wl-tag {
+  font-size: 10px; padding: 1px 7px; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.16); color: var(--text-dim);
+}
+.wl-tag.ok { border-color: rgba(52,211,153,.4); color: var(--green); background: rgba(52,211,153,.08); }
+.wl-tag.warn { border-color: rgba(239,68,68,.4); color: #fca5a5; background: rgba(239,68,68,.08); }
+.wl-empty { font-size: 11px; color: var(--text-dim); text-align: center; padding: 12px; }
+
+.task-unlock-input { max-width: 100px; }
+.task-unlock-badge {
+  font-size: 10px; color: var(--gold);
+  padding: 2px 7px; border-radius: 999px;
+  border: 1px solid rgba(232,198,106,.3);
+  background: rgba(232,198,106,.08);
+  white-space: nowrap;
+}
+
 /* ============ 响应式 ============ */
 @media (max-width: 620px) {
   .brand-title { font-size: 16px; letter-spacing: 2px; }
