@@ -205,6 +205,9 @@
         </td>`;
       tbody.appendChild(tr);
     }
+    if (!players.length) {
+      tbody.innerHTML = '<tr><td colspan="9" class="table-empty">🌙 今夜尚无人入场，静候嘉宾</td></tr>';
+    }
   }
 
   function statusText(p) {
@@ -231,6 +234,9 @@
         <td>${p.locked ? '🔒' : '❌'}</td>
         <td><button class="mini-btn danger" onclick="window._forceDivorce('${qq}','${p.partner}')">强制解除</button></td>`;
       tbody.appendChild(tr);
+    }
+    if (!tbody.children.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="table-empty">🥀 今夜尚无佳偶</td></tr>';
     }
   }
 

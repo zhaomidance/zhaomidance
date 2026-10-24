@@ -550,10 +550,19 @@ body::after {
 .stat-card .stat-label { font-size: 10px; letter-spacing: 1px; color: var(--text-dim); margin-top: 3px; }
 .btn-match {
   flex: 1; min-width: 150px; padding: 14px 22px;
+  white-space: nowrap;
   background: linear-gradient(135deg, #fff3cf, var(--gold) 42%, #c69c33);
   color: #2a1a05; font-weight: 800; letter-spacing: 2px;
   box-shadow: 0 12px 32px rgba(232,198,106,.3);
 }
+
+/* 报名弹窗紧凑排布，避免小屏需要长距离滚动 */
+#registerModal .modal-card { padding: 22px 20px; }
+#registerModal .modal-sub { margin: 6px 0 14px; }
+#registerModal .form-group { margin-bottom: 12px; }
+#registerModal .form-group input, #registerModal .form-group textarea { padding: 10px 12px; }
+#registerModal .form-group textarea { min-height: 52px; }
+#registerModal .modal-rules { margin-top: 12px; padding-top: 10px; }
 .section-title {
   font-family: var(--serif); font-size: 16px; letter-spacing: 3px;
   color: var(--gold-soft); margin: 24px 0 10px;
@@ -579,6 +588,10 @@ body::after {
 }
 .data-table td { padding: 10px; border-top: 1px solid rgba(255,255,255,.06); white-space: nowrap; }
 .data-table tr:hover { background: rgba(255,255,255,.03); }
+.data-table .table-empty {
+  text-align: center; padding: 26px 10px; color: var(--text-dim);
+  font-size: 12px; letter-spacing: 2px;
+}
 .mini-btn {
   background: rgba(139,92,246,.2); border: 1px solid rgba(139,92,246,.4);
   color: #d8caff; padding: 4px 9px; border-radius: 7px;
