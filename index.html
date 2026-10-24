@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>蒙面舞会 · 婚配玩法</title>
-<link rel="stylesheet" href="style.css?v=20261024e">
+<link rel="stylesheet" href="style.css?v=20261024f">
 </head>
 <body>
 
@@ -145,13 +145,12 @@
     <button class="modal-close" id="closeRegister">✕</button>
     <div class="modal-title">入 场 券</div>
 
-    <!-- QQ 获取：按钮 + 状态行，无输入框 -->
+    <!-- QQ 获取：按钮 + 手动输入默认展开（自动拿不到就直接手填） -->
     <div class="qq-fetch-row" id="qqFetchRow">
-      <button class="btn btn-ghost btn-sm btn-qq" id="fetchQqBtn">🔍 点击自动获取 QQ 号</button>
       <span class="qq-state" id="qqState">未获取</span>
-      <button class="link-btn qq-manual-toggle" id="qqManualToggle" type="button">手动输入 ▾</button>
+      <button class="btn btn-ghost btn-sm btn-qq" id="fetchQqBtn" type="button">🔄 尝试自动获取</button>
     </div>
-    <div class="qq-manual" id="qqManual" style="display:none">
+    <div class="qq-manual" id="qqManual">
       <div class="form-group" style="margin-bottom:6px">
         <label>手动填写 QQ 号</label>
         <input type="text" id="qqManualInput" placeholder="请输入你的 QQ 号（5-12 位）" maxlength="12" autocomplete="off">
@@ -354,6 +353,9 @@
     const btn = $('fetchQqBtn'), state = $('qqState');
     if (btn) { btn.textContent = '✅ 已获取：' + q; btn.disabled = true; }
     if (state) { state.textContent = '已获取'; state.style.color = 'var(--green)'; }
+    // 自动折叠手动输入（如果弹窗已开）
+    const manual = $('qqManual');
+    if (manual) manual.style.display = 'none';
   }
 
   // 弹窗里点按钮主动获取
@@ -372,9 +374,11 @@
       if (myQQ) { clearInterval(waiter); return; } // fillQQ 已触发
       if (Date.now() - start > 5500) {
         clearInterval(waiter);
-        btn.disabled = false; btn.textContent = '🔍 重新尝试获取';
+        btn.disabled = false; btn.textContent = '🔄 再次尝试';
         state.textContent = '自动获取失败'; state.style.color = 'var(--red)';
-        toast('自动获取 QQ 失败，请展开下方手动输入', 'error');
+        toast('自动获取未成功，请在下方手动填写 QQ 号', 'error');
+        // 确保手动输入可见
+        const m = $('qqManual'); if (m) m.style.display = '';
       }
     }, 250);
   }
@@ -657,38 +661,28 @@
 
     $('fetchQqBtn').addEventListener('click', fetchQqFromBtn);
 
-    // 手动输入兜底
-    $('qqManualToggle').addEventListener('click', () => {
-      const m = $('qqManual');
-      const show = m.style.display === 'none';
-      m.style.display = show ? '' : 'none';
-      $('qqManualToggle').textContent = show ? '手动输入 ▴' : '手动输入 ▾';
-      if (show) setTimeout(() => $('qqManualInput').focus(), 50);
-    });
+    // 手动填写 QQ（默认展开）
     $('qqManualBtn').addEventListener('click', () => {
       const v = $('qqManualInput').value.trim();
       if (!qqValid(v)) { toast('请输入 5-12 位 QQ 号', 'error'); return; }
       fillQQ(v);
-      $('qqManual').style.display = 'none';
-      $('qqManualToggle').textContent = '手动输入 ▾';
       toast('已使用手动填写的 QQ 号', 'success');
     });
 
     $('openRegisterBtn').addEventListener('click', () => {
-      // 弹窗前先同步一下按钮状态
+      // 同步弹窗里的 QQ 状态
       if (myQQ) {
         $('fetchQqBtn').textContent = '✅ 已获取：' + myQQ;
         $('fetchQqBtn').disabled = true;
         $('qqState').textContent = '已获取';
         $('qqState').style.color = 'var(--green)';
+        $('qqManual').style.display = 'none';
       } else {
-        $('fetchQqBtn').textContent = '🔍 点击自动获取 QQ 号';
+        $('fetchQqBtn').textContent = '🔄 尝试自动获取';
         $('fetchQqBtn').disabled = false;
-        $('qqState').textContent = '未获取';
+        $('qqState').textContent = '未获取（可直接在下方手动填写）';
         $('qqState').style.color = '';
-        // 弹窗内补抓一次（bridge 可能 init 后才 ready）
-        const retry = detectQQ();
-        if (retry) fillQQ(retry);
+        $('qqManual').style.display = ''; // 默认展开
       }
       const me = myPlayer;
       if (me) {
@@ -743,6 +737,12 @@
       const savedMajia = localStorage.getItem('zmd_majia');
       if (savedMajia) $('majiaInput').value = savedMajia;
     }
+    // 5 秒后还没拿到——主动给用户一个提醒（bridge 轮询还在后台跑）
+    setTimeout(() => {
+      if (!myQQ) {
+        toast('自动获取 QQ 未成功，报名时可手动填写', 'error');
+      }
+    }, 5000);
     refresh(false);
   }
   init();
