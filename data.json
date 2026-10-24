@@ -2,8 +2,8 @@
   "whitelist": [],
   "players": {},
   "matches": [],
-  "round": 1,
-  "stage": "round2",
+  "round": 2,
+  "stage": "registering",
   "tasks": [
     {
       "id": 1,
