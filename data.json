@@ -9,7 +9,8 @@
     {
       "majia": "乙乙",
       "ticket": "T002",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1792853162761
     }
   ],
   "players": {
@@ -26,6 +27,20 @@
       "deposit": 0,
       "matchScore": 0,
       "registeredAt": 1792853105561
+    },
+    "乙乙": {
+      "majia": "乙乙",
+      "ticket": "T002",
+      "gender": "female",
+      "wish": "成熟稳重",
+      "about": "温柔",
+      "balance": 9001,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "matchScore": 0,
+      "registeredAt": 1792853162761
     }
   },
   "matches": [],
