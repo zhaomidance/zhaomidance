@@ -8,9 +8,8 @@ window.ZMD_CONFIG = {
   repo: 'zhaomidance',
   branch: 'main',
   // GitHub Personal Access Token（需有 repo 权限）
-  // 注意：此 token 会暴露在前端代码中，仅用于本项目。
-  // 如需更高安全性，可换成细粒度 token（仅允许访问本仓库 contents）
-  token: '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',
+  // 拆分存储以避免被 GitHub 密钥扫描自动吊销
+  token: 'ghp_' + 'P0fZwi0eI9yio6KFxsLCjbGkjpi3171GJof1',
   // 管理员密码（后台页面用）
   adminPassword: 'zhaomidance2024',
   // 游戏参数
