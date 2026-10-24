@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>蒙面舞会 · 婚配玩法</title>
-<link rel="stylesheet" href="style.css?v=20261024d">
+<link rel="stylesheet" href="style.css?v=20261024e">
 </head>
 <body>
 
@@ -149,6 +149,14 @@
     <div class="qq-fetch-row" id="qqFetchRow">
       <button class="btn btn-ghost btn-sm btn-qq" id="fetchQqBtn">🔍 点击自动获取 QQ 号</button>
       <span class="qq-state" id="qqState">未获取</span>
+      <button class="link-btn qq-manual-toggle" id="qqManualToggle" type="button">手动输入 ▾</button>
+    </div>
+    <div class="qq-manual" id="qqManual" style="display:none">
+      <div class="form-group" style="margin-bottom:6px">
+        <label>手动填写 QQ 号</label>
+        <input type="text" id="qqManualInput" placeholder="请输入你的 QQ 号（5-12 位）" maxlength="12" autocomplete="off">
+      </div>
+      <button class="btn btn-primary btn-sm" id="qqManualBtn">确认使用这个 QQ</button>
     </div>
 
     <div class="form-group">
@@ -222,87 +230,153 @@
   function openModal(id) { $(id).style.display = 'flex'; }
   function closeModal(id) { $(id).style.display = 'none'; }
 
-  // ===== QQ 自动获取（QQ WebView 桥接 + 兜底） =====
-  // 判断当前是否处于 QQ 内置浏览器
+  // ===== QQ 自动获取（激进重试 + 多桥接兜底） =====
+  // QQ 内打开？
   function isInQQ() {
-    const ua = navigator.userAgent || '';
-    return /MQQBrowser|QQ\//i.test(ua) || /\bQQ\b/i.test(ua);
+    const ua = (navigator.userAgent || '') + ' ' + (navigator.vendor || '');
+    return /MQQBrowser|\bQQ\b|TencentQQ|AQQ/i.test(ua);
+  }
+  // 找 bridge：兼容不同容器挂载位置
+  function getBridge() {
+    const cands = [window, parent, top, self];
+    for (const w of cands) {
+      if (!w) continue;
+      if (w !== window) { try { if (w.mqq) return w.mqq; } catch(e) {} }
+      if (w.mqq) return w.mqq;
+      if (w.MQQBrowser && w.MQQBrowser.jsBridge) return w.MQQBrowser.jsBridge;
+      if (w.__JSBRIDGE__) return w.__JSBRIDGE__;
+    }
+    return null;
+  }
+  const qqValid = s => /^\d{5,12}$/.test(String(s || '').trim());
+
+  // 一次性尝试所有 bridge 方法
+  let qqFired = false;
+  function callAllBridgeMethods(mqq) {
+    const tryFill = qq => {
+      if (qqFired) return;
+      if (qqValid(qq)) { qqFired = true; fillQQ(qq); return true; }
+      return false;
+    };
+    try {
+      // 官方 mqq.invoke 体系
+      if (typeof mqq.invoke === 'function') {
+        // 先试试 openLogin（部分容器需先授权）
+        try {
+          mqq.invoke('ui', 'openLogin', r => {
+            if (r && (r.qq || r.uin || r.userId)) tryFill(r.qq || r.uin || r.userId);
+          });
+        } catch(e) {}
+        // data 域
+        mqq.invoke('data', 'getQQNumber', r => tryFill(r && (r.qq_number || r.qq || r.uin)));
+        mqq.invoke('data', 'getUserInfo', r => tryFill(r && (r.uin || r.qq || r.qq_number)));
+        mqq.invoke('data', 'getLoginInfo', r => tryFill(r && (r.qq || r.uin)));
+        // account 域
+        mqq.invoke('account', 'getUserAccount', r => tryFill(r && (r.qq_number || r.qq || r.uin)));
+        mqq.invoke('account', 'getAccount', r => tryFill(r && (r.qq || r.uin || r.account)));
+        // ui 域（部分版本）
+        mqq.invoke('ui', 'getUserInfo', r => tryFill(r && (r.qq || r.uin)));
+        // 另外：getAppInfo 也可能携带
+        mqq.invoke('app', 'getAppInfo', r => tryFill(r && (r.qq || r.uin)));
+      }
+      // mqq.data 直挂
+      if (mqq.data) {
+        ['getQQNumber','getUserInfo','getLoginInfo','getAccount'].forEach(m => {
+          try {
+            if (typeof mqq.data[m] === 'function') {
+              mqq.data[m](r => tryFill(r && (r.qq_number || r.qq || r.uin || r.account)));
+            }
+          } catch(e) {}
+        });
+      }
+      // mqq.account 直挂
+      if (mqq.account) {
+        ['getAccount','getUserAccount','getLoginInfo'].forEach(m => {
+          try {
+            if (typeof mqq.account[m] === 'function') {
+              mqq.account[m](r => tryFill(r && (r.qq || r.uin || r.account)));
+            }
+          } catch(e) {}
+        });
+      }
+      // mqq.ui 直挂
+      if (mqq.ui) {
+        ['getUserInfo','openLogin'].forEach(m => {
+          try {
+            if (typeof mqq.ui[m] === 'function')
+              mqq.ui[m](r => tryFill(r && (r.qq || r.uin || r.userId)));
+          } catch(e) {}
+        });
+      }
+      // mqq.getQQNumber 直接挂在根上（极少数老版本）
+      ['getQQNumber','getUserInfo','getAccount'].forEach(m => {
+        try {
+          if (typeof mqq[m] === 'function')
+            mqq[m](r => tryFill(r && (r.qq_number || r.qq || r.uin || r.account)));
+        } catch(e) {}
+      });
+    } catch(e) {}
   }
 
+  // 启动 bridge 轮询：最多轮询 5 秒，每 200ms 试一次
+  function startBridgePolling() {
+    const start = Date.now();
+    const timer = setInterval(() => {
+      if (qqFired) { clearInterval(timer); return; }
+      const mqq = getBridge();
+      if (mqq) { callAllBridgeMethods(mqq); }
+      if (Date.now() - start > 5000) clearInterval(timer);
+    }, 200);
+  }
+
+  // 入口：返回同步可得的 QQ（URL / localStorage），同时异步启动 bridge 尝试
   function detectQQ() {
     // 1) URL 参数（最快）
     const urlQq = new URLSearchParams(location.search).get('qq');
-    if (urlQq && /^\d{5,12}$/.test(urlQq)) return urlQq;
+    if (qqValid(urlQq)) return urlQq;
     // 2) localStorage 缓存（回来不用重填）
     const cache = localStorage.getItem('zmd_qq');
-    if (cache && /^\d{5,12}$/.test(cache)) return cache;
+    if (qqValid(cache)) return cache;
 
-    // 3) QQ WebView 桥接（多种 API，兼容不同版本）
-    if (isInQQ() && window.mqq) {
-      let fired = false;
-      const tryFill = (qq) => {
-        if (fired) return;
-        if (qq && /^\d{5,12}$/.test(qq)) { fired = true; fillQQ(qq); }
-      };
-      try {
-        if (typeof mqq.invoke === 'function') {
-          // 官方推荐
-          mqq.invoke('data', 'getQQNumber', r => tryFill(r && (r.qq_number || r.qq || r.uin)));
-          // 备选：账号接口
-          mqq.invoke('account', 'getUserAccount', r => tryFill(r && (r.qq_number || r.qq || r.uin)));
-          // 旧版
-          mqq.invoke('data', 'getUserInfo', r => tryFill(r && (r.qq || r.uin)));
-        }
-        if (mqq.data && typeof mqq.data.getQQNumber === 'function') {
-          mqq.data.getQQNumber(r => tryFill(r && (r.qq_number || r.qq || r.uin)));
-        }
-        if (mqq.account && typeof mqq.account.getAccount === 'function') {
-          mqq.account.getAccount(r => tryFill(r && (r.qq || r.uin || r.account)));
-        }
-      } catch (e) {}
-      // 延迟 1.2s 再试一次，部分 QQ 版本桥接初始化较慢
-      setTimeout(() => {
-        if (myQQ) return;
-        try {
-          if (typeof mqq.invoke === 'function') {
-            mqq.invoke('data', 'getQQNumber', r => tryFill(r && (r.qq_number || r.qq || r.uin)));
-          }
-          if (mqq.data && typeof mqq.data.getQQNumber === 'function') {
-            mqq.data.getQQNumber(r => tryFill(r && (r.qq_number || r.qq || r.uin)));
-          }
-        } catch (e) {}
-      }, 1200);
-    }
-
+    // 3) bridge 同步可见吗？可见则立刻调用一次全部方法
+    const mqq = getBridge();
+    if (mqq) { callAllBridgeMethods(mqq); }
+    // 4) 不论是否同步可见，都启动轮询（bridge 可能稍后才注入）
+    startBridgePolling();
     return null;
   }
+
   function fillQQ(qq) {
-    localStorage.setItem('zmd_qq', qq);
-    myQQ = qq;
-    // 同时更新弹窗里的按钮/状态（如果已打开）
+    const q = String(qq).trim();
+    localStorage.setItem('zmd_qq', q);
+    myQQ = q;
+    // 同步更新弹窗（已打开的情况下）
     const btn = $('fetchQqBtn'), state = $('qqState');
-    if (btn) { btn.textContent = '✅ 已获取：' + qq; btn.disabled = true; }
+    if (btn) { btn.textContent = '✅ 已获取：' + q; btn.disabled = true; }
     if (state) { state.textContent = '已获取'; state.style.color = 'var(--green)'; }
   }
 
-  // 弹窗里手动点按钮获取（含超时兜底）
+  // 弹窗里点按钮主动获取
   function fetchQqFromBtn() {
     const btn = $('fetchQqBtn'), state = $('qqState');
-    btn.disabled = true;
-    btn.textContent = '🔄 正在获取...';
-    state.textContent = '识别 QQ 桥接中';
-    state.style.color = '';
-    const direct = detectQQ();
+    btn.disabled = true; btn.textContent = '🔄 正在获取...';
+    state.textContent = '识别 QQ 桥接中（最多 5 秒）'; state.style.color = '';
+
+    qqFired = false;
+    const direct = detectQQ(); // URL/cache 可能同步命中
     if (direct) { fillQQ(direct); return; }
-    // 异步桥接回调
-    setTimeout(() => {
-      if (myQQ) return; // 已被回调填上
-      btn.disabled = false;
-      btn.textContent = '🔍 点击自动获取 QQ 号';
-      state.textContent = '获取失败，请确认在 QQ 内打开';
-      state.style.color = 'var(--red)';
-      toast('未能自动获取 QQ，请确认在 QQ 内打开或稍后重试', 'error');
-    }, 2500);
+
+    // 等最多 5 秒，期间 bridge 轮询在跑，只要回调一次就能填上
+    const start = Date.now();
+    const waiter = setInterval(() => {
+      if (myQQ) { clearInterval(waiter); return; } // fillQQ 已触发
+      if (Date.now() - start > 5500) {
+        clearInterval(waiter);
+        btn.disabled = false; btn.textContent = '🔍 重新尝试获取';
+        state.textContent = '自动获取失败'; state.style.color = 'var(--red)';
+        toast('自动获取 QQ 失败，请展开下方手动输入', 'error');
+      }
+    }, 250);
   }
 
   // ===== 大屏渲染 =====
@@ -582,6 +656,23 @@
     });
 
     $('fetchQqBtn').addEventListener('click', fetchQqFromBtn);
+
+    // 手动输入兜底
+    $('qqManualToggle').addEventListener('click', () => {
+      const m = $('qqManual');
+      const show = m.style.display === 'none';
+      m.style.display = show ? '' : 'none';
+      $('qqManualToggle').textContent = show ? '手动输入 ▴' : '手动输入 ▾';
+      if (show) setTimeout(() => $('qqManualInput').focus(), 50);
+    });
+    $('qqManualBtn').addEventListener('click', () => {
+      const v = $('qqManualInput').value.trim();
+      if (!qqValid(v)) { toast('请输入 5-12 位 QQ 号', 'error'); return; }
+      fillQQ(v);
+      $('qqManual').style.display = 'none';
+      $('qqManualToggle').textContent = '手动输入 ▾';
+      toast('已使用手动填写的 QQ 号', 'success');
+    });
 
     $('openRegisterBtn').addEventListener('click', () => {
       // 弹窗前先同步一下按钮状态
