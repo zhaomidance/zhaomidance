@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>蒙面舞会 · 管理后台</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=20261024">
 </head>
 <body>
 
@@ -63,7 +63,7 @@
       </div>
       <div class="stat-card">
         <div class="stat-num" id="statMatched">0</div>
-        <div class="stat-label">已婚配</div>
+        <div class="stat-label">今夜佳偶</div>
       </div>
       <button class="btn btn-gold btn-match" id="matchBtn">🌹 系统缘分匹配</button>
       <button class="btn btn-ghost" id="newRoundBtn">🔄 新一轮</button>
@@ -162,7 +162,13 @@
     $('statTotal').textContent = players.length;
     $('statMale').textContent = waiting.filter(p => p.gender === 'male').length;
     $('statFemale').textContent = waiting.filter(p => p.gender === 'female').length;
-    $('statMatched').textContent = players.filter(p => p.status === 'matched').length;
+    let couples = 0;
+    const seen = new Set();
+    for (const qq in data.players) {
+      const p = data.players[qq];
+      if (p.status === 'matched' && p.partner && !seen.has(qq)) { seen.add(p.partner); couples++; }
+    }
+    $('statMatched').textContent = couples;
     renderStage();
   }
 
