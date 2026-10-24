@@ -15,12 +15,5 @@
   "matches": [],
   "round": 2,
   "stage": "registering",
-  "tasks": [
-    {
-      "id": 3,
-      "title": "互相表白",
-      "unlock": 2000,
-      "done": false
-    }
-  ]
+  "tasks": []
 }
