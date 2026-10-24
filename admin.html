@@ -438,21 +438,16 @@
 
   // 新一轮
   async function newRound() {
-    if (!confirm('确定开启新一轮？所有婚配将被解除，待匹配玩家保留。')) return;
+    if (!confirm('确定开启新一轮？所有舞宾、配对、已投入灵石将被全部清空，门票白名单保留。')) return;
     data = await ZMD.load(true);
     data.round = (data.round || 1) + 1;
-    for (const key in data.players) {
-      const p = data.players[key];
-      if (p.status === 'matched' || p.status === 'confirmed') {
-        p.status = 'registered'; p.partner = null;
-        p.myConfirmed = false; p.deposit = 0;
-        p.matchScore = 0; p.divorceRequested = false; p.divorcePending = false;
-      }
-    }
+    data.players = {};
     data.matches = [];
     data.stage = 'registering';
-    await ZMD.save(data, `开启第${data.round}轮`);
-    toast('已开启新一轮', 'success');
+    // 重置门票白名单的占用状态，便于新一轮重新报名
+    (data.whitelist || []).forEach(w => { w.claimed = false; delete w.claimedAt; });
+    await ZMD.save(data, `开启第${data.round}轮，清空全部舞宾`);
+    toast('已开启新一轮，全部舞宾已清空', 'success');
     refresh();
   }
 
