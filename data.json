@@ -1,15 +1,5 @@
 {
-  "players": {
-    "10001": {
-      "qq": "10001",
-      "majia": "测试",
-      "balance": 9001,
-      "status": "registered",
-      "partner": null,
-      "locked": false,
-      "registeredAt": 1792820805600
-    }
-  },
+  "players": {},
   "matches": [],
   "tasks": [
     {
