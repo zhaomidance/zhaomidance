@@ -1,10 +1,32 @@
 {
-  "players": {},
+  "players": {
+    "10001": {
+      "qq": "10001",
+      "majia": "测试",
+      "balance": 9001,
+      "status": "registered",
+      "partner": null,
+      "locked": false,
+      "registeredAt": 1792820805600
+    }
+  },
   "matches": [],
   "tasks": [
-    { "id": 1, "title": "深情对视10秒", "done": false },
-    { "id": 2, "title": "合唱一首歌", "done": false },
-    { "id": 3, "title": "互相表白", "done": false }
+    {
+      "id": 1,
+      "title": "深情对视10秒",
+      "done": false
+    },
+    {
+      "id": 2,
+      "title": "合唱一首歌",
+      "done": false
+    },
+    {
+      "id": 3,
+      "title": "互相表白",
+      "done": false
+    }
   ],
   "round": 1
 }
