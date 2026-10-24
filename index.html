@@ -482,7 +482,6 @@
       }
 
       // 解除相关按钮状态
-      const spouse = data.players[me.partner];
       const spouseApplied = spouse && spouse.divorceRequested;
       const myApplied = !!me.divorceRequested;
       $('applyReleaseBtn').style.display = myApplied ? 'none' : '';
