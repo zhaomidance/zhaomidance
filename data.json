@@ -3,7 +3,8 @@
     {
       "majia": "女一",
       "ticket": "666",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1792861318396
     },
     {
       "majia": "女二",
@@ -36,7 +37,22 @@
       "claimed": false
     }
   ],
-  "players": {},
+  "players": {
+    "女一": {
+      "majia": "女一",
+      "ticket": "666",
+      "gender": "female",
+      "wish": "",
+      "about": "",
+      "balance": 9001,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "matchScore": 0,
+      "registeredAt": 1792861318396
+    }
+  },
   "matches": [],
   "round": 4,
   "stage": "registering",
@@ -70,6 +86,15 @@
       "title": "完成所有任务（奖励：再获得20%对方投入灵石）",
       "unlock": 13140,
       "done": false
+    }
+  ],
+  "logs": [
+    {
+      "time": "2026-10-24T17:01:58.396Z",
+      "actor": "女一",
+      "action": "报名入场",
+      "amount": -999,
+      "balance": 9001
     }
   ]
 }
