@@ -1,5 +1,16 @@
 {
-  "players": {},
+  "players": {
+    "123456789": {
+      "qq": "123456789",
+      "majia": "小明",
+      "balance": 9001,
+      "status": "registered",
+      "partner": null,
+      "locked": false,
+      "dice": null,
+      "registeredAt": 1792820890097
+    }
+  },
   "matches": [],
   "tasks": [
     {
