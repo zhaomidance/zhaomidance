@@ -17,12 +17,6 @@
   "stage": "registering",
   "tasks": [
     {
-      "id": 1,
-      "title": "深情对视 10 秒",
-      "unlock": 500,
-      "done": false
-    },
-    {
       "id": 2,
       "title": "共舞一曲",
       "unlock": 1200,
