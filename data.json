@@ -1,8 +1,70 @@
 {
-  "players": {},
-  "matches": [],
+  "players": {
+    "10000001": {
+      "qq": "10000001",
+      "majia": "阿强",
+      "gender": "male",
+      "wish": "温柔会唱歌",
+      "about": "阳光爱运动",
+      "balance": 9001,
+      "status": "matched",
+      "partner": "10000003",
+      "locked": false,
+      "matchScore": 9,
+      "registeredAt": 1792824918829
+    },
+    "10000002": {
+      "qq": "10000002",
+      "majia": "阿杰",
+      "gender": "male",
+      "wish": "安静爱看书",
+      "about": "幽默会做饭",
+      "balance": 9001,
+      "status": "matched",
+      "partner": "10000004",
+      "locked": false,
+      "matchScore": 18,
+      "registeredAt": 1792824918830
+    },
+    "10000003": {
+      "qq": "10000003",
+      "majia": "小美",
+      "gender": "female",
+      "wish": "阳光幽默",
+      "about": "温柔爱唱歌",
+      "balance": 9001,
+      "status": "matched",
+      "partner": "10000001",
+      "locked": false,
+      "matchScore": 9,
+      "registeredAt": 1792824918831
+    },
+    "10000004": {
+      "qq": "10000004",
+      "majia": "小雅",
+      "gender": "female",
+      "wish": "爱运动会做饭",
+      "about": "安静爱看书",
+      "balance": 9001,
+      "status": "matched",
+      "partner": "10000002",
+      "locked": false,
+      "matchScore": 18,
+      "registeredAt": 1792824918832
+    }
+  },
+  "matches": [
+    [
+      "10000002",
+      "10000004"
+    ],
+    [
+      "10000001",
+      "10000003"
+    ]
+  ],
   "round": 1,
-  "stage": "registering",
+  "stage": "round1",
   "tasks": [
     {
       "id": 1,
