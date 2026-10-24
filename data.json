@@ -1,5 +1,41 @@
 {
-  "whitelist": [],
+  "whitelist": [
+    {
+      "majia": "女一",
+      "ticket": "666",
+      "claimed": false
+    },
+    {
+      "majia": "女二",
+      "ticket": "666",
+      "claimed": false
+    },
+    {
+      "majia": "女三",
+      "ticket": "666",
+      "claimed": false
+    },
+    {
+      "majia": "男一",
+      "ticket": "666",
+      "claimed": false
+    },
+    {
+      "majia": "男二",
+      "ticket": "666",
+      "claimed": false
+    },
+    {
+      "majia": "男三",
+      "ticket": "666",
+      "claimed": false
+    },
+    {
+      "majia": "男四",
+      "ticket": "666",
+      "claimed": false
+    }
+  ],
   "players": {
     "新娘": {
       "majia": "新娘",
