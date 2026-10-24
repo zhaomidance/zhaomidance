@@ -180,7 +180,7 @@
       } else if (me.status === 'matched' && me.partner) {
         const spouse = data.players[me.partner];
         $('spouseName').textContent = spouse ? spouse.majia : '?';
-        $('diceResult').textContent = me.dice ? `🎲 你 ${me.dice} : ${me.dice} 舞伴` : '';
+        $('diceResult').textContent = (me.dice && spouse) ? `🎲 你 ${me.dice} : ${spouse.dice} 舞伴` : '';
         const lockEl = $('lockStatus');
         if (me.locked) {
           lockEl.textContent = '🔒 关系已锁定';
