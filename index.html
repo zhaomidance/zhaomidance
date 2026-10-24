@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>蒙面舞会 · 婚配玩法</title>
-<link rel="stylesheet" href="style.css?v=20261024">
+<link rel="stylesheet" href="style.css?v=20261024b">
 </head>
 <body>
 
@@ -226,28 +226,58 @@
   function openModal(id) { $(id).style.display = 'flex'; }
   function closeModal(id) { $(id).style.display = 'none'; }
 
-  // ===== QQ 自动获取 =====
+  // ===== QQ 自动获取（QQ WebView 桥接 + 兜底） =====
+  // 判断当前是否处于 QQ 内置浏览器
+  function isInQQ() {
+    const ua = navigator.userAgent || '';
+    return /MQQBrowser|QQ\//i.test(ua) || /\bQQ\b/i.test(ua);
+  }
+
   function detectQQ() {
+    // 1) URL 参数（最快）
     const urlQq = new URLSearchParams(location.search).get('qq');
     if (urlQq && /^\d{5,12}$/.test(urlQq)) return urlQq;
+    // 2) localStorage 缓存（回来不用重填）
     const cache = localStorage.getItem('zmd_qq');
     if (cache && /^\d{5,12}$/.test(cache)) return cache;
-    try {
-      if (window.mqq) {
+
+    // 3) QQ WebView 桥接（多种 API，兼容不同版本）
+    if (isInQQ() && window.mqq) {
+      let fired = false;
+      const tryFill = (qq) => {
+        if (fired) return;
+        if (qq && /^\d{5,12}$/.test(qq)) { fired = true; fillQQ(qq); }
+      };
+      try {
         if (typeof mqq.invoke === 'function') {
-          mqq.invoke('data', 'getQQNumber', function (res) {
-            const qq = res && (res.qq_number || res.qq);
-            if (qq && /^\d{5,12}$/.test(qq)) fillQQ(qq);
-          });
+          // 官方推荐
+          mqq.invoke('data', 'getQQNumber', r => tryFill(r && (r.qq_number || r.qq || r.uin)));
+          // 备选：账号接口
+          mqq.invoke('account', 'getUserAccount', r => tryFill(r && (r.qq_number || r.qq || r.uin)));
+          // 旧版
+          mqq.invoke('data', 'getUserInfo', r => tryFill(r && (r.qq || r.uin)));
         }
         if (mqq.data && typeof mqq.data.getQQNumber === 'function') {
-          mqq.data.getQQNumber(function (res) {
-            const qq = res && (res.qq_number || res.qq);
-            if (qq && /^\d{5,12}$/.test(qq)) fillQQ(qq);
-          });
+          mqq.data.getQQNumber(r => tryFill(r && (r.qq_number || r.qq || r.uin)));
         }
-      }
-    } catch (e) {}
+        if (mqq.account && typeof mqq.account.getAccount === 'function') {
+          mqq.account.getAccount(r => tryFill(r && (r.qq || r.uin || r.account)));
+        }
+      } catch (e) {}
+      // 延迟 1.2s 再试一次，部分 QQ 版本桥接初始化较慢
+      setTimeout(() => {
+        if (myQQ) return;
+        try {
+          if (typeof mqq.invoke === 'function') {
+            mqq.invoke('data', 'getQQNumber', r => tryFill(r && (r.qq_number || r.qq || r.uin)));
+          }
+          if (mqq.data && typeof mqq.data.getQQNumber === 'function') {
+            mqq.data.getQQNumber(r => tryFill(r && (r.qq_number || r.qq || r.uin)));
+          }
+        } catch (e) {}
+      }, 1200);
+    }
+
     return null;
   }
   function fillQQ(qq) {

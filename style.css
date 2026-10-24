@@ -159,7 +159,7 @@ body::after {
 /* 阶段横幅 */
 .stage-banner {
   position: relative; text-align: center;
-  padding: 30px 18px 26px;
+  padding: 22px 18px 18px;
   border-radius: 22px;
   background:
     linear-gradient(180deg, rgba(139,92,246,.16), rgba(157,23,77,.08) 60%, transparent),
@@ -193,24 +193,26 @@ body::after {
 }
 .stage-orn span.line { width: 56px; height: 1px; background: linear-gradient(90deg, transparent, var(--line), transparent); }
 
-/* 统计条 */
+/* 统计条（极致压缩，一行扁平横条） */
 .stats {
   display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 1px; border-radius: 16px; overflow: hidden;
+  gap: 1px; border-radius: 10px; overflow: hidden;
   background: rgba(232,198,106,.16);
   border: 1px solid var(--line);
+  margin: -4px 0 8px;
 }
 .stat-box {
   background: rgba(10,5,18,.85);
-  padding: 14px 8px; text-align: center;
+  padding: 6px 6px; text-align: center;
 }
 .stat-box .num {
   font-family: var(--serif);
-  font-size: 28px; font-weight: 900; color: var(--gold-soft);
+  font-size: 20px; font-weight: 900; color: var(--gold-soft);
+  line-height: 1;
 }
 .stat-box.male .num { color: #93c5fd; }
 .stat-box.female .num { color: #f9a8d4; }
-.stat-box .lbl { font-size: 10px; letter-spacing: 2px; color: var(--text-dim); margin-top: 3px; }
+.stat-box .lbl { font-size: 9px; letter-spacing: 1px; color: var(--text-dim); margin-top: 2px; }
 
 /* 区块标题 */
 .section-head {
