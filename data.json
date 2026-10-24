@@ -5,10 +5,10 @@
       "majia": "阿强",
       "gender": "male",
       "balance": 9001,
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "222222222",
       "locked": false,
-      "dice": null,
+      "dice": 3,
       "registeredAt": 1792822370304
     },
     "222222222": {
@@ -16,14 +16,19 @@
       "majia": "小美",
       "gender": "female",
       "balance": 9001,
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "111111111",
       "locked": false,
-      "dice": null,
+      "dice": 3,
       "registeredAt": 1792822625262
     }
   },
-  "matches": [],
+  "matches": [
+    [
+      "111111111",
+      "222222222"
+    ]
+  ],
   "tasks": [
     {
       "id": 1,
