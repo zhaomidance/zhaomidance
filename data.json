@@ -21,13 +21,15 @@
       "wish": "腹肌、帅气",
       "about": "温柔，被动",
       "balance": 6373,
-      "status": "confirmed",
-      "partner": "新郎",
-      "myConfirmed": true,
-      "deposit": 1314,
-      "matchScore": 6,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "matchScore": 0,
       "registeredAt": 1792856742180,
-      "public": false
+      "public": false,
+      "divorceRequested": false,
+      "divorcePending": false
     },
     "新郎": {
       "majia": "新郎",
@@ -36,22 +38,19 @@
       "wish": "温柔",
       "about": "帅气",
       "balance": 7687,
-      "status": "confirmed",
-      "partner": "新娘",
-      "myConfirmed": true,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
       "deposit": 0,
-      "matchScore": 6,
-      "registeredAt": 1792856857616
+      "matchScore": 0,
+      "registeredAt": 1792856857616,
+      "divorceRequested": false,
+      "divorcePending": false
     }
   },
-  "matches": [
-    [
-      "新郎",
-      "新娘"
-    ]
-  ],
-  "round": 2,
-  "stage": "round1",
+  "matches": [],
+  "round": 3,
+  "stage": "registering",
   "tasks": [
     {
       "id": 1792856165383,
