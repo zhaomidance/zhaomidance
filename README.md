@@ -1,55 +1,57 @@
 # 🎭 蒙面舞会 · 婚配玩法
 
-多人在线匿名婚配匹配网页，可直接在 QQ 内打开。
+多人在线匿名婚配匹配网页，可直接在 QQ 内打开。**纯前端实现，数据存储在 GitHub 仓库，无需后端服务器。**
+
+## 架构
+
+- **前端**：GitHub Pages 静态托管（三个页面）
+- **数据存储**：仓库内 `data.json` 文件，通过 GitHub Contents API 读写
+- **无需后端、无需信用卡、无需第三方服务**
+
+## 页面
+
+| 页面 | 地址 | 说明 |
+|------|------|------|
+| 用户页 | https://zhaomidance.github.io/zhaomidance/ | 报名、查配对结果、婚配操作 |
+| 管理后台 | https://zhaomidance.github.io/zhaomidance/admin.html | 查看全部、开始匹配、灵石/任务管理 |
+| 大屏展示 | https://zhaomidance.github.io/zhaomidance/screen.html | 匿名配对、灵石、任务大屏 |
 
 ## 功能
 
-- 登录自动获取 QQ 号（QQ WebView），输入二字马甲进入
-- 报名匹配（999 灵石）→ 摇骰子配对（点数相同即婚配）
-- 婚配操作：锁定 1314 / 离婚 1111 / 强制解除 5555
-- 实时在线人数、灵石余额
+- ✅ QQ 号自动获取（QQ 内打开）+ 本地缓存，回来不用重填
+- ✅ 二字马甲报名，扣 999 灵石
+- ✅ 管理员点"开始匹配"，系统自动摇骰配对
+- ✅ 锁定 1314 / 离婚 1111 / 强制解除 5555
+- ✅ 大屏匿名展示所有配对、灵石、任务
+- ✅ 后台查看全部真实信息（QQ、灵石、状态）
 
-## 本地运行
+## 管理员密码
 
-```bash
-npm install
-node server.js
-# 打开 http://localhost:3000
-```
-
-## 部署
-
-### 1. 前端（GitHub Pages）
-
-本仓库已推送到 GitHub，在仓库设置中开启 **Settings → Pages → Source: main branch**，
-前端即可通过 `https://<你的组织名>.github.io/<仓库名>/` 访问。
-
-### 2. 后端（WebSocket 服务）
-
-GitHub Pages 不能运行 Node，需单独部署后端。推荐 **Render**（免费）：
-
-1. 登录 [render.com](https://render.com)
-2. New → Blueprint → 选择本仓库（含 `render.yaml`）
-3. 等待部署完成，得到后端地址如 `https://zhaomidance-server.onrender.com`
-4. 修改 `app.js` 顶部的 `BACKEND_URL` 为 `wss://zhaomidance-server.onrender.com`
-5. 重新推送代码即可
-
-> Render 免费实例约 15 分钟无请求会休眠，首次访问需等几十秒唤醒。
-
-### 3. QQ 内打开
-
-将前端 GitHub Pages 链接发到 QQ 群，点击即可在 QQ 内置浏览器打开。
-- QQ 号会自动获取（需页面在 QQ 内打开）
-- 若未获取到，可手动输入
+后台默认密码：`zhaomidance2024`（可在 `config.js` 修改）
 
 ## 规则
 
 | 操作 | 灵石 | 说明 |
 |------|------|------|
 | 报名 | 999 | 进入匹配队列，匿名 |
-| 锁定 | 1314 | 锁定婚配关系，不可被替换 |
+| 锁定 | 1314 | 锁定婚配关系 |
 | 离婚 | 1111 | 申请离婚，需对方同意 |
 | 强制解除 | 5555 | 单方面解除，无需同意 |
 
 - 灵石费用一经缴纳不退
-- 一轮婚配解除后，需重新报名（999）开启新一轮
+- 一轮婚配解除后，需重新报名开启新一轮
+- 初始灵石 10000
+
+## 文件说明
+
+- `index.html` — 用户页
+- `admin.html` — 管理后台
+- `screen.html` — 大屏展示
+- `style.css` — 样式
+- `config.js` — 配置（仓库地址、Token、管理员密码）
+- `data.js` — 数据层（GitHub API 读写）
+- `data.json` — 游戏数据（玩家、配对、任务）
+
+## 安全提示
+
+`config.js` 中的 GitHub Token 会暴露在前端代码中。建议使用**细粒度 Token**（仅允许访问本仓库 contents），并定期更换。
