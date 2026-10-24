@@ -51,8 +51,8 @@
       "wish": "",
       "about": "",
       "balance": 9001,
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "男四",
       "myConfirmed": false,
       "deposit": 0,
       "matchScore": 0,
@@ -65,8 +65,8 @@
       "wish": "",
       "about": "",
       "balance": 9001,
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "男二",
       "myConfirmed": false,
       "deposit": 0,
       "matchScore": 0,
@@ -79,8 +79,8 @@
       "wish": "",
       "about": "",
       "balance": 9001,
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "男一",
       "myConfirmed": false,
       "deposit": 0,
       "matchScore": 0,
@@ -93,8 +93,8 @@
       "wish": "",
       "about": "",
       "balance": 9001,
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "女三",
       "myConfirmed": false,
       "deposit": 0,
       "matchScore": 0,
@@ -107,8 +107,8 @@
       "wish": "",
       "about": "",
       "balance": 9001,
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "女二",
       "myConfirmed": false,
       "deposit": 0,
       "matchScore": 0,
@@ -135,17 +135,30 @@
       "wish": "",
       "about": "",
       "balance": 9001,
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "女一",
       "myConfirmed": false,
       "deposit": 0,
       "matchScore": 0,
       "registeredAt": 1792861433796
     }
   },
-  "matches": [],
+  "matches": [
+    [
+      "男二",
+      "女二"
+    ],
+    [
+      "男四",
+      "女一"
+    ],
+    [
+      "男一",
+      "女三"
+    ]
+  ],
   "round": 4,
-  "stage": "round1",
+  "stage": "round2",
   "tasks": [
     {
       "id": 1792856165383,
