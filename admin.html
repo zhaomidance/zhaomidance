@@ -10,15 +10,17 @@
 
 <!-- 登录 -->
 <div id="adminLogin" class="page active">
-  <div class="login-bg"></div>
-  <div class="login-card">
-    <div class="logo">🛡️</div>
-    <h1 class="title">管理后台</h1>
-    <div class="form-group">
-      <label>管理员密码</label>
-      <input type="password" id="adminPwd" placeholder="请输入管理员密码">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="logo">🎭</div>
+      <h1 class="title">红娘阁</h1>
+      <p class="subtitle">MASKED BALL · 后台管理</p>
+      <div class="form-group">
+        <label>管理员密码</label>
+        <input type="password" id="adminPwd" placeholder="请输入管理员密码">
+      </div>
+      <button class="btn btn-gold btn-block" id="adminLoginBtn">进入后台</button>
     </div>
-    <button class="btn btn-primary" id="adminLoginBtn">进入后台</button>
   </div>
 </div>
 
@@ -36,6 +38,15 @@
   </header>
 
   <main class="content" style="max-width:900px">
+    <!-- 大屏阶段控制 -->
+    <h2 class="section-title">🎬 大屏阶段</h2>
+    <div class="stage-row" id="stageRow">
+      <button class="stage-btn" data-stage="registering">🔮 报名中</button>
+      <button class="stage-btn" data-stage="round1">💫 第一次匹配</button>
+      <button class="stage-btn" data-stage="round2">💫 第二次匹配</button>
+      <button class="stage-btn" data-stage="final">💍 最终匹配</button>
+    </div>
+
     <!-- 统计 + 操作 -->
     <div class="admin-actions">
       <div class="stat-card">
@@ -54,7 +65,7 @@
         <div class="stat-num" id="statMatched">0</div>
         <div class="stat-label">已婚配</div>
       </div>
-      <button class="btn btn-primary btn-match" id="matchBtn">🎲 开始匹配</button>
+      <button class="btn btn-gold btn-match" id="matchBtn">🌹 系统缘分匹配</button>
       <button class="btn btn-ghost" id="newRoundBtn">🔄 新一轮</button>
     </div>
 
@@ -64,7 +75,7 @@
       <table class="data-table" id="playersTable">
         <thead>
           <tr>
-            <th>QQ号</th><th>马甲</th><th>性别</th><th>灵石</th><th>状态</th><th>舞伴</th><th>操作</th>
+            <th>QQ号</th><th>马甲</th><th>性别</th><th>灵石</th><th>状态</th><th>舞伴</th><th>许愿</th><th>自述</th><th>操作</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -76,7 +87,7 @@
     <div class="table-wrap">
       <table class="data-table" id="matchesTable">
         <thead>
-          <tr><th>马甲A</th><th>QQ</th><th>马甲B</th><th>QQ</th><th>锁定</th><th>操作</th></tr>
+          <tr><th>马甲A</th><th>QQ</th><th>马甲B</th><th>QQ</th><th>缘分</th><th>锁定</th><th>操作</th></tr>
         </thead>
         <tbody></tbody>
       </table>
@@ -152,12 +163,24 @@
     $('statMale').textContent = waiting.filter(p => p.gender === 'male').length;
     $('statFemale').textContent = waiting.filter(p => p.gender === 'female').length;
     $('statMatched').textContent = players.filter(p => p.status === 'matched').length;
+    renderStage();
+  }
+
+  function renderStage() {
+    const cur = data.stage || 'registering';
+    document.querySelectorAll('.stage-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.stage === cur);
+    });
   }
 
   function genderText(p) {
-    if (p.gender === 'male') return '<span style="color:#60a5fa">👦 男</span>';
-    if (p.gender === 'female') return '<span style="color:var(--pink)">👧 女</span>';
+    if (p.gender === 'male') return '<span style="color:#93c5fd">👦 男</span>';
+    if (p.gender === 'female') return '<span style="color:#f9a8d4">👧 女</span>';
     return '<span style="color:var(--text-dim)">?</span>';
+  }
+
+  function esc(s) {
+    return String(s || '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
   }
 
   function renderPlayers() {
@@ -174,6 +197,8 @@
         <td><b>${p.balance}</b> 💎</td>
         <td>${statusText(p)}</td>
         <td>${spouse ? spouse.majia : '-'}</td>
+        <td>${esc(p.wish) || '<span style="opacity:.4">-</span>'}</td>
+        <td>${esc(p.about) || '<span style="opacity:.4">-</span>'}</td>
         <td>
           <button class="mini-btn" onclick="window._adjBal('${p.qq}')">调灵石</button>
           <button class="mini-btn danger" onclick="window._delPlayer('${p.qq}')">删除</button>
@@ -184,7 +209,7 @@
 
   function statusText(p) {
     if (p.status === 'registered') return '<span style="color:var(--gold)">待匹配</span>';
-    if (p.status === 'matched') return p.locked ? '<span style="color:var(--green)">已锁定</span>' : '<span style="color:var(--pink)">已婚配</span>';
+    if (p.status === 'matched') return p.locked ? '<span style="color:var(--green)">已锁定</span>' : '<span style="color:var(--rose)">已婚配</span>';
     return p.status;
   }
 
@@ -202,6 +227,7 @@
       tr.innerHTML = `
         <td>${p.majia}</td><td>${p.qq}</td>
         <td>${spouse.majia}</td><td>${spouse.qq}</td>
+        <td>缘分 ${p.matchScore || 0}</td>
         <td>${p.locked ? '🔒' : '❌'}</td>
         <td><button class="mini-btn danger" onclick="window._forceDivorce('${qq}','${p.partner}')">强制解除</button></td>`;
       tbody.appendChild(tr);
@@ -222,41 +248,50 @@
     });
   }
 
-  // 开始匹配（男女配对）
+  // ===== 系统缘分匹配（参考许愿偏好，非骰子） =====
   async function startMatch() {
     const waiting = Object.values(data.players).filter(p => p.status === 'registered');
-    const males = ZMD.shuffle(waiting.filter(p => p.gender === 'male'));
-    const females = ZMD.shuffle(waiting.filter(p => p.gender === 'female'));
-    const n = Math.min(males.length, females.length);
-    if (n < 1) {
+    const males = waiting.filter(p => p.gender === 'male');
+    const females = waiting.filter(p => p.gender === 'female');
+    if (!males.length || !females.length) {
       toast(`男女各需至少1人（当前男 ${males.length} / 女 ${females.length}）`, 'error');
       return;
     }
-    if (!confirm(`男嘉宾 ${males.length} 人 / 女嘉宾 ${females.length} 人\n将配对 ${n} 对，确定开始摇骰？`)) return;
+    const n = Math.min(males.length, females.length);
+    if (!confirm(`男宾 ${males.length} 人 / 女宾 ${females.length} 人\n系统将参考许愿偏好配对 ${n} 对，确定？`)) return;
 
-    const pairs = [];
-    for (let i = 0; i < n; i++) pairs.push([males[i], females[i]]);
-
-    let msg = '匹配结果：\n';
-    for (const [a, b] of pairs) {
-      const da = ZMD.rollDice(), db = ZMD.rollDice();
+    const pairs = ZMD.fateMatch(males, females);
+    let msg = '缘分匹配结果：\n';
+    for (const pr of pairs) {
+      const a = pr.a, b = pr.b;
       a.status = 'matched'; b.status = 'matched';
       a.partner = b.qq; b.partner = a.qq;
-      a.dice = da; b.dice = db;
       a.locked = false; b.locked = false;
+      a.matchScore = pr.score; b.matchScore = pr.score;
+      a.divorceRequested = false; a.divorcePending = false;
+      b.divorceRequested = false; b.divorcePending = false;
+      if (!data.matches) data.matches = [];
       data.matches.push([a.qq, b.qq]);
-      msg += `${a.majia}(${da}) ❤ ${b.majia}(${db})\n`;
+      msg += `${a.majia} ❤ ${b.majia}（缘分 ${pr.score}）\n`;
     }
-    // 人数多出的一方轮空
-    if (males.length > n) {
-      males.slice(n).forEach(p => { msg += `${p.majia}（男）轮空，继续等待\n`; });
-    }
-    if (females.length > n) {
-      females.slice(n).forEach(p => { msg += `${p.majia}（女）轮空，继续等待\n`; });
-    }
-    await ZMD.save(data, `管理员开始匹配，生成${pairs.length}对`);
+    // 轮空提示
+    const usedM = new Set(pairs.map(p => p.a.qq));
+    const usedF = new Set(pairs.map(p => p.b.qq));
+    males.filter(p => !usedM.has(p.qq)).forEach(p => { msg += `${p.majia}（男宾）轮空，继续等待\n`; });
+    females.filter(p => !usedF.has(p.qq)).forEach(p => { msg += `${p.majia}（女宾）轮空，继续等待\n`; });
+
+    // 匹配后自动推进大屏阶段
+    data.stage = nextStage(data.stage || 'registering');
+    await ZMD.save(data, `系统缘分匹配，生成${pairs.length}对`);
     alert(msg);
     refresh();
+  }
+
+  function nextStage(s) {
+    if (s === 'registering') return 'round1';
+    if (s === 'round1') return 'round2';
+    if (s === 'round2') return 'final';
+    return 'final';
   }
 
   // 新一轮
@@ -267,10 +302,11 @@
       const p = data.players[qq];
       if (p.status === 'matched') {
         p.status = 'registered'; p.partner = null; p.locked = false;
-        p.dice = null; p.divorceRequested = false; p.divorcePending = false;
+        p.matchScore = 0; p.divorceRequested = false; p.divorcePending = false;
       }
     }
     data.matches = [];
+    data.stage = 'registering';
     await ZMD.save(data, `开启第${data.round}轮`);
     toast('已开启新一轮', 'success');
     refresh();
@@ -305,7 +341,7 @@
       if (spouse) { spouse.partner = null; spouse.status = 'registered'; }
     }
     delete data.players[qq];
-    data.matches = data.matches.filter(m => !m.includes(qq));
+    data.matches = (data.matches || []).filter(m => !m.includes(qq));
     await ZMD.save(data, `删除玩家 ${p.majia}`);
     refresh();
   };
@@ -314,8 +350,8 @@
   window._forceDivorce = async (a, b) => {
     if (!confirm('确定强制解除这对婚配？')) return;
     const pa = data.players[a], pb = data.players[b];
-    if (pa) { pa.partner = null; pa.status = 'registered'; pa.locked = false; pa.dice = null; }
-    if (pb) { pb.partner = null; pb.status = 'registered'; pb.locked = false; pb.dice = null; }
+    if (pa) { pa.partner = null; pa.status = 'registered'; pa.locked = false; pa.matchScore = 0; }
+    if (pb) { pb.partner = null; pb.status = 'registered'; pb.locked = false; pb.matchScore = 0; }
     data.matches = data.matches.filter(m => !m.includes(a) && !m.includes(b));
     await ZMD.save(data, '管理员强制解除婚配');
     refresh();
@@ -341,12 +377,27 @@
     refresh();
   };
 
+  // 阶段切换
+  document.querySelectorAll('.stage-btn').forEach(b => {
+    b.onclick = async () => {
+      try {
+        data = await ZMD.load();
+        data.stage = b.dataset.stage;
+        await ZMD.save(data, `设置大屏阶段: ${b.dataset.stage}`);
+        toast('大屏阶段已更新', 'success');
+        refresh();
+      } catch (e) {
+        toast('切换失败: ' + e.message, 'error');
+      }
+    };
+  });
+
   // 登录
   $('adminLoginBtn').onclick = () => {
     if ($('adminPwd').value === C.adminPassword) {
       showPage('adminPanel');
       refresh();
-      setInterval(refresh, 10000);
+      setInterval(refresh, 15000);
     } else {
       toast('密码错误', 'error');
     }

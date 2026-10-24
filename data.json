@@ -2,6 +2,7 @@
   "players": {},
   "matches": [],
   "round": 1,
+  "stage": "registering",
   "tasks": [
     {
       "id": 1,

@@ -77,5 +77,53 @@ const ZMD = (function () {
     return arr;
   }
 
-  return { load, save, uid, rollDice, shuffle, get config() { return C; } };
+  // ===== 缘分匹配算法（参考许愿偏好，不使用骰子） =====
+  // 中文关键词提取：去标点空白后按 2 字滑窗切分
+  function keywords(text) {
+    if (!text) return new Set();
+    const clean = String(text)
+      .replace(/[\s，,。.、；;：:！!？?~～\-—_/|\\()（）\[\]【】"'“”‘’]/g, '');
+    const set = new Set();
+    for (let i = 0; i + 2 <= clean.length; i++) set.add(clean.slice(i, i + 2));
+    if (clean.length === 1) set.add(clean);
+    return set;
+  }
+
+  // 缘分分：双方"许愿"与对方"自我描述"的契合度 + 双方许愿相似度
+  function affinity(a, b) {
+    const aWish = keywords(a.wish);
+    const bWish = keywords(b.wish);
+    const aAbout = keywords(a.about);
+    const bAbout = keywords(b.about);
+    let score = 0;
+    aWish.forEach(k => { if (bAbout.has(k)) score += 3; }); // 我的许愿，他/她的样子
+    bWish.forEach(k => { if (aAbout.has(k)) score += 3; }); // 他/她的许愿，我的样子
+    aWish.forEach(k => { if (bWish.has(k)) score += 1; });  // 彼此期许相似
+    return score;
+  }
+
+  // 全局缘分配对：所有男女组合按缘分分排序后贪心配对
+  function fateMatch(males, females) {
+    const cand = [];
+    for (const m of males) {
+      for (const f of females) {
+        cand.push({ m, f, s: affinity(m, f) + Math.random() * 2.2 });
+      }
+    }
+    cand.sort((x, y) => y.s - x.s);
+    const usedM = new Set(), usedF = new Set();
+    const pairs = [];
+    for (const c of cand) {
+      if (usedM.has(c.m.qq) || usedF.has(c.f.qq)) continue;
+      usedM.add(c.m.qq); usedF.add(c.f.qq);
+      pairs.push({ a: c.m, b: c.f, score: affinity(c.m, c.f) });
+    }
+    return pairs;
+  }
+
+  return {
+    load, save, uid, rollDice, shuffle,
+    keywords, affinity, fateMatch,
+    get config() { return C; }
+  };
 })();
