@@ -4,10 +4,10 @@
       "qq": "123456789",
       "majia": "小明",
       "balance": 9001,
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "987654321",
       "locked": false,
-      "dice": null,
+      "dice": 3,
       "registeredAt": 1792820890097,
       "divorceRequested": false,
       "divorcePending": false
@@ -16,16 +16,21 @@
       "qq": "987654321",
       "majia": "小红",
       "balance": 9001,
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "123456789",
       "locked": false,
       "registeredAt": 1792821004709,
-      "dice": null,
+      "dice": 4,
       "divorceRequested": false,
       "divorcePending": false
     }
   },
-  "matches": [],
+  "matches": [
+    [
+      "123456789",
+      "987654321"
+    ]
+  ],
   "tasks": [
     {
       "id": 1,
