@@ -1,73 +1,12 @@
 {
-  "whitelist": [
-    {
-      "majia": "甲甲",
-      "ticket": "T001",
-      "claimed": true,
-      "claimedAt": 1792853105561
-    },
-    {
-      "majia": "乙乙",
-      "ticket": "T002",
-      "claimed": true,
-      "claimedAt": 1792853162761
-    }
-  ],
-  "players": {
-    "甲甲": {
-      "majia": "甲甲",
-      "ticket": "T001",
-      "gender": "male",
-      "wish": "温柔体贴",
-      "about": "沉稳",
-      "balance": 7687,
-      "status": "registered",
-      "partner": null,
-      "myConfirmed": false,
-      "deposit": 0,
-      "matchScore": 0,
-      "registeredAt": 1792853105561,
-      "divorceRequested": false,
-      "divorcePending": false
-    },
-    "乙乙": {
-      "majia": "乙乙",
-      "ticket": "T002",
-      "gender": "female",
-      "wish": "成熟稳重",
-      "about": "温柔",
-      "balance": 5376,
-      "status": "registered",
-      "partner": null,
-      "myConfirmed": false,
-      "deposit": 0,
-      "matchScore": 0,
-      "registeredAt": 1792853162761,
-      "divorceRequested": false,
-      "divorcePending": false
-    }
-  },
+  "whitelist": [],
+  "players": {},
   "matches": [],
   "round": 1,
-  "stage": "round1",
+  "stage": "registering",
   "tasks": [
-    {
-      "id": 1,
-      "title": "深情对视 10 秒",
-      "unlock": 500,
-      "done": false
-    },
-    {
-      "id": 2,
-      "title": "共舞一曲",
-      "unlock": 1200,
-      "done": false
-    },
-    {
-      "id": 3,
-      "title": "互相表白",
-      "unlock": 2000,
-      "done": false
-    }
+    { "id": 1, "title": "深情对视 10 秒", "unlock": 500, "done": false },
+    { "id": 2, "title": "共舞一曲", "unlock": 1200, "done": false },
+    { "id": 3, "title": "互相表白", "unlock": 2000, "done": false }
   ]
 }
