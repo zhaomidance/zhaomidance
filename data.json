@@ -3,7 +3,8 @@
     {
       "majia": "新娘",
       "ticket": "666",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1792856742180
     },
     {
       "majia": "新郎",
@@ -11,7 +12,22 @@
       "claimed": false
     }
   ],
-  "players": {},
+  "players": {
+    "新娘": {
+      "majia": "新娘",
+      "ticket": "666",
+      "gender": "male",
+      "wish": "腹肌、帅气",
+      "about": "温柔，被动",
+      "balance": 9001,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "matchScore": 0,
+      "registeredAt": 1792856742180
+    }
+  },
   "matches": [],
   "round": 2,
   "stage": "registering",
