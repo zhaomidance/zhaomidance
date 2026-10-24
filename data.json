@@ -21,11 +21,11 @@
       "wish": "腹肌、帅气",
       "about": "温柔，被动",
       "balance": 9001,
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "新郎",
       "myConfirmed": false,
       "deposit": 0,
-      "matchScore": 0,
+      "matchScore": 6,
       "registeredAt": 1792856742180
     },
     "新郎": {
@@ -35,17 +35,22 @@
       "wish": "温柔",
       "about": "帅气",
       "balance": 9001,
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "新娘",
       "myConfirmed": false,
       "deposit": 0,
-      "matchScore": 0,
+      "matchScore": 6,
       "registeredAt": 1792856857616
     }
   },
-  "matches": [],
+  "matches": [
+    [
+      "新郎",
+      "新娘"
+    ]
+  ],
   "round": 2,
-  "stage": "round1",
+  "stage": "round2",
   "tasks": [
     {
       "id": 1792856165383,
