@@ -572,11 +572,11 @@
   function generateReport() {
     if (!data) return '';
     const lines = [];
-    lines.push('=== 蒙面舞会 · 灵石流水报表 ===');
+    lines.push('=== 蒙面舞会 · 灵石流水报表（按人） ===');
     lines.push('生成时间：' + fmtTime(new Date().toISOString()));
     lines.push('');
 
-    // 门票 / 白名单
+    // 门票白名单
     lines.push('【门票白名单】');
     const wl = data.whitelist || [];
     if (!wl.length) lines.push('（暂无）');
@@ -587,27 +587,28 @@
     });
     lines.push('');
 
-    // 操作流水
-    lines.push('【灵石操作流水】');
-    const logs = data.logs || [];
-    if (!logs.length) lines.push('（暂无操作记录）');
-    logs.forEach(l => {
-      const amt = (l.amount > 0 ? '+' : '') + l.amount;
-      lines.push(`${fmtTime(l.time)}\t${l.actor}\t${l.action}\t${amt} 💎\t余额 ${l.balance}`);
-    });
-    lines.push('');
+    // 按人分组流水（从入场 999 开始，含确认/解除/投入，二次匹配流水自然按时间续上）
+    const logs = (data.logs || []).slice().sort((a,b) => (a.time||'').localeCompare(b.time||''));
+    const byActor = {};
+    logs.forEach(l => { (byActor[l.actor] = byActor[l.actor] || []).push(l); });
 
-    // 当前各玩家余额
-    lines.push('【当前各舞宾余额】');
+    lines.push('【按人灵石流水】');
     const players = Object.values(data.players || {});
     if (!players.length) lines.push('（暂无）');
     players.sort((a,b) => (a.gender === b.gender ? 0 : a.gender === 'male' ? -1 : 1)).forEach(p => {
+      const gender = p.gender === 'male' ? '男' : '女';
       const spouse = p.partner ? data.players[p.partner] : null;
-      lines.push(`${p.majia}\t门票 ${p.ticket}\t${p.gender === 'male' ? '男' : '女'}\t余额 ${p.balance} 💎\t已投入 ${p.deposit || 0} 💎\t${p.status}${spouse ? ' · 舞伴 ' + spouse.majia : ''}`);
+      lines.push(`—— ${p.majia}（${gender} · 门票 ${p.ticket} · 当前余额 ${p.balance} 💎 · 已投入 ${p.deposit||0} 💎${spouse ? ' · 舞伴 ' + spouse.majia : ''}）——`);
+      const myLogs = byActor[p.majia] || [];
+      if (!myLogs.length) lines.push('  （无操作记录）');
+      myLogs.forEach(l => {
+        const amt = (l.amount > 0 ? '+' : '') + l.amount;
+        lines.push(`  ${fmtTime(l.time)}\t${l.action}\t${amt} 💎\t余额 ${l.balance}`);
+      });
+      lines.push('');
     });
-    lines.push('');
 
-    // 统计
+    // 合计
     const totalBal = players.reduce((s,p) => s + (p.balance||0), 0);
     const totalDeposit = players.reduce((s,p) => s + (p.deposit||0), 0);
     lines.push('【合计】');
