@@ -1,12 +1,38 @@
 {
-  "whitelist": [],
+  "whitelist": [
+    {
+      "majia": "甲甲",
+      "ticket": "T001",
+      "claimed": false
+    },
+    {
+      "majia": "乙乙",
+      "ticket": "T002",
+      "claimed": false
+    }
+  ],
   "players": {},
   "matches": [],
   "round": 1,
   "stage": "registering",
   "tasks": [
-    { "id": 1, "title": "深情对视 10 秒", "unlock": 500, "done": false },
-    { "id": 2, "title": "共舞一曲", "unlock": 1200, "done": false },
-    { "id": 3, "title": "互相表白", "unlock": 2000, "done": false }
+    {
+      "id": 1,
+      "title": "深情对视 10 秒",
+      "unlock": 500,
+      "done": false
+    },
+    {
+      "id": 2,
+      "title": "共舞一曲",
+      "unlock": 1200,
+      "done": false
+    },
+    {
+      "id": 3,
+      "title": "互相表白",
+      "unlock": 2000,
+      "done": false
+    }
   ]
 }
