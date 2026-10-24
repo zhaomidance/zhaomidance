@@ -527,6 +527,9 @@
       msg.textContent = '✓ 核对成功，请填写报名信息';
       msg.className = 'verify-msg ok';
       showInfoStep(majia, ticket);
+      $('registerBtn').textContent = existing
+        ? '回 到 舞 会（报名费已缴）'
+        : `缴纳 ${C.costs.register} 灵石 · 入场`;
       if (existing) {
         chosenGender = existing.gender || null;
         $('wishInput').value = existing.wish || '';

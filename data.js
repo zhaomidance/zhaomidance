@@ -14,7 +14,8 @@ const ZMD = (function () {
     // 刚写入后优先用本地最新数据，避免读到 GitHub 的旧缓存
     if (lastWrite && Date.now() - lastWrite < 5000) return cache;
     if (!force && cache && Date.now() - cacheTime < 10000) return cache;
-    const res = await fetch(API, {
+    const res = await fetch(API + '&_=' + Date.now(), {
+      cache: 'no-store',
       headers: {
         Authorization: `token ${C.token}`,
         Accept: 'application/vnd.github+json',
