@@ -5,11 +5,6 @@
   "stage": "registering",
   "tasks": [
     {
-      "id": 1,
-      "title": "深情对视10秒",
-      "done": true
-    },
-    {
       "id": 2,
       "title": "合唱一首歌",
       "done": false
