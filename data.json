@@ -15,5 +15,12 @@
   "matches": [],
   "round": 2,
   "stage": "registering",
-  "tasks": []
+  "tasks": [
+    {
+      "id": 1792856165383,
+      "title": "拥有好友位（奖励：获得20%对方投入灵石）",
+      "unlock": 0,
+      "done": false
+    }
+  ]
 }
