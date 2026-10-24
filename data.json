@@ -1,5 +1,16 @@
 {
-  "whitelist": [],
+  "whitelist": [
+    {
+      "majia": "新娘",
+      "ticket": "666",
+      "claimed": false
+    },
+    {
+      "majia": "新郎",
+      "ticket": "999",
+      "claimed": false
+    }
+  ],
   "players": {},
   "matches": [],
   "round": 2,
