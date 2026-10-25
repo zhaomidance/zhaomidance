@@ -635,7 +635,7 @@ body::after {
 }
 .task-item.done { text-decoration: line-through; opacity: .5; }
 .task-check { cursor: pointer; font-size: 17px; }
-.task-title { flex: 1; font-size: 14px; }
+.task-title { flex: 1; min-width: 0; font-size: 14px; }
 
 /* ============================================================
    面具舞会装饰元素

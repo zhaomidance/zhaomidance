@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>蒙面舞会 · 管理后台</title>
-<link rel="stylesheet" href="style.css?v=20261025d">
+<link rel="stylesheet" href="style.css?v=20261025e">
 </head>
 <body>
 
@@ -358,6 +358,7 @@
         <span class="task-check" onclick="window._toggleTask(${idx})">${t.done ? '✅' : '⬜'}</span>
         <span class="task-title">${esc(t.title)}</span>
         <span class="task-unlock-badge">🔓 ${t.unlock || 0} 💎</span>
+        <button class="mini-btn" onclick="window._editTaskTitle(${idx})">改字</button>
         <button class="mini-btn" onclick="window._editUnlock(${idx})">改值</button>
         <button class="mini-btn danger" onclick="window._delTask(${idx})">删除</button>`;
       ul.appendChild(li);
@@ -469,6 +470,18 @@
     data = await ZMD.load(true);
     data.tasks.splice(i, 1);
     await ZMD.save(data, '删除任务');
+    refresh();
+  };
+  window._editTaskTitle = async (i) => {
+    data = await ZMD.load(true);
+    const cur = data.tasks[i].title || '';
+    const v = prompt('修改任务文字：', cur);
+    if (v === null) return;
+    const title = v.trim();
+    if (!title) { toast('任务文字不能为空', 'error'); return; }
+    data.tasks[i].title = title;
+    await ZMD.save(data, '修改任务文字');
+    toast('任务文字已更新', 'success');
     refresh();
   };
   window._editUnlock = async (i) => {
