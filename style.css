@@ -636,6 +636,19 @@ body::after {
 .task-item.done { text-decoration: line-through; opacity: .5; }
 .task-check { cursor: pointer; font-size: 17px; }
 .task-title { flex: 1; min-width: 0; font-size: 14px; }
+.task-edit-input {
+  flex: 1; min-width: 0;
+  padding: 5px 8px; border-radius: 6px;
+  background: rgba(0,0,0,.5);
+  border: 1px solid rgba(232,198,106,.65);
+  color: var(--text); font-size: 13px; font-family: inherit; outline: none;
+}
+.task-edit-num { flex: 0 0 76px; }
+.mini-btn.save {
+  background: rgba(52,211,153,.2);
+  border-color: rgba(52,211,153,.45);
+  color: #86efac;
+}
 
 /* ============================================================
    面具舞会装饰元素

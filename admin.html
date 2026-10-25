@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>蒙面舞会 · 管理后台</title>
-<link rel="stylesheet" href="style.css?v=20261025e">
+<link rel="stylesheet" href="style.css?v=20261025f">
 </head>
 <body>
 
@@ -346,26 +346,152 @@
   }
 
   // ===== 任务 =====
+  // 行内编辑，避免依赖 prompt（QQ 内置浏览器常屏蔽 prompt）
+  let editing = null; // { idx, field: 'title' | 'unlock' }
+
+  function miniBtn(text, handler, cls) {
+    const b = document.createElement('button');
+    b.className = cls || 'mini-btn';
+    b.textContent = text;
+    b.onclick = handler;
+    return b;
+  }
+
   function renderTasks() {
     const ul = $('taskList');
     ul.innerHTML = '';
-    const tasks = (data.tasks || []).slice().sort((a,b) => (a.unlock||0) - (b.unlock||0));
-    tasks.forEach((t) => {
+    const tasks = (data.tasks || []).slice().sort((a, b) => (a.unlock || 0) - (b.unlock || 0));
+
+    if (!tasks.length) {
+      const empty = document.createElement('li');
+      empty.className = 'table-empty';
+      empty.style.cssText = 'text-align:center;color:var(--text-dim);padding:12px';
+      empty.textContent = '今夜暂无任务';
+      ul.appendChild(empty);
+      return;
+    }
+
+    tasks.forEach(t => {
       const idx = data.tasks.indexOf(t);
+      const isEditTitle = editing && editing.idx === idx && editing.field === 'title';
+      const isEditUnlock = editing && editing.idx === idx && editing.field === 'unlock';
+
       const li = document.createElement('li');
       li.className = 'task-item' + (t.done ? ' done' : '');
-      li.innerHTML = `
-        <span class="task-check" onclick="window._toggleTask(${idx})">${t.done ? '✅' : '⬜'}</span>
-        <span class="task-title">${esc(t.title)}</span>
-        <span class="task-unlock-badge">🔓 ${t.unlock || 0} 💎</span>
-        <button class="mini-btn" onclick="window._editTaskTitle(${idx})">改字</button>
-        <button class="mini-btn" onclick="window._editUnlock(${idx})">改值</button>
-        <button class="mini-btn danger" onclick="window._delTask(${idx})">删除</button>`;
+
+      const check = document.createElement('span');
+      check.className = 'task-check';
+      check.textContent = t.done ? '✅' : '⬜';
+      check.onclick = () => toggleTask(idx);
+      li.appendChild(check);
+
+      if (isEditTitle) {
+        const input = document.createElement('input');
+        input.className = 'task-edit-input';
+        input.value = t.title || '';
+        input.maxLength = 40;
+        input.placeholder = '任务文字';
+        bindEditKeys(input, idx);
+        li.appendChild(input);
+      } else {
+        const title = document.createElement('span');
+        title.className = 'task-title';
+        title.textContent = t.title || '';
+        li.appendChild(title);
+      }
+
+      if (isEditUnlock) {
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.className = 'task-edit-input task-edit-num';
+        input.value = t.unlock || 0;
+        input.min = '0';
+        input.placeholder = '灵石';
+        bindEditKeys(input, idx);
+        li.appendChild(input);
+      } else {
+        const badge = document.createElement('span');
+        badge.className = 'task-unlock-badge';
+        badge.textContent = `🔓 ${t.unlock || 0} 💎`;
+        li.appendChild(badge);
+      }
+
+      if (isEditTitle || isEditUnlock) {
+        li.appendChild(miniBtn('保存', () => saveTaskEdit(idx), 'mini-btn save'));
+        li.appendChild(miniBtn('取消', cancelTaskEdit));
+      } else {
+        li.appendChild(miniBtn('改字', () => startTaskEdit(idx, 'title')));
+        li.appendChild(miniBtn('改值', () => startTaskEdit(idx, 'unlock')));
+        li.appendChild(miniBtn('删除', () => delTask(idx), 'mini-btn danger'));
+      }
       ul.appendChild(li);
     });
-    if (!tasks.length) {
-      ul.innerHTML = '<li class="table-empty" style="text-align:center;color:var(--text-dim);padding:12px">今夜暂无任务</li>';
+
+    const input = ul.querySelector('.task-edit-input');
+    if (input) {
+      input.focus();
+      try { input.select(); } catch (e) {}
     }
+  }
+
+  function startTaskEdit(idx, field) {
+    editing = { idx, field };
+    renderTasks();
+  }
+
+  function cancelTaskEdit() {
+    editing = null;
+    renderTasks();
+  }
+
+  function bindEditKeys(input, idx) {
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); saveTaskEdit(idx); }
+      else if (e.key === 'Escape') { e.preventDefault(); cancelTaskEdit(); }
+    });
+  }
+
+  async function saveTaskEdit(idx) {
+    if (!editing) return;
+    const field = editing.field;
+    const input = $('taskList').querySelector('.task-edit-input');
+    if (!input) { cancelTaskEdit(); return; }
+    const raw = input.value.trim();
+
+    if (field === 'title') {
+      if (!raw) { toast('任务文字不能为空', 'error'); return; }
+    } else {
+      const num = parseInt(raw, 10);
+      if (isNaN(num) || num < 0) { toast('请输入有效的灵石数值', 'error'); return; }
+    }
+
+    const fresh = await ZMD.load(true);
+    const target = (fresh.tasks || [])[idx];
+    if (!target) { toast('任务已变更，请刷新后重试', 'error'); editing = null; refresh(); return; }
+
+    if (field === 'title') target.title = raw;
+    else target.unlock = parseInt(raw, 10);
+
+    await ZMD.save(fresh, field === 'title' ? '修改任务文字' : '修改任务解锁灵石');
+    editing = null;
+    toast(field === 'title' ? '任务文字已更新' : '解锁灵石已更新', 'success');
+    refresh();
+  }
+
+  async function toggleTask(i) {
+    const fresh = await ZMD.load(true);
+    if (!fresh.tasks || !fresh.tasks[i]) return;
+    fresh.tasks[i].done = !fresh.tasks[i].done;
+    await ZMD.save(fresh, '切换任务状态');
+    refresh();
+  }
+
+  async function delTask(i) {
+    if (!confirm('确定删除该任务？')) return;
+    const fresh = await ZMD.load(true);
+    fresh.tasks.splice(i, 1);
+    await ZMD.save(fresh, '删除任务');
+    refresh();
   }
 
   // ===== 系统匹配 =====
@@ -459,43 +585,6 @@
   };
 
   // ===== 任务操作 =====
-  window._toggleTask = async (i) => {
-    data = await ZMD.load(true);
-    data.tasks[i].done = !data.tasks[i].done;
-    await ZMD.save(data, '切换任务状态');
-    refresh();
-  };
-  window._delTask = async (i) => {
-    if (!confirm('确定删除该任务？')) return;
-    data = await ZMD.load(true);
-    data.tasks.splice(i, 1);
-    await ZMD.save(data, '删除任务');
-    refresh();
-  };
-  window._editTaskTitle = async (i) => {
-    data = await ZMD.load(true);
-    const cur = data.tasks[i].title || '';
-    const v = prompt('修改任务文字：', cur);
-    if (v === null) return;
-    const title = v.trim();
-    if (!title) { toast('任务文字不能为空', 'error'); return; }
-    data.tasks[i].title = title;
-    await ZMD.save(data, '修改任务文字');
-    toast('任务文字已更新', 'success');
-    refresh();
-  };
-  window._editUnlock = async (i) => {
-    data = await ZMD.load(true);
-    const cur = data.tasks[i].unlock || 0;
-    const v = prompt('请输入解锁所需灵石数值：', cur);
-    if (v === null) return;
-    const num = parseInt(v, 10);
-    if (isNaN(num) || num < 0) { toast('请输入有效数字', 'error'); return; }
-    data.tasks[i].unlock = num;
-    await ZMD.save(data, '修改任务解锁灵石');
-    toast('已更新解锁灵石', 'success');
-    refresh();
-  };
 
   $('addTaskBtn').onclick = async () => {
     const title = $('newTaskInput').value.trim();
@@ -544,7 +633,7 @@
     return { rows };
   }
 
-  function renderStats() {
+  function openStatsModal() {
     const { rows } = buildStats();
     const copyLines = ['批量减灵石'];
     const view = $('statsView');
@@ -581,7 +670,7 @@
 
   $('reportBtn').onclick = async () => {
     data = await ZMD.load(true);
-    renderStats();
+    openStatsModal();
   };
   $('reportCopyBtn').onclick = async () => {
     try {
