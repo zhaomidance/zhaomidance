@@ -55,7 +55,8 @@
       "myConfirmed": true,
       "deposit": 3600,
       "matchScore": 0,
-      "registeredAt": 1792861318396
+      "registeredAt": 1792861318396,
+      "public": true
     },
     "女二": {
       "majia": "女二",
