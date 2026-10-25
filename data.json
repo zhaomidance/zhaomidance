@@ -53,7 +53,7 @@
       "status": "confirmed",
       "partner": "男四",
       "myConfirmed": true,
-      "deposit": 0,
+      "deposit": 2600,
       "matchScore": 0,
       "registeredAt": 1792861318396
     },
@@ -242,6 +242,12 @@
     {
       "time": "2026-10-25T02:58:17.597Z",
       "actor": "男四",
+      "action": "投入灵石(任务共池)",
+      "amount": -2600
+    },
+    {
+      "time": "2026-10-25T02:58:50.056Z",
+      "actor": "女一",
       "action": "投入灵石(任务共池)",
       "amount": -2600
     }
