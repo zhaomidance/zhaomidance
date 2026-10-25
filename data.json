@@ -52,7 +52,7 @@
       "about": "",
       "status": "matched",
       "partner": "男四",
-      "myConfirmed": false,
+      "myConfirmed": true,
       "deposit": 0,
       "matchScore": 0,
       "registeredAt": 1792861318396
@@ -226,6 +226,12 @@
       "actor": "男四",
       "action": "报名入场",
       "amount": -999
+    },
+    {
+      "time": "2026-10-25T02:57:29.018Z",
+      "actor": "女一",
+      "action": "确认舞伴",
+      "amount": -1314
     }
   ]
 }
