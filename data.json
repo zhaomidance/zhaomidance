@@ -50,7 +50,7 @@
       "gender": "female",
       "wish": "",
       "about": "",
-      "status": "matched",
+      "status": "confirmed",
       "partner": "男四",
       "myConfirmed": true,
       "deposit": 0,
@@ -128,9 +128,9 @@
       "gender": "male",
       "wish": "",
       "about": "",
-      "status": "matched",
+      "status": "confirmed",
       "partner": "女一",
-      "myConfirmed": false,
+      "myConfirmed": true,
       "deposit": 0,
       "matchScore": 0,
       "registeredAt": 1792861433796
@@ -230,6 +230,12 @@
     {
       "time": "2026-10-25T02:57:29.018Z",
       "actor": "女一",
+      "action": "确认舞伴",
+      "amount": -1314
+    },
+    {
+      "time": "2026-10-25T02:58:06.768Z",
+      "actor": "男四",
       "action": "确认舞伴",
       "amount": -1314
     }
