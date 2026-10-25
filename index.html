@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>蒙面舞会 · 婚配玩法</title>
-<link rel="stylesheet" href="style.css?v=20261025b">
+<link rel="stylesheet" href="style.css?v=20261025c">
 </head>
 <body>
 
@@ -155,10 +155,12 @@
       </div>
       <div class="waiting-wrap">
         <div class="wait-panel male">
-          <span class="wait-label">👦 男宾</span><b id="maleNum">0</b>
+          <div class="wait-head male"><span>👦 男宾</span><b id="maleNum">0</b></div>
+          <div class="chips" id="maleChips"></div>
         </div>
         <div class="wait-panel female">
-          <span class="wait-label">👧 女宾</span><b id="femaleNum">0</b>
+          <div class="wait-head female"><span>👧 女宾</span><b id="femaleNum">0</b></div>
+          <div class="chips" id="femaleChips"></div>
         </div>
       </div>
     </section>
@@ -293,6 +295,23 @@
     $('femaleWaitNum').textContent = females.length;
     $('maleNum').textContent = males.length;
     $('femaleNum').textContent = females.length;
+
+    const mChips = $('maleChips'), fChips = $('femaleChips');
+    mChips.innerHTML = ''; fChips.innerHTML = '';
+    if (!males.length) mChips.innerHTML = '<span class="chip-empty">🕯️ 虚位以待…</span>';
+    if (!females.length) fChips.innerHTML = '<span class="chip-empty">🕯️ 虚位以待…</span>';
+    males.forEach(p => {
+      const c = document.createElement('span');
+      c.className = 'chip male';
+      c.textContent = p.majia;
+      mChips.appendChild(c);
+    });
+    females.forEach(p => {
+      const c = document.createElement('span');
+      c.className = 'chip female';
+      c.textContent = p.majia;
+      fChips.appendChild(c);
+    });
 
     // 已匹配
     const grid = $('coupleGrid');

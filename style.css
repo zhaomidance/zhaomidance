@@ -283,11 +283,10 @@ body::after {
 }
 .couple-card.locked .couple-bond { color: var(--green); opacity: 1; }
 
-/* ============ 待匹配（仅数量） ============ */
+/* ============ 待匹配（紧凑显示马甲） ============ */
 .waiting-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .wait-panel {
-  display: flex; align-items: center; justify-content: space-between;
-  border-radius: 12px; padding: 9px 14px;
+  border-radius: 10px; padding: 7px 10px 8px;
   border: 1px solid rgba(255,255,255,.1);
   background: rgba(255,255,255,.025);
 }
@@ -299,10 +298,21 @@ body::after {
   border-color: rgba(244,114,182,.3);
   background: linear-gradient(180deg, rgba(244,114,182,.1), rgba(255,255,255,.02));
 }
-.wait-label { font-size: 12px; letter-spacing: 1px; color: var(--text-dim); }
-.wait-panel.male .wait-label { color: #93c5fd; }
-.wait-panel.female .wait-label { color: #f9a8d4; }
-.wait-panel b { font-family: var(--serif); font-size: 20px; font-weight: 900; line-height: 1; color: var(--gold-soft); }
+.wait-head {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 11px; letter-spacing: 1px; margin-bottom: 4px;
+}
+.wait-head.male { color: #93c5fd; }
+.wait-head.female { color: #f9a8d4; }
+.wait-head b { font-family: var(--serif); font-size: 14px; line-height: 1; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip {
+  font-size: 11px; font-weight: 600; line-height: 1.35;
+  padding: 2px 7px; border-radius: 999px;
+}
+.chip.male { background: rgba(96,165,250,.14); border: 1px solid rgba(96,165,250,.36); color: #bfdbfe; }
+.chip.female { background: rgba(244,114,182,.14); border: 1px solid rgba(244,114,182,.36); color: #fbcfe8; }
+.chip-empty { font-size: 11px; color: var(--text-dim); opacity: .65; }
 
 /* ============ 任务 ============ */
 .task-board {
@@ -873,7 +883,7 @@ body::after {
   .couple-wall { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
   .couple-names { font-size: 12px; }
   .waiting-wrap { gap: 8px; }
-  .wait-panel { padding: 8px 12px; }
+  .wait-panel { padding: 7px 9px 8px; }
   .marriage-actions { gap: 6px; }
   .act-btn { padding: 7px 4px; }
   .act-btn .act-title { font-size: 11px; }
