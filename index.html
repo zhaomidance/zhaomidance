@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>蒙面舞会 · 婚配玩法</title>
-<link rel="stylesheet" href="style.css?v=20261025f">
+<link rel="stylesheet" href="style.css?v=20261025g">
 </head>
 <body>
 
@@ -760,6 +760,20 @@
     const val = parseInt($('depositInput').value, 10);
     if (!val || val <= 0) { toast('请输入有效的灵石数量', 'error'); return; }
 
+    const data = await ZMD.load(true);
+    const me = data.players[myMajia];
+    if (!me || me.status !== 'confirmed') { toast('双方确认舞伴后方可投入', 'error'); return; }
+    const spouse = data.players[me.partner];
+    const pool = (me.deposit || 0) + (spouse ? (spouse.deposit || 0) : 0);
+
+    confirmBox(
+      '💎 确认投入灵石',
+      `本次消耗 ${val} 灵石\n投入后计入双方任务共池，不可撤回、不退还\n共池：${pool} → ${pool + val} 灵石`,
+      () => doDeposit(val)
+    );
+  }
+
+  async function doDeposit(val) {
     const data = await ZMD.load(true);
     const me = data.players[myMajia];
     if (!me || me.status !== 'confirmed') { toast('双方确认舞伴后方可投入', 'error'); return; }

@@ -474,6 +474,7 @@ body::after {
 .modal-btns .btn { flex: 1; }
 .modal-card h3 { font-family: var(--serif); font-size: 19px; letter-spacing: 3px; color: var(--gold-soft); margin-bottom: 12px; text-align: center; }
 .modal-card p { color: var(--text-dim); line-height: 1.8; font-size: 14px; text-align: center; }
+#confirmText { white-space: pre-line; }
 
 /* ============ Toast ============ */
 .toast {
