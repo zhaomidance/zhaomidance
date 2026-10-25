@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>蒙面舞会 · 管理后台</title>
-<link rel="stylesheet" href="style.css?v=20261025c">
+<link rel="stylesheet" href="style.css?v=20261025d">
 </head>
 <body>
 
@@ -125,8 +125,8 @@
 <div class="modal" id="reportModal" style="display:none">
   <div class="modal-card wide">
     <h3>📊 灵石统计</h3>
-    <p class="report-sub">直接复制使用：批量减灵石 某某666 某某888</p>
-    <textarea id="reportText" readonly></textarea>
+    <p class="report-sub">灰色理由仅用于查看，复制时不会带上</p>
+    <div id="statsView" class="stats-view"></div>
     <div class="modal-btns">
       <button class="btn btn-primary" id="reportCopyBtn">📋 复制全部</button>
       <button class="btn btn-ghost" id="reportCloseBtn">关闭</button>
@@ -514,37 +514,75 @@
   });
 
   // ===== 灵石统计 =====
-  // 格式：每笔流水一行「批量减灵石 某某666 某某888 …」，按时间顺序排列
-  function generateStats() {
-    if (!data) return '';
+  // 「批量减灵石」只在首行出现一次；按人分组，每人的扣分项按时间顺序排列
+  let lastStatsCopy = '';
+  function buildStats() {
+    const rows = [];
+    if (!data) return { rows };
     const logs = (data.logs || []).slice().sort((a, b) => (a.time || '').localeCompare(b.time || ''));
-    const lines = [];
-    const groupIndex = {};
+    const byActor = new Map();
     logs.forEach(l => {
       const amount = Number(l.amount) || 0;
       if (amount >= 0) return;
-      const key = (l.time || '').slice(0, 19) + '|' + l.action;
-      if (!(key in groupIndex)) {
-        groupIndex[key] = lines.length;
-        lines.push('批量减灵石');
-      }
-      lines[groupIndex[key]] += ' ' + l.actor + Math.abs(amount);
+      if (!byActor.has(l.actor)) byActor.set(l.actor, []);
+      byActor.get(l.actor).push({ text: l.actor + Math.abs(amount), reason: l.action });
     });
-    return lines.join('\n');
+    byActor.forEach(items => { items.forEach(it => rows.push(it)); });
+    return { rows };
   }
+
+  function renderStats() {
+    const { rows } = buildStats();
+    const copyLines = ['批量减灵石'];
+    const view = $('statsView');
+    view.innerHTML = '';
+
+    const head = document.createElement('div');
+    head.className = 'stats-line stats-head';
+    head.textContent = '批量减灵石';
+    view.appendChild(head);
+
+    if (!rows.length) {
+      const empty = document.createElement('div');
+      empty.className = 'stats-line stats-reason';
+      empty.textContent = '（暂无扣分记录）';
+      view.appendChild(empty);
+    }
+    rows.forEach(r => {
+      copyLines.push(r.text);
+      const line = document.createElement('div');
+      line.className = 'stats-line';
+      const main = document.createElement('span');
+      main.textContent = r.text;
+      const reason = document.createElement('span');
+      reason.className = 'stats-reason';
+      reason.textContent = '　' + r.reason;
+      line.appendChild(main);
+      line.appendChild(reason);
+      view.appendChild(line);
+    });
+
+    lastStatsCopy = copyLines.join('\n');
+    $('reportModal').style.display = 'flex';
+  }
+
   $('reportBtn').onclick = async () => {
     data = await ZMD.load(true);
-    $('reportText').value = generateStats();
-    $('reportModal').style.display = 'flex';
+    renderStats();
   };
   $('reportCopyBtn').onclick = async () => {
-    const txt = $('reportText');
-    txt.select();
     try {
-      await navigator.clipboard.writeText(txt.value);
-      toast('已复制全部统计', 'success');
+      await navigator.clipboard.writeText(lastStatsCopy);
+      toast('已复制（不含灰色理由）', 'success');
     } catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = lastStatsCopy;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
       document.execCommand('copy');
+      document.body.removeChild(ta);
       toast('已复制（回退方式）', 'success');
     }
   };
