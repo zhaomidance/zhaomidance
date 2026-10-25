@@ -118,6 +118,7 @@
           <button class="btn btn-primary btn-sm" id="agreeReleaseBtn" style="display:none">✅ 同意对方解除申请</button>
           <button class="btn btn-ghost btn-sm" id="cancelApplyBtn" style="display:none">↩️ 撤销我的解除申请</button>
         </div>
+        <p class="warn-tip" id="publicTip"></p>
         <p class="warn-tip" id="marriageTip"></p>
 
         <!-- 灵石共池 · 解锁任务 -->
@@ -341,7 +342,7 @@
     couples.forEach(({ a, b }) => {
       const isConfirmed = a.status === 'confirmed' && b.status === 'confirmed';
       if (isConfirmed) confirmedCount++;
-      const bothPublic = a.public && b.public;
+      const bothPublic = !!a.public && !!b.public;
       const nameA = bothPublic ? a.majia : anon(a);
       const nameB = bothPublic ? b.majia : anon(b);
       const pool = (a.deposit || 0) + (b.deposit || 0);
@@ -467,15 +468,19 @@
         ul.appendChild(li);
       });
 
-      // 公开身份按钮
+      // 公开身份：只有双方都选择公开，大屏才会展示真名
       const pubBtn = $('publicToggleBtn');
-      if (me.public) {
-        pubBtn.textContent = '🌐 已公开身份（点击匿名）';
-        pubBtn.classList.add('btn-gold');
-      } else {
-        pubBtn.textContent = '🎭 匿名身份（点击公开）';
-        pubBtn.classList.remove('btn-gold');
-      }
+      const spousePublic = !!(spouse && spouse.public);
+      const myPublic = !!me.public;
+      pubBtn.textContent = myPublic ? '🌐 已选择公开（点击改为匿名）' : '🎭 匿名身份（点击选择公开）';
+      pubBtn.classList.toggle('btn-gold', myPublic);
+      $('publicTip').textContent = myPublic && spousePublic
+        ? '✅ 双方都已选择公开，大屏将展示真名'
+        : myPublic
+          ? '🕯️ 你已选择公开，需对方也选择公开，大屏才会展示真名'
+          : spousePublic
+            ? '🕯️ 对方已选择公开，你也选择公开后，大屏才会展示真名'
+            : '🎭 双方均为匿名，大屏仅显示男舞宾 / 女舞宾编号';
 
       // 解除相关按钮状态
       const spouseApplied = spouse && spouse.divorceRequested;
@@ -622,6 +627,7 @@
           partner: null,
           myConfirmed: false,
           deposit: 0,
+          public: false,
           matchScore: 0,
           registeredAt: Date.now()
         };
@@ -734,11 +740,11 @@
   function doRelease(data, me, spouse) {
     me.partner = null; me.status = 'registered';
     me.myConfirmed = false; me.deposit = 0; me.matchScore = 0;
-    me.divorceRequested = false;
+    me.divorceRequested = false; me.public = false;
     if (spouse) {
       spouse.partner = null; spouse.status = 'registered';
       spouse.myConfirmed = false; spouse.deposit = 0; spouse.matchScore = 0;
-      spouse.divorceRequested = false;
+      spouse.divorceRequested = false; spouse.public = false;
     }
     const pm = spouse ? spouse.majia : null;
     data.matches = (data.matches || []).filter(m => !m.includes(me.majia) && !(pm && m.includes(pm)));
@@ -750,8 +756,10 @@
     const me = data.players[myMajia];
     if (!me) return;
     me.public = !me.public;
-    await ZMD.save(data, `${me.majia} ${me.public ? '公开' : '匿名'}身份`);
-    toast(me.public ? '已公开身份，大屏将显示你的名字' : '已匿名，大屏将隐藏你的名字', 'success');
+    await ZMD.save(data, `${me.majia} ${me.public ? '选择公开' : '改为匿名'}身份`);
+    toast(me.public
+      ? '已选择公开，需对方也选择公开，大屏才会展示真名'
+      : '已改为匿名，大屏将隐藏你的名字', 'success');
     refresh(true);
   }
 
