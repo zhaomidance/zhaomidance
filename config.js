@@ -13,6 +13,5 @@ window.ZMD_CONFIG = {
   // 管理员密码（后台页面用）
   adminPassword: 'dance520',
   // 游戏参数
-  startBalance: 10000,
   costs: { register: 999, confirm: 1314, release: 1111, forceRelease: 2888 },
 };

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>蒙面舞会 · 管理后台</title>
-<link rel="stylesheet" href="style.css?v=20261025a">
+<link rel="stylesheet" href="style.css?v=20261025b">
 </head>
 <body>
 
@@ -66,9 +66,11 @@
         <div class="stat-num" id="statMatched">0</div>
         <div class="stat-label">今夜佳偶</div>
       </div>
+    </div>
+    <div class="admin-btns">
       <button class="btn btn-gold btn-match" id="matchBtn">🌹 系统匹配</button>
       <button class="btn btn-ghost" id="newRoundBtn">🔄 新一轮</button>
-      <button class="btn btn-primary" id="reportBtn">📊 灵石流水报表</button>
+      <button class="btn btn-primary" id="reportBtn">📊 灵石统计</button>
     </div>
 
     <!-- 白名单录入 -->
@@ -119,26 +121,11 @@
   </main>
 </div>
 
-<!-- 调整灵石弹窗 -->
-<div class="modal" id="balanceModal" style="display:none">
-  <div class="modal-card">
-    <h3>调整灵石</h3>
-    <p id="balanceModalText"></p>
-    <div class="form-group">
-      <input type="number" id="balanceInput" placeholder="正数增加，负数减少">
-    </div>
-    <div class="modal-btns">
-      <button class="btn btn-primary" id="balanceOk">确定</button>
-      <button class="btn btn-ghost" id="balanceCancel">取消</button>
-    </div>
-  </div>
-</div>
-
-<!-- 灵石流水报表弹窗 -->
+<!-- 灵石统计弹窗 -->
 <div class="modal" id="reportModal" style="display:none">
   <div class="modal-card wide">
-    <h3>📊 灵石流水报表</h3>
-    <p class="report-sub">全部分行文本，可直接复制到别处用于加减灵石</p>
+    <h3>📊 灵石统计</h3>
+    <p class="report-sub">直接复制使用：批量减灵石 某某666 某某888</p>
     <textarea id="reportText" readonly></textarea>
     <div class="modal-btns">
       <button class="btn btn-primary" id="reportCopyBtn">📋 复制全部</button>
@@ -156,18 +143,6 @@
   const $ = id => document.getElementById(id);
   const C = ZMD.config;
   let data = null;
-  let targetMajia = null;
-
-  // 灵石流水日志
-  function addLog(actor, action, amount) {
-    if (!data.logs) data.logs = [];
-    const p = data.players[actor];
-    data.logs.push({
-      time: new Date().toISOString(),
-      actor, action, amount,
-      balance: p ? p.balance : null,
-    });
-  }
 
   let toastTimer = null;
   function toast(msg, type) {
@@ -436,42 +411,24 @@
     return 'final';
   }
 
-  // 新一轮
+  // 新一轮（完全重置，二次确认）
   async function newRound() {
-    if (!confirm('确定开启新一轮？所有舞宾、配对、已投入灵石将被全部清空，门票白名单保留。')) return;
+    if (!confirm('确定开启新一轮？本场所有舞宾、配对、灵石统计将被清空。')) return;
+    if (!confirm('再次确认：此操作不可恢复！门票白名单会保留，其余数据全部重置为初始状态。')) return;
     data = await ZMD.load(true);
     data.round = (data.round || 1) + 1;
     data.players = {};
     data.matches = [];
+    data.logs = [];
     data.stage = 'registering';
-    // 重置门票白名单的占用状态，便于新一轮重新报名
+    (data.tasks || []).forEach(t => { t.done = false; });
     (data.whitelist || []).forEach(w => { w.claimed = false; delete w.claimedAt; });
-    await ZMD.save(data, `开启第${data.round}轮，清空全部舞宾`);
-    toast('已开启新一轮，全部舞宾已清空', 'success');
+    await ZMD.save(data, `开启第${data.round}轮，完全重置全部数据`);
+    toast('已完成完全重置', 'success');
     refresh();
   }
 
   // ===== 玩家操作 =====
-  window._adjBal = (majia) => {
-    targetMajia = majia;
-    const p = data.players[majia];
-    $('balanceModalText').textContent = `${p.majia}（门票 ${p.ticket}）当前灵石：${p.balance}`;
-    $('balanceInput').value = '';
-    $('balanceModal').style.display = 'flex';
-  };
-  $('balanceOk').onclick = async () => {
-    const num = parseInt($('balanceInput').value);
-    if (isNaN(num)) { toast('请输入数字', 'error'); return; }
-    data = await ZMD.load(true);
-    data.players[targetMajia].balance += num;
-    addLog(targetMajia, '后台调整灵石', num);
-    await ZMD.save(data, `调整 ${data.players[targetMajia].majia} 灵石 ${num}`);
-    $('balanceModal').style.display = 'none';
-    toast('已调整', 'success');
-    refresh();
-  };
-  $('balanceCancel').onclick = () => $('balanceModal').style.display = 'none';
-
   window._delPlayer = async (majia) => {
     if (!confirm(`确定删除舞宾 ${majia}？`)) return;
     data = await ZMD.load(true);
@@ -556,64 +513,28 @@
     };
   });
 
-  // ===== 灵石流水报表 =====
-  function fmtTime(iso) {
-    try {
-      const d = new Date(iso);
-      const pad = n => String(n).padStart(2, '0');
-      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    } catch (e) { return iso; }
-  }
-  function generateReport() {
+  // ===== 灵石统计 =====
+  // 格式：每笔流水一行「批量减灵石 某某666 某某888 …」，按时间顺序排列
+  function generateStats() {
     if (!data) return '';
+    const logs = (data.logs || []).slice().sort((a, b) => (a.time || '').localeCompare(b.time || ''));
     const lines = [];
-    lines.push('=== 蒙面舞会 · 灵石流水报表（按人） ===');
-    lines.push('生成时间：' + fmtTime(new Date().toISOString()));
-    lines.push('');
-
-    // 门票白名单
-    lines.push('【门票白名单】');
-    const wl = data.whitelist || [];
-    if (!wl.length) lines.push('（暂无）');
-    wl.forEach(w => {
-      const player = data.players[w.majia];
-      const state = player ? '已报名' : (w.claimed ? '已占用' : '待入场');
-      lines.push(`${w.majia}\t门票 ${w.ticket}\t${state}`);
+    const groupIndex = {};
+    logs.forEach(l => {
+      const amount = Number(l.amount) || 0;
+      if (amount >= 0) return;
+      const key = (l.time || '').slice(0, 19) + '|' + l.action;
+      if (!(key in groupIndex)) {
+        groupIndex[key] = lines.length;
+        lines.push('批量减灵石');
+      }
+      lines[groupIndex[key]] += ' ' + l.actor + Math.abs(amount);
     });
-    lines.push('');
-
-    // 按人分组流水（从入场 999 开始，含确认/解除/投入，二次匹配流水自然按时间续上）
-    const logs = (data.logs || []).slice().sort((a,b) => (a.time||'').localeCompare(b.time||''));
-    const byActor = {};
-    logs.forEach(l => { (byActor[l.actor] = byActor[l.actor] || []).push(l); });
-
-    lines.push('【按人灵石流水】');
-    const players = Object.values(data.players || {});
-    if (!players.length) lines.push('（暂无）');
-    players.sort((a,b) => (a.gender === b.gender ? 0 : a.gender === 'male' ? -1 : 1)).forEach(p => {
-      const gender = p.gender === 'male' ? '男' : '女';
-      const spouse = p.partner ? data.players[p.partner] : null;
-      lines.push(`—— ${p.majia}（${gender} · 门票 ${p.ticket} · 当前余额 ${p.balance} 💎 · 已投入 ${p.deposit||0} 💎${spouse ? ' · 舞伴 ' + spouse.majia : ''}）——`);
-      const myLogs = byActor[p.majia] || [];
-      if (!myLogs.length) lines.push('  （无操作记录）');
-      myLogs.forEach(l => {
-        const amt = (l.amount > 0 ? '+' : '') + l.amount;
-        lines.push(`  ${fmtTime(l.time)}\t${l.action}\t${amt} 💎\t余额 ${l.balance}`);
-      });
-      lines.push('');
-    });
-
-    // 合计
-    const totalBal = players.reduce((s,p) => s + (p.balance||0), 0);
-    const totalDeposit = players.reduce((s,p) => s + (p.deposit||0), 0);
-    lines.push('【合计】');
-    lines.push(`舞宾总数：${players.length}\t灵石结余总和：${totalBal} 💎\t任务共池总和：${totalDeposit} 💎`);
-
     return lines.join('\n');
   }
   $('reportBtn').onclick = async () => {
     data = await ZMD.load(true);
-    $('reportText').value = generateReport();
+    $('reportText').value = generateStats();
     $('reportModal').style.display = 'flex';
   };
   $('reportCopyBtn').onclick = async () => {
@@ -621,7 +542,7 @@
     txt.select();
     try {
       await navigator.clipboard.writeText(txt.value);
-      toast('已复制全部报表', 'success');
+      toast('已复制全部统计', 'success');
     } catch (e) {
       document.execCommand('copy');
       toast('已复制（回退方式）', 'success');

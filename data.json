@@ -50,7 +50,6 @@
       "gender": "female",
       "wish": "",
       "about": "",
-      "balance": 9001,
       "status": "matched",
       "partner": "男四",
       "myConfirmed": false,
@@ -64,7 +63,6 @@
       "gender": "female",
       "wish": "",
       "about": "",
-      "balance": 9001,
       "status": "matched",
       "partner": "男二",
       "myConfirmed": false,
@@ -78,7 +76,6 @@
       "gender": "female",
       "wish": "",
       "about": "",
-      "balance": 9001,
       "status": "matched",
       "partner": "男一",
       "myConfirmed": false,
@@ -92,7 +89,6 @@
       "gender": "male",
       "wish": "",
       "about": "",
-      "balance": 9001,
       "status": "matched",
       "partner": "女三",
       "myConfirmed": false,
@@ -106,7 +102,6 @@
       "gender": "male",
       "wish": "",
       "about": "",
-      "balance": 9001,
       "status": "matched",
       "partner": "女二",
       "myConfirmed": false,
@@ -120,7 +115,6 @@
       "gender": "male",
       "wish": "",
       "about": "",
-      "balance": 9001,
       "status": "registered",
       "partner": null,
       "myConfirmed": false,
@@ -134,7 +128,6 @@
       "gender": "male",
       "wish": "",
       "about": "",
-      "balance": 9001,
       "status": "matched",
       "partner": "女一",
       "myConfirmed": false,
@@ -196,50 +189,43 @@
       "time": "2026-10-24T17:01:58.396Z",
       "actor": "女一",
       "action": "报名入场",
-      "amount": -999,
-      "balance": 9001
+      "amount": -999
     },
     {
       "time": "2026-10-24T17:02:26.953Z",
       "actor": "女二",
       "action": "报名入场",
-      "amount": -999,
-      "balance": 9001
+      "amount": -999
     },
     {
       "time": "2026-10-24T17:02:46.610Z",
       "actor": "女三",
       "action": "报名入场",
-      "amount": -999,
-      "balance": 9001
+      "amount": -999
     },
     {
       "time": "2026-10-24T17:03:03.127Z",
       "actor": "男一",
       "action": "报名入场",
-      "amount": -999,
-      "balance": 9001
+      "amount": -999
     },
     {
       "time": "2026-10-24T17:03:20.565Z",
       "actor": "男二",
       "action": "报名入场",
-      "amount": -999,
-      "balance": 9001
+      "amount": -999
     },
     {
       "time": "2026-10-24T17:03:38.865Z",
       "actor": "男三",
       "action": "报名入场",
-      "amount": -999,
-      "balance": 9001
+      "amount": -999
     },
     {
       "time": "2026-10-24T17:03:53.796Z",
       "actor": "男四",
       "action": "报名入场",
-      "amount": -999,
-      "balance": 9001
+      "amount": -999
     }
   ]
 }

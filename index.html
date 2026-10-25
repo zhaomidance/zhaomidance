@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>蒙面舞会 · 婚配玩法</title>
-<link rel="stylesheet" href="style.css?v=20261025a">
+<link rel="stylesheet" href="style.css?v=20261025b">
 </head>
 <body>
 
@@ -25,7 +25,6 @@
     </div>
     <div class="header-right">
       <span class="identity-pill" id="identityPill" style="display:none"></span>
-      <span class="balance-pill" id="balancePill" style="display:none">💎 0</span>
       <button class="btn btn-gold btn-sm" id="openRegisterBtn">我要报名</button>
       <button class="link-btn" id="logoutBtn" style="display:none">离场</button>
     </div>
@@ -44,7 +43,7 @@
       <span class="corner tr">❦</span>
       <span class="corner bl">❦</span>
       <span class="corner br">❦</span>
-      <div class="stage-kicker">MASKED BALL · <span id="roundText">第 1 轮</span></div>
+      <div class="stage-kicker">MASKED BALL</div>
       <h1 class="stage-title" id="stageTitle">报 名 中</h1>
       <p class="stage-desc" id="stageDesc">舞会序幕已拉开，静候各位戴上面具入场</p>
     </section>
@@ -156,12 +155,10 @@
       </div>
       <div class="waiting-wrap">
         <div class="wait-panel male">
-          <div class="wait-head male"><span>👦 男宾</span><b id="maleNum">0</b></div>
-          <div class="chips" id="maleChips"></div>
+          <span class="wait-label">👦 男宾</span><b id="maleNum">0</b>
         </div>
         <div class="wait-panel female">
-          <div class="wait-head female"><span>👧 女宾</span><b id="femaleNum">0</b></div>
-          <div class="chips" id="femaleChips"></div>
+          <span class="wait-label">👧 女宾</span><b id="femaleNum">0</b>
         </div>
       </div>
     </section>
@@ -291,29 +288,11 @@
     const stage = STAGES[data.stage] || STAGES.registering;
     $('stageTitle').textContent = stage.title;
     $('stageDesc').textContent = stage.desc;
-    $('roundText').textContent = '第 ' + (data.round || 1) + ' 轮';
 
     $('maleWaitNum').textContent = males.length;
     $('femaleWaitNum').textContent = females.length;
     $('maleNum').textContent = males.length;
     $('femaleNum').textContent = females.length;
-
-    const mChips = $('maleChips'), fChips = $('femaleChips');
-    mChips.innerHTML = ''; fChips.innerHTML = '';
-    if (!males.length) mChips.innerHTML = '<span class="chip-empty">🕯️ 虚位以待…</span>';
-    if (!females.length) fChips.innerHTML = '<span class="chip-empty">🕯️ 虚位以待…</span>';
-    males.forEach(p => {
-      const c = document.createElement('span');
-      c.className = 'chip male';
-      c.textContent = p.majia;
-      mChips.appendChild(c);
-    });
-    females.forEach(p => {
-      const c = document.createElement('span');
-      c.className = 'chip female';
-      c.textContent = p.majia;
-      fChips.appendChild(c);
-    });
 
     // 已匹配
     const grid = $('coupleGrid');
@@ -410,8 +389,6 @@
     $('logoutBtn').style.display = '';
     $('identityPill').style.display = '';
     $('identityPill').textContent = `${me.gender === 'female' ? '👧' : '👦'} ${me.majia}`;
-    $('balancePill').style.display = '';
-    $('balancePill').textContent = '💎 ' + me.balance;
     $('myName').textContent = me.majia;
 
     if (me.status === 'matched' || me.status === 'confirmed') {
@@ -511,7 +488,6 @@
         $('openRegisterBtn').style.display = '';
         $('logoutBtn').style.display = 'none';
         $('identityPill').style.display = 'none';
-        $('balancePill').style.display = 'none';
       }
     } catch (e) {
       toast('加载失败: ' + e.message, 'error');
@@ -623,7 +599,6 @@
           majia, ticket,
           gender: chosenGender,
           wish, about,
-          balance: C.startBalance - C.costs.register,
           status: 'registered',
           partner: null,
           myConfirmed: false,
@@ -651,11 +626,9 @@
   // 灵石流水日志
   function addLog(data, actor, action, amount) {
     if (!data.logs) data.logs = [];
-    const p = data.players[actor];
     data.logs.push({
       time: new Date().toISOString(),
       actor, action, amount,
-      balance: p ? p.balance : null,
     });
   }
 
@@ -668,9 +641,7 @@
     }
     if (me.myConfirmed || me.status === 'confirmed') { toast('你已确认过舞伴', 'error'); return; }
     const cost = C.costs.confirm;
-    if (me.balance < cost) { toast(`灵石不足，需要 ${cost}`, 'error'); return; }
 
-    me.balance -= cost;
     me.myConfirmed = true;
     addLog(data, me.majia, '确认舞伴', -cost);
 
@@ -680,7 +651,7 @@
       spouse.status = 'confirmed';
       toast('💍 双方心意已定，舞伴关系确立', 'success');
     } else {
-      toast(`已扣除 ${cost} 灵石，等待对方确认`, 'success');
+      toast(`已确认，记录了 ${cost} 灵石，等待对方确认`, 'success');
     }
     await ZMD.save(data, `${me.majia} 确认舞伴`);
     refresh(true);
@@ -717,15 +688,12 @@
     const spouse = data.players[me.partner];
     if (!spouse || !spouse.divorceRequested) { toast('对方未申请解除', 'error'); return; }
     const cost = C.costs.release;
-    if (me.balance < cost) { toast(`灵石不足，需要 ${cost}`, 'error'); return; }
-    if (spouse.balance < cost) { toast('对方灵石不足，无法同意解除', 'error'); return; }
 
-    me.balance -= cost; spouse.balance -= cost;
     addLog(data, me.majia, '同意解除舞伴', -cost);
     addLog(data, spouse.majia, '同意解除舞伴', -cost);
     doRelease(data, me, spouse);
     await ZMD.save(data, `${me.majia} 与 ${spouse.majia} 双方同意解除舞伴`);
-    toast(`双方各扣除 ${cost} 灵石，红线已断`, 'success');
+    toast(`双方各记录 ${cost} 灵石，红线已断`, 'success');
     refresh(true);
   }
 
@@ -735,13 +703,11 @@
     const me = data.players[myMajia];
     if (!me || !me.partner) { toast('当前没有舞伴', 'error'); return; }
     const cost = C.costs.forceRelease;
-    if (me.balance < cost) { toast(`灵石不足，需要 ${cost}`, 'error'); return; }
-    me.balance -= cost;
     addLog(data, me.majia, '单方强制解除舞伴', -cost);
     const spouse = data.players[me.partner];
     doRelease(data, me, spouse);
     await ZMD.save(data, `${me.majia} 单方强制解除舞伴`);
-    toast(`已扣除 ${cost} 灵石，红线已断`, 'success');
+    toast(`已记录 ${cost} 灵石，红线已断`, 'success');
     refresh(true);
   }
 
@@ -778,9 +744,7 @@
     const data = await ZMD.load(true);
     const me = data.players[myMajia];
     if (!me || me.status !== 'confirmed') { toast('双方确认舞伴后方可投入', 'error'); return; }
-    if (me.balance < val) { toast(`灵石不足，当前 ${me.balance}`, 'error'); return; }
 
-    me.balance -= val;
     me.deposit = (me.deposit || 0) + val;
     addLog(data, me.majia, `投入灵石(任务共池)`, -val);
     const spouse = data.players[me.partner];
