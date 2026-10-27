@@ -158,7 +158,7 @@
       "status": "confirmed",
       "partner": "男三",
       "myConfirmed": true,
-      "deposit": 14251,
+      "deposit": 27391,
       "public": false,
       "matchScore": 0,
       "registeredAt": 1793110377716,
@@ -316,6 +316,12 @@
     },
     {
       "time": "2026-10-27T14:23:36.959Z",
+      "actor": "熱爱",
+      "action": "投入灵石(任务共池)",
+      "amount": -13140
+    },
+    {
+      "time": "2026-10-27T14:23:43.674Z",
       "actor": "熱爱",
       "action": "投入灵石(任务共池)",
       "amount": -13140
