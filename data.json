@@ -50,7 +50,8 @@
     {
       "majia": "熱爱",
       "ticket": "520",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1793110377716
     }
   ],
   "players": {
@@ -145,6 +146,20 @@
       "deposit": 2600,
       "matchScore": 0,
       "registeredAt": 1792861433796
+    },
+    "熱爱": {
+      "majia": "熱爱",
+      "ticket": "520",
+      "gender": "female",
+      "wish": "唧唧大，有腹肌",
+      "about": "",
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1793110377716
     }
   },
   "matches": [
@@ -267,6 +282,12 @@
       "actor": "女一",
       "action": "投入灵石(任务共池)",
       "amount": -1000
+    },
+    {
+      "time": "2026-10-27T14:12:57.716Z",
+      "actor": "熱爱",
+      "action": "报名入场",
+      "amount": -999
     }
   ]
 }
