@@ -69,6 +69,16 @@
       "majia": "新娘",
       "ticket": "520",
       "claimed": false
+    },
+    {
+      "majia": "花儿",
+      "ticket": "777",
+      "claimed": false
+    },
+    {
+      "majia": "痴儿",
+      "ticket": "777",
+      "claimed": false
     }
   ],
   "players": {
