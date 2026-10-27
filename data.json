@@ -239,13 +239,14 @@
       "gender": "male",
       "wish": "甜妹",
       "about": "年上",
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "痴儿",
       "myConfirmed": false,
       "deposit": 0,
       "public": false,
       "matchScore": 0,
-      "registeredAt": 1793116428464
+      "registeredAt": 1793116428464,
+      "divorceRequested": false
     },
     "痴儿": {
       "majia": "痴儿",
@@ -253,13 +254,14 @@
       "gender": "female",
       "wish": "年下",
       "about": "女王，权威",
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "花儿",
       "myConfirmed": false,
       "deposit": 0,
       "public": false,
       "matchScore": 0,
-      "registeredAt": 1793116467702
+      "registeredAt": 1793116467702,
+      "divorceRequested": false
     }
   },
   "matches": [
@@ -282,6 +284,10 @@
     [
       "花痴",
       "花花"
+    ],
+    [
+      "花儿",
+      "痴儿"
     ]
   ],
   "round": 4,
