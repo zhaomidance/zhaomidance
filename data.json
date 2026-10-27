@@ -159,7 +159,7 @@
       "partner": "男三",
       "myConfirmed": true,
       "deposit": 27391,
-      "public": false,
+      "public": true,
       "matchScore": 0,
       "registeredAt": 1793110377716,
       "divorceRequested": false
