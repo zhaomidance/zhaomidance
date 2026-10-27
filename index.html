@@ -297,23 +297,6 @@
     $('maleNum').textContent = males.length;
     $('femaleNum').textContent = females.length;
 
-    const mChips = $('maleChips'), fChips = $('femaleChips');
-    mChips.innerHTML = ''; fChips.innerHTML = '';
-    if (!males.length) mChips.innerHTML = '<span class="chip-empty">🕯️ 虚位以待…</span>';
-    if (!females.length) fChips.innerHTML = '<span class="chip-empty">🕯️ 虚位以待…</span>';
-    males.forEach(p => {
-      const c = document.createElement('span');
-      c.className = 'chip male';
-      c.textContent = p.majia;
-      mChips.appendChild(c);
-    });
-    females.forEach(p => {
-      const c = document.createElement('span');
-      c.className = 'chip female';
-      c.textContent = p.majia;
-      fChips.appendChild(c);
-    });
-
     // 已匹配
     const grid = $('coupleGrid');
     grid.innerHTML = '';
@@ -331,11 +314,30 @@
       const b = a === p ? spouse : p;
       couples.push({ a, b });
     }
-    // 匿名编号：按出现顺序，男舞宾1/女舞宾1…
+    // 匿名编号：已匹配者按佳偶顺序优先，未匹配者接续编号（大屏始终不显示马甲）
     const maleMap = {}, femaleMap = {};
     let maleIdx = 0, femaleIdx = 0;
     couples.forEach(c => { maleMap[c.a.majia] = ++maleIdx; femaleMap[c.b.majia] = ++femaleIdx; });
+    males.forEach(p => { maleMap[p.majia] = ++maleIdx; });
+    females.forEach(p => { femaleMap[p.majia] = ++femaleIdx; });
     const anon = (p) => (p.gender === 'male' ? '男舞宾' : '女舞宾') + (p.gender === 'male' ? maleMap[p.majia] : femaleMap[p.majia]);
+
+    const mChips = $('maleChips'), fChips = $('femaleChips');
+    mChips.innerHTML = ''; fChips.innerHTML = '';
+    if (!males.length) mChips.innerHTML = '<span class="chip-empty">🕯️ 虚位以待…</span>';
+    if (!females.length) fChips.innerHTML = '<span class="chip-empty">🕯️ 虚位以待…</span>';
+    males.forEach(p => {
+      const c = document.createElement('span');
+      c.className = 'chip male';
+      c.textContent = anon(p);
+      mChips.appendChild(c);
+    });
+    females.forEach(p => {
+      const c = document.createElement('span');
+      c.className = 'chip female';
+      c.textContent = anon(p);
+      fChips.appendChild(c);
+    });
 
     let coupleCount = couples.length;
     let confirmedCount = 0;
