@@ -157,7 +157,7 @@
       "about": "",
       "status": "matched",
       "partner": "男三",
-      "myConfirmed": false,
+      "myConfirmed": true,
       "deposit": 0,
       "public": false,
       "matchScore": 0,
@@ -295,6 +295,12 @@
       "actor": "熱爱",
       "action": "报名入场",
       "amount": -999
+    },
+    {
+      "time": "2026-10-27T14:14:32.531Z",
+      "actor": "熱爱",
+      "action": "确认舞伴",
+      "amount": -1314
     }
   ]
 }
