@@ -68,7 +68,8 @@
     {
       "majia": "新娘",
       "ticket": "520",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1793115632140
     }
   ],
   "players": {
@@ -211,6 +212,20 @@
       "matchScore": 0,
       "registeredAt": 1793115241060,
       "divorceRequested": false
+    },
+    "新娘": {
+      "majia": "新娘",
+      "ticket": "520",
+      "gender": "female",
+      "wish": "",
+      "about": "",
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1793115632140
     }
   },
   "matches": [
@@ -399,6 +414,12 @@
     {
       "time": "2026-10-27T15:34:01.060Z",
       "actor": "花花",
+      "action": "报名入场",
+      "amount": -999
+    },
+    {
+      "time": "2026-10-27T15:40:32.140Z",
+      "actor": "新娘",
       "action": "报名入场",
       "amount": -999
     }
