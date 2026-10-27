@@ -52,6 +52,11 @@
       "ticket": "520",
       "claimed": true,
       "claimedAt": 1793110377716
+    },
+    {
+      "majia": "花痴",
+      "ticket": "777",
+      "claimed": false
     }
   ],
   "players": {
