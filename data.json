@@ -41,6 +41,11 @@
       "ticket": "666",
       "claimed": true,
       "claimedAt": 1792861433796
+    },
+    {
+      "majia": "安婷",
+      "ticket": "175",
+      "claimed": false
     }
   ],
   "players": {
