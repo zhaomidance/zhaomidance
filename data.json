@@ -139,9 +139,9 @@
     "男四": {
       "majia": "男四",
       "ticket": "666",
-      "gender": "male",
-      "wish": "",
-      "about": "",
+      "gender": "female",
+      "wish": "陪伴",
+      "about": "哑巴 权威",
       "status": "confirmed",
       "partner": "女一",
       "myConfirmed": true,
