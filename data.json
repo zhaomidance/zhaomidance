@@ -243,7 +243,7 @@
       "partner": "痴儿",
       "myConfirmed": true,
       "deposit": 0,
-      "public": false,
+      "public": true,
       "matchScore": 0,
       "registeredAt": 1793116428464,
       "divorceRequested": false
