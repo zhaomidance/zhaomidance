@@ -56,7 +56,8 @@
     {
       "majia": "花痴",
       "ticket": "777",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1793115144760
     }
   ],
   "players": {
@@ -169,6 +170,20 @@
       "matchScore": 0,
       "registeredAt": 1793110377716,
       "divorceRequested": false
+    },
+    "花痴": {
+      "majia": "花痴",
+      "ticket": "777",
+      "gender": "male",
+      "wish": "陪伴",
+      "about": "哑巴，权威",
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1793115144760
     }
   },
   "matches": [
@@ -343,6 +358,12 @@
       "actor": "男四",
       "action": "投入灵石(任务共池)",
       "amount": -10000
+    },
+    {
+      "time": "2026-10-27T15:32:24.760Z",
+      "actor": "花痴",
+      "action": "报名入场",
+      "amount": -999
     }
   ]
 }
