@@ -68,7 +68,8 @@
     {
       "majia": "花儿",
       "ticket": "777",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1793116428464
     },
     {
       "majia": "痴儿",
@@ -230,6 +231,20 @@
       "public": false,
       "matchScore": 0,
       "registeredAt": 1793115632140
+    },
+    "花儿": {
+      "majia": "花儿",
+      "ticket": "777",
+      "gender": "male",
+      "wish": "甜妹",
+      "about": "年上",
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1793116428464
     }
   },
   "matches": [
@@ -424,6 +439,12 @@
     {
       "time": "2026-10-27T15:40:32.140Z",
       "actor": "新娘",
+      "action": "报名入场",
+      "amount": -999
+    },
+    {
+      "time": "2026-10-27T15:53:48.464Z",
+      "actor": "花儿",
       "action": "报名入场",
       "amount": -999
     }
