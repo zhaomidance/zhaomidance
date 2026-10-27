@@ -127,12 +127,14 @@
       "gender": "male",
       "wish": "",
       "about": "",
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "熱爱",
       "myConfirmed": false,
       "deposit": 0,
       "matchScore": 0,
-      "registeredAt": 1792861418865
+      "registeredAt": 1792861418865,
+      "public": false,
+      "divorceRequested": false
     },
     "男四": {
       "majia": "男四",
@@ -153,13 +155,14 @@
       "gender": "female",
       "wish": "唧唧大，有腹肌",
       "about": "",
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "男三",
       "myConfirmed": false,
       "deposit": 0,
       "public": false,
       "matchScore": 0,
-      "registeredAt": 1793110377716
+      "registeredAt": 1793110377716,
+      "divorceRequested": false
     }
   },
   "matches": [
@@ -174,10 +177,14 @@
     [
       "男一",
       "女三"
+    ],
+    [
+      "男三",
+      "熱爱"
     ]
   ],
   "round": 4,
-  "stage": "round1",
+  "stage": "round2",
   "tasks": [
     {
       "id": 1792856165383,
