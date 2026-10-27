@@ -62,7 +62,8 @@
     {
       "majia": "花花",
       "ticket": "777",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1793115241060
     }
   ],
   "players": {
@@ -189,6 +190,20 @@
       "public": false,
       "matchScore": 0,
       "registeredAt": 1793115144760
+    },
+    "花花": {
+      "majia": "花花",
+      "ticket": "777",
+      "gender": "female",
+      "wish": "",
+      "about": "",
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1793115241060
     }
   },
   "matches": [
@@ -367,6 +382,12 @@
     {
       "time": "2026-10-27T15:32:24.760Z",
       "actor": "花痴",
+      "action": "报名入场",
+      "amount": -999
+    },
+    {
+      "time": "2026-10-27T15:34:01.060Z",
+      "actor": "花花",
       "action": "报名入场",
       "amount": -999
     }
