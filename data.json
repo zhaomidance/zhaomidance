@@ -258,7 +258,7 @@
       "partner": "花儿",
       "myConfirmed": false,
       "deposit": 0,
-      "public": false,
+      "public": true,
       "matchScore": 0,
       "registeredAt": 1793116467702,
       "divorceRequested": false
