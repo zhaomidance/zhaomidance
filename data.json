@@ -74,7 +74,8 @@
     {
       "majia": "痴儿",
       "ticket": "777",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1793116467702
     }
   ],
   "players": {
@@ -245,6 +246,20 @@
       "public": false,
       "matchScore": 0,
       "registeredAt": 1793116428464
+    },
+    "痴儿": {
+      "majia": "痴儿",
+      "ticket": "777",
+      "gender": "female",
+      "wish": "年下",
+      "about": "女王，权威",
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1793116467702
     }
   },
   "matches": [
@@ -445,6 +460,12 @@
     {
       "time": "2026-10-27T15:53:48.464Z",
       "actor": "花儿",
+      "action": "报名入场",
+      "amount": -999
+    },
+    {
+      "time": "2026-10-27T15:54:27.702Z",
+      "actor": "痴儿",
       "action": "报名入场",
       "amount": -999
     }
