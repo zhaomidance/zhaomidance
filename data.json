@@ -183,13 +183,14 @@
       "gender": "male",
       "wish": "陪伴",
       "about": "哑巴，权威",
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "花花",
       "myConfirmed": false,
       "deposit": 0,
       "public": false,
       "matchScore": 0,
-      "registeredAt": 1793115144760
+      "registeredAt": 1793115144760,
+      "divorceRequested": false
     },
     "花花": {
       "majia": "花花",
@@ -197,13 +198,14 @@
       "gender": "female",
       "wish": "",
       "about": "",
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "花痴",
       "myConfirmed": false,
       "deposit": 0,
       "public": false,
       "matchScore": 0,
-      "registeredAt": 1793115241060
+      "registeredAt": 1793115241060,
+      "divorceRequested": false
     }
   },
   "matches": [
@@ -222,6 +224,10 @@
     [
       "男三",
       "熱爱"
+    ],
+    [
+      "花痴",
+      "花花"
     ]
   ],
   "round": 4,
