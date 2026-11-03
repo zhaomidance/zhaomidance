@@ -36,12 +36,13 @@
       "gender": "female",
       "wish": "",
       "about": "",
-      "status": "matched",
-      "partner": "男一",
+      "status": "registered",
+      "partner": null,
       "myConfirmed": false,
       "deposit": 0,
       "matchScore": 0,
-      "registeredAt": 1792861366610
+      "registeredAt": 1792861366610,
+      "divorceRequested": false
     },
     "男一": {
       "majia": "男一",
@@ -49,12 +50,13 @@
       "gender": "male",
       "wish": "",
       "about": "",
-      "status": "matched",
-      "partner": "女三",
+      "status": "registered",
+      "partner": null,
       "myConfirmed": false,
       "deposit": 0,
       "matchScore": 0,
-      "registeredAt": 1792861383127
+      "registeredAt": 1792861383127,
+      "divorceRequested": false
     },
     "男二": {
       "majia": "男二",
@@ -191,10 +193,6 @@
     }
   },
   "matches": [
-    [
-      "男一",
-      "女三"
-    ],
     [
       "男三",
       "熱爱"
