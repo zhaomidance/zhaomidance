@@ -82,7 +82,7 @@
       "about": "烧，胸大，有趣，小学生音",
       "status": "matched",
       "partner": "云深",
-      "myConfirmed": false,
+      "myConfirmed": true,
       "deposit": 0,
       "public": true,
       "matchScore": 0,
@@ -255,6 +255,12 @@
     {
       "time": "2026-11-03T12:07:13.492Z",
       "actor": "初一",
+      "action": "确认舞伴",
+      "amount": -1314
+    },
+    {
+      "time": "2026-11-03T12:12:50.254Z",
+      "actor": "端端",
       "action": "确认舞伴",
       "amount": -1314
     }
