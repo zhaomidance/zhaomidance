@@ -7,13 +7,14 @@
       "gender": "female",
       "wish": "",
       "about": "",
-      "status": "confirmed",
-      "partner": "男四",
-      "myConfirmed": true,
-      "deposit": 3600,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
       "matchScore": 0,
       "registeredAt": 1792861318396,
-      "public": true
+      "public": true,
+      "divorceRequested": false
     },
     "女二": {
       "majia": "女二",
@@ -88,13 +89,14 @@
       "gender": "female",
       "wish": "陪伴",
       "about": "哑巴 权威",
-      "status": "confirmed",
-      "partner": "女一",
-      "myConfirmed": true,
-      "deposit": 18800,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
       "matchScore": 0,
       "registeredAt": 1792861433796,
-      "public": true
+      "public": true,
+      "divorceRequested": false
     },
     "熱爱": {
       "majia": "熱爱",
@@ -190,10 +192,6 @@
     [
       "男二",
       "女二"
-    ],
-    [
-      "男四",
-      "女一"
     ],
     [
       "男一",
