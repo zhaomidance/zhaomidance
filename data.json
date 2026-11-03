@@ -128,8 +128,8 @@
       "gender": "female",
       "wish": "有趣的灵魂",
       "about": "古灵精怪",
-      "status": "matched",
-      "partner": "春秋",
+      "status": "registered",
+      "partner": null,
       "myConfirmed": false,
       "deposit": 0,
       "public": false,
@@ -143,9 +143,9 @@
       "gender": "male",
       "wish": "",
       "about": "",
-      "status": "matched",
-      "partner": "屁屁",
-      "myConfirmed": true,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
       "deposit": 0,
       "public": false,
       "matchScore": 0,
@@ -157,10 +157,6 @@
     [
       "初一",
       "璃雾"
-    ],
-    [
-      "春秋",
-      "屁屁"
     ]
   ],
   "round": 6,
@@ -305,6 +301,12 @@
       "actor": "璃雾",
       "action": "投入灵石(任务共池)",
       "amount": -3000
+    },
+    {
+      "time": "2026-11-03T12:35:04.167Z",
+      "actor": "春秋",
+      "action": "单方强制解除舞伴",
+      "amount": -2888
     }
   ]
 }
