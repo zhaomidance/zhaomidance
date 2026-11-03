@@ -71,8 +71,8 @@
       "gender": "male",
       "wish": "肤白貌美大长腿白瘦🐻大",
       "about": "平凡",
-      "status": "matched",
-      "partner": "苏苏",
+      "status": "registered",
+      "partner": null,
       "myConfirmed": false,
       "deposit": 0,
       "public": false,
@@ -131,8 +131,8 @@
       "gender": "female",
       "wish": "耐心 有趣",
       "about": "水瓶座",
-      "status": "matched",
-      "partner": "神采",
+      "status": "registered",
+      "partner": null,
       "myConfirmed": false,
       "deposit": 0,
       "public": false,
@@ -183,10 +183,6 @@
     [
       "春秋",
       "屁屁"
-    ],
-    [
-      "神采",
-      "苏苏"
     ]
   ],
   "round": 6,
@@ -313,6 +309,12 @@
       "actor": "春秋",
       "action": "确认舞伴",
       "amount": -1314
+    },
+    {
+      "time": "2026-11-03T12:28:42.362Z",
+      "actor": "神采",
+      "action": "单方强制解除舞伴",
+      "amount": -2888
     }
   ]
 }
