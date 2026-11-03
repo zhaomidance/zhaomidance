@@ -1,12 +1,6 @@
 {
   "whitelist": [
     {
-      "majia": "女三",
-      "ticket": "666",
-      "claimed": true,
-      "claimedAt": 1792861366610
-    },
-    {
       "majia": "男一",
       "ticket": "666",
       "claimed": true,
