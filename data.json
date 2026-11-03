@@ -41,7 +41,7 @@
       "status": "confirmed",
       "partner": "璃雾",
       "myConfirmed": true,
-      "deposit": 3000,
+      "deposit": 6570,
       "public": false,
       "matchScore": 2,
       "registeredAt": 1793702677482,
@@ -307,6 +307,12 @@
       "actor": "春秋",
       "action": "单方强制解除舞伴",
       "amount": -2888
+    },
+    {
+      "time": "2026-11-03T12:51:35.138Z",
+      "actor": "初一",
+      "action": "投入灵石(任务共池)",
+      "amount": -3570
     }
   ]
 }
