@@ -101,7 +101,7 @@
       "status": "confirmed",
       "partner": "初一",
       "myConfirmed": true,
-      "deposit": 3000,
+      "deposit": 6570,
       "public": false,
       "matchScore": 2,
       "registeredAt": 1793704496583,
@@ -311,6 +311,12 @@
     {
       "time": "2026-11-03T12:51:35.138Z",
       "actor": "初一",
+      "action": "投入灵石(任务共池)",
+      "amount": -3570
+    },
+    {
+      "time": "2026-11-03T12:53:48.856Z",
+      "actor": "璃雾",
       "action": "投入灵石(任务共池)",
       "amount": -3570
     }
