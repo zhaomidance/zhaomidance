@@ -56,7 +56,7 @@
       "gender": "male",
       "wish": "聊得来？我也不知道",
       "about": "十年精神病史",
-      "status": "matched",
+      "status": "confirmed",
       "partner": "璃雾",
       "myConfirmed": true,
       "deposit": 0,
@@ -116,9 +116,9 @@
       "gender": "female",
       "wish": "不知道",
       "about": "御姐，着迷最最厉害的大s",
-      "status": "matched",
+      "status": "confirmed",
       "partner": "初一",
-      "myConfirmed": false,
+      "myConfirmed": true,
       "deposit": 0,
       "public": false,
       "matchScore": 2,
@@ -301,6 +301,12 @@
       "actor": "神采",
       "action": "单方强制解除舞伴",
       "amount": -2888
+    },
+    {
+      "time": "2026-11-03T12:28:14.971Z",
+      "actor": "璃雾",
+      "action": "确认舞伴",
+      "amount": -1314
     }
   ]
 }
