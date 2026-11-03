@@ -17,6 +17,11 @@
       "ticket": "003",
       "claimed": true,
       "claimedAt": 1793702677482
+    },
+    {
+      "majia": "云深",
+      "ticket": "004",
+      "claimed": false
     }
   ],
   "players": {
