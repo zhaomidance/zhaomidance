@@ -3,7 +3,8 @@
     {
       "majia": "端端",
       "ticket": "001",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1793703272409
     },
     {
       "majia": "神采",
@@ -46,6 +47,20 @@
       "public": false,
       "matchScore": 0,
       "registeredAt": 1793702770740
+    },
+    "端端": {
+      "majia": "端端",
+      "ticket": "001",
+      "gender": "female",
+      "wish": "烧的有趣的灵魂有腹肌的皮囊和绝佳青叔音",
+      "about": "烧，胸大，有趣，小学生音",
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1793703272409
     }
   },
   "matches": [],
@@ -105,6 +120,12 @@
     {
       "time": "2026-11-03T10:46:10.740Z",
       "actor": "神采",
+      "action": "报名入场",
+      "amount": -999
+    },
+    {
+      "time": "2026-11-03T10:54:32.409Z",
+      "actor": "端端",
       "action": "报名入场",
       "amount": -999
     }
