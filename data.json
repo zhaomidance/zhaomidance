@@ -163,7 +163,7 @@
       "about": "",
       "status": "matched",
       "partner": "屁屁",
-      "myConfirmed": false,
+      "myConfirmed": true,
       "deposit": 0,
       "public": false,
       "matchScore": 0,
@@ -305,6 +305,12 @@
     {
       "time": "2026-11-03T12:28:14.971Z",
       "actor": "璃雾",
+      "action": "确认舞伴",
+      "amount": -1314
+    },
+    {
+      "time": "2026-11-03T12:28:26.299Z",
+      "actor": "春秋",
       "action": "确认舞伴",
       "amount": -1314
     }
