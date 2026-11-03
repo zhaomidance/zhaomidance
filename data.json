@@ -1,18 +1,5 @@
 {
-  "whitelist": [
-    {
-      "majia": "熱爱",
-      "ticket": "520",
-      "claimed": true,
-      "claimedAt": 1793110377716
-    },
-    {
-      "majia": "花儿",
-      "ticket": "777",
-      "claimed": true,
-      "claimedAt": 1793116428464
-    }
-  ],
+  "whitelist": [],
   "players": {
     "女一": {
       "majia": "女一",
