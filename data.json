@@ -84,7 +84,7 @@
       "partner": "云深",
       "myConfirmed": false,
       "deposit": 0,
-      "public": false,
+      "public": true,
       "matchScore": 0,
       "registeredAt": 1793703272409,
       "divorceRequested": false
