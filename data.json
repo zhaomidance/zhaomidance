@@ -52,7 +52,7 @@
       "about": "十年精神病史",
       "status": "matched",
       "partner": "璃雾",
-      "myConfirmed": false,
+      "myConfirmed": true,
       "deposit": 0,
       "public": false,
       "matchScore": 2,
@@ -251,6 +251,12 @@
       "actor": "屁屁",
       "action": "报名入场",
       "amount": -999
+    },
+    {
+      "time": "2026-11-03T12:07:13.492Z",
+      "actor": "初一",
+      "action": "确认舞伴",
+      "amount": -1314
     }
   ]
 }
