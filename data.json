@@ -1,16 +1,5 @@
 {
-  "whitelist": [
-    {
-      "majia": "阿龙",
-      "ticket": "003",
-      "claimed": false
-    },
-    {
-      "majia": "阿雅",
-      "ticket": "004",
-      "claimed": false
-    }
-  ],
+  "whitelist": [],
   "players": {},
   "matches": [],
   "round": 6,
