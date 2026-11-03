@@ -167,9 +167,9 @@
       "gender": "male",
       "wish": "甜妹",
       "about": "年上",
-      "status": "matched",
-      "partner": "痴儿",
-      "myConfirmed": true,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
       "deposit": 0,
       "public": true,
       "matchScore": 0,
@@ -182,8 +182,8 @@
       "gender": "female",
       "wish": "年下",
       "about": "女王，权威",
-      "status": "matched",
-      "partner": "花儿",
+      "status": "registered",
+      "partner": null,
       "myConfirmed": false,
       "deposit": 0,
       "public": true,
@@ -196,10 +196,6 @@
     [
       "花痴",
       "花花"
-    ],
-    [
-      "花儿",
-      "痴儿"
     ]
   ],
   "round": 4,
