@@ -146,13 +146,14 @@
       "gender": "female",
       "wish": "有趣的灵魂",
       "about": "古灵精怪",
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "春秋",
       "myConfirmed": false,
       "deposit": 0,
       "public": false,
       "matchScore": 0,
-      "registeredAt": 1793707459506
+      "registeredAt": 1793707459506,
+      "divorceRequested": false
     },
     "春秋": {
       "majia": "春秋",
@@ -160,13 +161,14 @@
       "gender": "male",
       "wish": "",
       "about": "",
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "屁屁",
       "myConfirmed": false,
       "deposit": 0,
       "public": false,
       "matchScore": 0,
-      "registeredAt": 1793708512733
+      "registeredAt": 1793708512733,
+      "divorceRequested": false
     }
   },
   "matches": [
@@ -181,10 +183,14 @@
     [
       "神采",
       "苏苏"
+    ],
+    [
+      "春秋",
+      "屁屁"
     ]
   ],
   "round": 6,
-  "stage": "round1",
+  "stage": "round2",
   "tasks": [
     {
       "id": 1792856165383,
