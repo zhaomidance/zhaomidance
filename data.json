@@ -27,7 +27,8 @@
     {
       "majia": "苏苏",
       "ticket": "005",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1793704636364
     },
     {
       "majia": "璃雾",
@@ -106,6 +107,20 @@
       "public": false,
       "matchScore": 0,
       "registeredAt": 1793704496583
+    },
+    "苏苏": {
+      "majia": "苏苏",
+      "ticket": "005",
+      "gender": "female",
+      "wish": "耐心 有趣",
+      "about": "水瓶座",
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1793704636364
     }
   },
   "matches": [],
@@ -183,6 +198,12 @@
     {
       "time": "2026-11-03T11:14:56.584Z",
       "actor": "璃雾",
+      "action": "报名入场",
+      "amount": -999
+    },
+    {
+      "time": "2026-11-03T11:17:16.364Z",
+      "actor": "苏苏",
       "action": "报名入场",
       "amount": -999
     }
