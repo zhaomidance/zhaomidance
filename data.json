@@ -41,6 +41,11 @@
       "ticket": "007",
       "claimed": true,
       "claimedAt": 1793707459506
+    },
+    {
+      "majia": "春秋",
+      "ticket": "008",
+      "claimed": false
     }
   ],
   "players": {
