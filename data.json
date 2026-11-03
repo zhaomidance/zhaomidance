@@ -21,7 +21,8 @@
     {
       "majia": "云深",
       "ticket": "004",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1793703613204
     }
   ],
   "players": {
@@ -66,6 +67,20 @@
       "public": false,
       "matchScore": 0,
       "registeredAt": 1793703272409
+    },
+    "云深": {
+      "majia": "云深",
+      "ticket": "004",
+      "gender": "male",
+      "wish": "",
+      "about": "",
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1793703613204
     }
   },
   "matches": [],
@@ -131,6 +146,12 @@
     {
       "time": "2026-11-03T10:54:32.409Z",
       "actor": "端端",
+      "action": "报名入场",
+      "amount": -999
+    },
+    {
+      "time": "2026-11-03T11:00:13.204Z",
+      "actor": "云深",
       "action": "报名入场",
       "amount": -999
     }
