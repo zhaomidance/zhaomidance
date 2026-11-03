@@ -45,7 +45,8 @@
     {
       "majia": "春秋",
       "ticket": "008",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1793708512733
     }
   ],
   "players": {
@@ -152,6 +153,20 @@
       "public": false,
       "matchScore": 0,
       "registeredAt": 1793707459506
+    },
+    "春秋": {
+      "majia": "春秋",
+      "ticket": "008",
+      "gender": "male",
+      "wish": "",
+      "about": "",
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1793708512733
     }
   },
   "matches": [
@@ -268,6 +283,12 @@
       "actor": "端端",
       "action": "确认舞伴",
       "amount": -1314
+    },
+    {
+      "time": "2026-11-03T12:21:52.734Z",
+      "actor": "春秋",
+      "action": "报名入场",
+      "amount": -999
     }
   ]
 }
