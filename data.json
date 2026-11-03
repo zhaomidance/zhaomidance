@@ -13,10 +13,26 @@
     {
       "majia": "初一",
       "ticket": "003",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1793702677482
     }
   ],
-  "players": {},
+  "players": {
+    "初一": {
+      "majia": "初一",
+      "ticket": "003",
+      "gender": "male",
+      "wish": "聊得来？我也不知道",
+      "about": "十年精神病史",
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1793702677482
+    }
+  },
   "matches": [],
   "round": 6,
   "stage": "registering",
@@ -64,5 +80,12 @@
       "done": false
     }
   ],
-  "logs": []
+  "logs": [
+    {
+      "time": "2026-11-03T10:44:37.483Z",
+      "actor": "初一",
+      "action": "报名入场",
+      "amount": -999
+    }
+  ]
 }
