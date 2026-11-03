@@ -78,9 +78,9 @@
       "gender": "male",
       "wish": "",
       "about": "",
-      "status": "confirmed",
-      "partner": "熱爱",
-      "myConfirmed": true,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
       "deposit": 0,
       "matchScore": 0,
       "registeredAt": 1792861418865,
@@ -108,10 +108,10 @@
       "gender": "female",
       "wish": "唧唧大，有腹肌",
       "about": "",
-      "status": "confirmed",
-      "partner": "男三",
-      "myConfirmed": true,
-      "deposit": 27391,
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
       "public": true,
       "matchScore": 0,
       "registeredAt": 1793110377716,
@@ -193,10 +193,6 @@
     }
   },
   "matches": [
-    [
-      "男三",
-      "熱爱"
-    ],
     [
       "花痴",
       "花花"
