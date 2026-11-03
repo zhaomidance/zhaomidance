@@ -123,8 +123,8 @@
       "gender": "male",
       "wish": "陪伴",
       "about": "哑巴，权威",
-      "status": "matched",
-      "partner": "花花",
+      "status": "registered",
+      "partner": null,
       "myConfirmed": false,
       "deposit": 0,
       "public": false,
@@ -138,8 +138,8 @@
       "gender": "female",
       "wish": "",
       "about": "",
-      "status": "matched",
-      "partner": "花痴",
+      "status": "registered",
+      "partner": null,
       "myConfirmed": false,
       "deposit": 0,
       "public": false,
@@ -192,12 +192,7 @@
       "divorceRequested": false
     }
   },
-  "matches": [
-    [
-      "花痴",
-      "花花"
-    ]
-  ],
+  "matches": [],
   "round": 4,
   "stage": "registering",
   "tasks": [
