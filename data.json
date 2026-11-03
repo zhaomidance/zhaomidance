@@ -35,6 +35,11 @@
       "ticket": "006",
       "claimed": true,
       "claimedAt": 1793704496583
+    },
+    {
+      "majia": "屁屁",
+      "ticket": "007",
+      "claimed": false
     }
   ],
   "players": {
