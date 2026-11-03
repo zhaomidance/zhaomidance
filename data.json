@@ -32,7 +32,8 @@
     {
       "majia": "璃雾",
       "ticket": "006",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1793704496583
     }
   ],
   "players": {
@@ -91,6 +92,20 @@
       "public": false,
       "matchScore": 0,
       "registeredAt": 1793703613204
+    },
+    "璃雾": {
+      "majia": "璃雾",
+      "ticket": "006",
+      "gender": "female",
+      "wish": "不知道",
+      "about": "御姐，着迷最最厉害的大s",
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1793704496583
     }
   },
   "matches": [],
@@ -162,6 +177,12 @@
     {
       "time": "2026-11-03T11:00:13.204Z",
       "actor": "云深",
+      "action": "报名入场",
+      "amount": -999
+    },
+    {
+      "time": "2026-11-03T11:14:56.584Z",
+      "actor": "璃雾",
       "action": "报名入场",
       "amount": -999
     }
