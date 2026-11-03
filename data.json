@@ -39,7 +39,8 @@
     {
       "majia": "屁屁",
       "ticket": "007",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1793707459506
     }
   ],
   "players": {
@@ -126,6 +127,20 @@
       "public": false,
       "matchScore": 0,
       "registeredAt": 1793704636364
+    },
+    "屁屁": {
+      "majia": "屁屁",
+      "ticket": "007",
+      "gender": "female",
+      "wish": "有趣的灵魂",
+      "about": "古灵精怪",
+      "status": "registered",
+      "partner": null,
+      "myConfirmed": false,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1793707459506
     }
   },
   "matches": [],
@@ -209,6 +224,12 @@
     {
       "time": "2026-11-03T11:17:16.364Z",
       "actor": "苏苏",
+      "action": "报名入场",
+      "amount": -999
+    },
+    {
+      "time": "2026-11-03T12:04:19.506Z",
+      "actor": "屁屁",
       "action": "报名入场",
       "amount": -999
     }
