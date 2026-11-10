@@ -59,7 +59,7 @@
       "about": "幽默，弟弟",
       "status": "matched",
       "partner": "璃雾",
-      "deposit": 0,
+      "deposit": 1,
       "public": false,
       "matchScore": 0,
       "registeredAt": 1794302125207,
@@ -287,6 +287,12 @@
       "actor": "悬溺",
       "action": "报名门票",
       "amount": -999
+    },
+    {
+      "time": "2026-11-10T13:08:11.074Z",
+      "actor": "飒飒",
+      "action": "投入灵石(任务共池)",
+      "amount": -1
     }
   ]
 }
