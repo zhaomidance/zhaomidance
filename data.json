@@ -57,12 +57,13 @@
       "gender": "male",
       "wish": "不高冷的就好啦，我很不会和高冷姐姐搭话",
       "about": "幽默，弟弟",
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "璃雾",
       "deposit": 0,
       "public": false,
       "matchScore": 0,
-      "registeredAt": 1794302125207
+      "registeredAt": 1794302125207,
+      "divorceRequested": false
     },
     "嶙峋": {
       "majia": "嶙峋",
@@ -126,12 +127,13 @@
       "gender": "female",
       "wish": "小m",
       "about": "大s",
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "飒飒",
       "deposit": 0,
       "public": false,
       "matchScore": 0,
-      "registeredAt": 1794315485096
+      "registeredAt": 1794315485096,
+      "divorceRequested": false
     },
     "悬溺": {
       "majia": "悬溺",
@@ -155,10 +157,14 @@
     [
       "云深",
       "羊羊"
+    ],
+    [
+      "飒飒",
+      "璃雾"
     ]
   ],
   "round": 7,
-  "stage": "round1",
+  "stage": "round2",
   "tasks": [
     {
       "id": 1792856165383,
