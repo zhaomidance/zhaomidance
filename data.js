@@ -118,9 +118,15 @@ const ZMD = (function () {
     return pairs;
   }
 
+  // 费用：后台设置优先（data.settings.costs），否则回退 config.js 默认值
+  function getCosts(data) {
+    return Object.assign({}, C.costs, (data && data.settings && data.settings.costs) || {});
+  }
+
   return {
     load, save, uid, shuffle,
     keywords, affinity, fateMatch,
+    getCosts,
     get config() { return C; }
   };
 })();

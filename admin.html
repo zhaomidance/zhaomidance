@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>蒙面舞会 · 管理后台</title>
-<link rel="stylesheet" href="style.css?v=20261025g">
+<link rel="stylesheet" href="style.css?v=20261110a">
 </head>
 <body>
 
@@ -73,10 +73,19 @@
       <button class="btn btn-primary" id="reportBtn">📊 灵石统计</button>
     </div>
 
+    <!-- 费用设置 -->
+    <h2 class="section-title">⚙ 费用设置</h2>
+    <div class="cost-set">
+      <label>门票（录入名单即计入）<input type="number" id="costRegister" min="0"></label>
+      <label>双方解除 · 每人<input type="number" id="costRelease" min="0"></label>
+      <label>单方强制解除<input type="number" id="costForce" min="0"></label>
+      <button class="btn btn-primary btn-sm" id="saveCostsBtn">保存费用</button>
+    </div>
+
     <!-- 白名单录入 -->
     <h2 class="section-title">🎫 报名人员录入（门票白名单）</h2>
     <div class="wl-box">
-      <textarea id="wlInput" placeholder="每行一个人，格式：二字马甲,门票编号&#10;分隔符不限（逗号 / 空格 / 顿号 / 竖线 / 制表符均可）&#10;&#10;例：&#10;阿强,001&#10;小美 002&#10;阿龙|003"></textarea>
+      <textarea id="wlInput" placeholder="每行一个人，格式：二字马甲,性别,门票编号&#10;分隔符不限（逗号 / 空格 / 顿号 / 竖线均可），性别可省略&#10;&#10;例：&#10;阿强,男,001&#10;小美,女,002&#10;阿龙 男 003"></textarea>
       <div class="wl-actions">
         <button class="btn btn-primary btn-sm" id="wlImportBtn">导入白名单</button>
         <button class="btn btn-ghost btn-sm" id="wlDemoBtn">查看示例格式</button>
@@ -104,7 +113,7 @@
     <div class="table-wrap">
       <table class="data-table" id="matchesTable">
         <thead>
-          <tr><th>马甲A</th><th>马甲B</th><th>确认</th><th>共池灵石</th><th>操作</th></tr>
+          <tr><th>马甲A</th><th>马甲B</th><th>共池灵石</th><th>操作</th></tr>
         </thead>
         <tbody></tbody>
       </table>
@@ -168,6 +177,7 @@
       data = await ZMD.load(true);
       if (!data.whitelist) data.whitelist = [];
       renderStats();
+      renderCosts();
       renderWhitelist();
       renderPlayers();
       renderMatches();
@@ -202,6 +212,30 @@
     });
   }
 
+  // ===== 费用设置 =====
+  function renderCosts() {
+    const c = ZMD.getCosts(data);
+    $('costRegister').value = c.register || 0;
+    $('costRelease').value = c.release || 0;
+    $('costForce').value = c.forceRelease || 0;
+  }
+
+  $('saveCostsBtn').onclick = async () => {
+    const reg = parseInt($('costRegister').value, 10);
+    const rel = parseInt($('costRelease').value, 10);
+    const force = parseInt($('costForce').value, 10);
+    if (isNaN(reg) || reg < 0 || isNaN(rel) || rel < 0 || isNaN(force) || force < 0) {
+      toast('请输入有效的灵石数值', 'error');
+      return;
+    }
+    data = await ZMD.load(true);
+    if (!data.settings) data.settings = {};
+    data.settings.costs = { register: reg, release: rel, forceRelease: force };
+    await ZMD.save(data, '更新费用设置');
+    toast('费用已保存，大屏将同步生效', 'success');
+    refresh();
+  };
+
   // ===== 白名单 =====
   function renderWhitelist() {
     const kw = ($('wlSearch').value || '').trim();
@@ -215,9 +249,11 @@
       const state = player
         ? '<span class="wl-tag ok">已报名</span>'
         : (w.claimed ? '<span class="wl-tag warn">已占用</span>' : '<span class="wl-tag">待入场</span>');
+      const g = w.gender === 'male' ? '👦' : w.gender === 'female' ? '👧' : '<span style="opacity:.4">❓</span>';
       return `
         <div class="wl-item">
           <span class="wl-majia">${esc(w.majia)}</span>
+          <span class="wl-gender">${g}</span>
           <span class="wl-ticket">${esc(w.ticket)}</span>
           ${state}
           <button class="mini-btn danger" onclick="window._delWl('${esc(w.majia)}','${esc(w.ticket)}')">移除</button>
@@ -238,7 +274,16 @@
     refresh();
   };
 
+  // 解析性别：男 / male / m → male；女 / female / f → female
+  function parseGender(tok) {
+    const s = String(tok || '').trim().toLowerCase();
+    if (/^(男|male|m$)/.test(s)) return 'male';
+    if (/^(女|female|f$)/.test(s)) return 'female';
+    return null;
+  }
+
   // 解析白名单文本：换行即一人，分隔符不限
+  // 格式：二字马甲,性别,门票编号（性别可省略 → 二字马甲,门票编号）
   function parseWhitelist(text) {
     const out = [];
     (text || '').split(/\r?\n/).forEach(line => {
@@ -247,9 +292,14 @@
       const parts = s.split(/[,，、\s|;；/\\·.。\t]+/).filter(Boolean);
       if (parts.length < 2) return;
       const majia = parts[0].slice(0, 2);
-      const ticket = parts[1].trim();
+      let gender = null, ticket = null;
+      for (let i = 1; i < parts.length; i++) {
+        const g = parseGender(parts[i]);
+        if (g && !gender) { gender = g; continue; }
+        if (ticket === null) ticket = parts[i];
+      }
       if (!majia || !ticket) return;
-      out.push({ majia, ticket });
+      out.push({ majia, ticket, gender });
     });
     return out;
   }
@@ -258,25 +308,30 @@
     const raw = $('wlInput').value;
     const incoming = parseWhitelist(raw);
     if (!incoming.length) {
-      toast('未解析到有效行，格式应为「二字马甲,门票编号」', 'error');
+      toast('未解析到有效行，格式应为「马甲,性别,门票编号」（性别可省略）', 'error');
       return;
     }
     data = await ZMD.load(true);
     if (!data.whitelist) data.whitelist = [];
+    if (!data.logs) data.logs = [];
     let added = 0, skipped = 0;
+    const c = ZMD.getCosts(data);
+    const now = new Date().toISOString();
     for (const item of incoming) {
       const exists = data.whitelist.some(w => w.majia === item.majia && String(w.ticket) === item.ticket);
       if (exists) { skipped++; continue; }
-      data.whitelist.push({ majia: item.majia, ticket: item.ticket, claimed: false });
+      data.whitelist.push({ majia: item.majia, ticket: item.ticket, gender: item.gender || null, claimed: false });
+      // 门票费用在录入名单时即计入
+      data.logs.push({ time: now, actor: item.majia, action: '报名门票', amount: -(c.register || 0) });
       added++;
     }
-    await ZMD.save(data, `导入白名单 ${added} 人`);
+    await ZMD.save(data, `导入白名单 ${added} 人（门票费用已计入）`);
     $('wlInput').value = '';
-    toast(`导入完成：新增 ${added} 人，重复跳过 ${skipped} 人`, 'success');
+    toast(`导入完成：新增 ${added} 人（门票已计入），重复跳过 ${skipped} 人`, 'success');
     refresh();
   };
   $('wlDemoBtn').onclick = () => {
-    $('wlInput').value = '阿强,001\n小美 002\n阿龙|003\n阿雅、004';
+    $('wlInput').value = '阿强,男,001\n小美,女,002\n阿龙 男 003\n阿雅、女、004';
     toast('示例已填入，可直接点「导入白名单」', 'success');
   };
   $('wlSearch').addEventListener('input', () => { if (data) renderWhitelist(); });
@@ -290,12 +345,7 @@
 
   function statusText(p) {
     if (p.status === 'registered') return '<span style="color:var(--gold)">待匹配</span>';
-    if (p.status === 'matched') {
-      return p.myConfirmed
-        ? '<span style="color:var(--gold-soft)">待对方确认</span>'
-        : '<span style="color:var(--rose)">待确认舞伴</span>';
-    }
-    if (p.status === 'confirmed') return '<span style="color:var(--green)">舞伴已确认</span>';
+    if (p.status === 'matched' || p.status === 'confirmed') return '<span style="color:var(--green)">已配对</span>';
     return p.status;
   }
 
@@ -330,18 +380,16 @@
       if (!spouse) continue;
       seen.add(key); seen.add(p.partner);
       const pool = (p.deposit || 0) + (spouse.deposit || 0);
-      const confirmed = p.status === 'confirmed' && spouse.status === 'confirmed';
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${esc(p.majia)}</td>
         <td>${esc(spouse.majia)}</td>
-        <td>${confirmed ? '✅ 双方已确认' : (p.myConfirmed ? '⏳ 一方已确认' : '❌ 未确认')}</td>
         <td>${pool} 💎</td>
         <td><button class="mini-btn danger" onclick="window._forceDivorce('${esc(p.majia)}','${esc(spouse.majia)}')">强制解除</button></td>`;
       tbody.appendChild(tr);
     }
     if (!tbody.children.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="table-empty">🥀 暂无结伴舞宾</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" class="table-empty">🥀 暂无结伴舞宾</td></tr>';
     }
   }
 
@@ -513,7 +561,6 @@
       const a = pr.a, b = pr.b;
       a.status = 'matched'; b.status = 'matched';
       a.partner = b.majia; b.partner = a.majia;
-      a.myConfirmed = false; b.myConfirmed = false;
       a.deposit = 0; b.deposit = 0;
       a.public = false; b.public = false;
       a.divorceRequested = false; b.divorceRequested = false;
@@ -552,7 +599,14 @@
     data.stage = 'registering';
     (data.tasks || []).forEach(t => { t.done = false; });
     (data.whitelist || []).forEach(w => { w.claimed = false; delete w.claimedAt; });
-    await ZMD.save(data, `开启第${data.round}轮，完全重置全部数据`);
+    // 名单保留到新一轮，门票费用随之重新计入
+    const c = ZMD.getCosts(data);
+    if (!data.logs) data.logs = [];
+    const now = new Date().toISOString();
+    (data.whitelist || []).forEach(w => {
+      data.logs.push({ time: now, actor: w.majia, action: '报名门票', amount: -(c.register || 0) });
+    });
+    await ZMD.save(data, `开启第${data.round}轮，重置数据并重新计入门票`);
     toast('已完成完全重置', 'success');
     refresh();
   }
@@ -565,7 +619,7 @@
     if (!p) return;
     if (p.partner) {
       const spouse = data.players[p.partner];
-      if (spouse) { spouse.partner = null; spouse.status = 'registered'; spouse.myConfirmed = false; spouse.deposit = 0; }
+      if (spouse) { spouse.partner = null; spouse.status = 'registered'; spouse.deposit = 0; }
     }
     delete data.players[majia];
     data.matches = (data.matches || []).filter(m => !m.includes(majia));
@@ -579,8 +633,8 @@
     if (!confirm(`确定强制解除 ${a} ❤ ${b}？`)) return;
     data = await ZMD.load(true);
     const pa = data.players[a], pb = data.players[b];
-    if (pa) { pa.partner = null; pa.status = 'registered'; pa.myConfirmed = false; pa.deposit = 0; pa.matchScore = 0; pa.divorceRequested = false; }
-    if (pb) { pb.partner = null; pb.status = 'registered'; pb.myConfirmed = false; pb.deposit = 0; pb.matchScore = 0; pb.divorceRequested = false; }
+    if (pa) { pa.partner = null; pa.status = 'registered'; pa.deposit = 0; pa.matchScore = 0; pa.divorceRequested = false; }
+    if (pb) { pb.partner = null; pb.status = 'registered'; pb.deposit = 0; pb.matchScore = 0; pb.divorceRequested = false; }
     data.matches = (data.matches || []).filter(m => !m.includes(a) && !m.includes(b));
     await ZMD.save(data, '管理员强制解除婚配');
     refresh();

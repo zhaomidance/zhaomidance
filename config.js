@@ -12,6 +12,6 @@ window.ZMD_CONFIG = {
   token: 'ghp_' + 'P0fZwi0eI9yio6KFxsLCjbGkjpi3171GJof1',
   // 管理员密码（后台页面用）
   adminPassword: 'dance520',
-  // 游戏参数
-  costs: { register: 999, confirm: 1314, release: 1111, forceRelease: 2888 },
+  // 游戏参数（默认值；后台「费用设置」可覆盖，存于 data.json 的 settings.costs）
+  costs: { register: 999, release: 1111, forceRelease: 2888 },
 };

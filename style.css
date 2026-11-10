@@ -366,7 +366,7 @@ body::after {
 .my-couple .names .heart { color: var(--rose); margin: 0 6px; animation: beat 1.6s infinite; }
 .my-couple .bond { font-size: 10px; letter-spacing: 1px; color: var(--gold-soft); opacity: .85; text-align: right; line-height: 1.4; }
 
-.marriage-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+.marriage-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 8px; }
 .act-btn {
   border: 1px solid rgba(255,255,255,.14); border-radius: 10px;
   background: rgba(255,255,255,.04); color: var(--text);
@@ -464,6 +464,27 @@ body::after {
   border-color: rgba(244,114,182,.75); color: #fbcfe8;
   background: rgba(244,114,182,.16); box-shadow: 0 0 20px rgba(244,114,182,.2);
 }
+.gender-fixed {
+  padding: 14px 8px; text-align: center; font-weight: 700; letter-spacing: 2px;
+  background: rgba(0,0,0,.36); border: 1px solid rgba(255,255,255,.14);
+  border-radius: 12px; color: var(--text); font-size: 14px;
+}
+.wl-gender { min-width: 20px; text-align: center; }
+.cost-set {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px; padding: 12px;
+}
+.cost-set label {
+  display: flex; flex-direction: column; gap: 5px;
+  font-size: 11px; color: var(--text-dim); flex: 1; min-width: 130px;
+}
+.cost-set input {
+  background: rgba(0,0,0,.36); border: 1px solid rgba(255,255,255,.14);
+  border-radius: 8px; color: var(--text); padding: 8px 10px;
+  font-family: inherit; font-size: 13px;
+}
+.cost-set input:focus { outline: none; border-color: rgba(255,215,130,.45); }
 .modal-rules {
   margin-top: 16px; padding-top: 14px;
   border-top: 1px solid rgba(255,255,255,.08);

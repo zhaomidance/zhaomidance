@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>蒙面舞会 · 婚配玩法</title>
-<link rel="stylesheet" href="style.css?v=20261025g">
+<link rel="stylesheet" href="style.css?v=20261110a">
 </head>
 <body>
 
@@ -85,7 +85,7 @@
           <span class="big-emoji" id="myStateEmoji">💍</span>
           <div>
             <h2 id="myStateTitle">红线已系</h2>
-            <p id="lockStatus">尚未确认舞伴</p>
+            <p id="lockStatus">已与你结为舞伴</p>
           </div>
         </div>
 
@@ -99,17 +99,13 @@
         </div>
 
         <div class="marriage-actions">
-          <button class="act-btn lock" id="confirmBtn">
-            <div class="act-title">💍 确认舞伴</div>
-            <div class="act-cost">1314 💎</div>
-          </button>
           <button class="act-btn divorce" id="applyReleaseBtn">
             <div class="act-title">💔 申请解除</div>
-            <div class="act-cost">双方同意各扣 1111 💎</div>
+            <div class="act-cost"></div>
           </button>
           <button class="act-btn force" id="forceReleaseBtn">
             <div class="act-title">⚡ 单方强制解除</div>
-            <div class="act-cost">2888 💎</div>
+            <div class="act-cost"></div>
           </button>
         </div>
 
@@ -203,9 +199,13 @@
     <div id="infoStep" style="display:none">
       <div class="verify-ok">
         <span class="ok-icon">✓</span>
-        <span>身份核对成功：<b id="okMajia">-</b> · 门票 <b id="okTicket">-</b></span>
+        <span>身份核对成功：<b id="okMajia">-</b><span id="okGender"></span> · 门票 <b id="okTicket">-</b></span>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="genderKnownGroup" style="display:none">
+        <label>性别 <span class="opt">（报名名单已登记）</span></label>
+        <div class="gender-fixed" id="genderFixed">-</div>
+      </div>
+      <div class="form-group" id="genderPickGroup">
         <label>性别</label>
         <div class="gender-select">
           <button class="gender-btn" data-g="male">👦 男宾</button>
@@ -220,15 +220,11 @@
         <label>我的模样 <span class="opt">（选填）</span></label>
         <textarea id="aboutInput" maxlength="40" placeholder="用几个词描述自己"></textarea>
       </div>
-      <button class="btn btn-gold btn-block" id="registerBtn">缴纳 999 灵石 · 入场</button>
+      <button class="btn btn-gold btn-block" id="registerBtn">核验通过 · 入场</button>
       <button class="link-btn back-btn" id="backVerifyBtn">← 重新核对身份</button>
     </div>
 
-    <div class="modal-rules">
-      报名 999 · 确认舞伴 1314<br>
-      双方同意解除 各 1111 · 单方强制解除 2888<br>
-      灵石一经缴纳，除特殊说明外不退
-    </div>
+    <div class="modal-rules" id="modalRules"></div>
   </div>
 </div>
 
@@ -269,6 +265,7 @@
   let chosenGender = null;
   let verifiedMajia = null;
   let verifiedTicket = null;
+  let verifiedGender = null;
   let toastTimer = null;
 
   function toast(msg, type) {
@@ -340,18 +337,15 @@
     });
 
     let coupleCount = couples.length;
-    let confirmedCount = 0;
     couples.forEach(({ a, b }) => {
-      const isConfirmed = a.status === 'confirmed' && b.status === 'confirmed';
-      if (isConfirmed) confirmedCount++;
       const bothPublic = !!a.public && !!b.public;
       const nameA = bothPublic ? a.majia : anon(a);
       const nameB = bothPublic ? b.majia : anon(b);
       const pool = (a.deposit || 0) + (b.deposit || 0);
       const card = document.createElement('div');
-      card.className = 'couple-card' + (isConfirmed ? ' locked' : '');
-      const bondText = isConfirmed
-        ? '💍 舞伴已确认 · 共池 ' + pool + ' 灵石'
+      card.className = 'couple-card' + (pool > 0 ? ' locked' : '');
+      const bondText = pool > 0
+        ? '💍 今夜共舞 · 共池 ' + pool + ' 灵石'
         : '🌙 红线初系 · 今夜共舞';
       card.innerHTML = `
         <div class="couple-names">
@@ -383,9 +377,9 @@
         const counted = new Set();
         for (const key in data.players) {
           const p = data.players[key];
-          if (p.status !== 'confirmed' || !p.partner || counted.has(key)) continue;
+          if ((p.status !== 'matched' && p.status !== 'confirmed') || !p.partner || counted.has(key)) continue;
           const sp = data.players[p.partner];
-          if (!sp || sp.status !== 'confirmed') continue;
+          if (!sp || (sp.status !== 'matched' && sp.status !== 'confirmed')) continue;
           counted.add(key); counted.add(p.partner);
           if ((p.deposit || 0) + (sp.deposit || 0) >= (t.unlock || 0)) unlockedPairs++;
         }
@@ -395,7 +389,7 @@
           <span class="t-dot">${t.done ? '✦' : '❖'}</span>
           <span class="t-title-text">${t.title}</span>
           <span class="t-unlock">🔓 ${t.unlock || 0} 💎</span>
-          <span class="t-count">${unlockedPairs}/${confirmedCount} 对解锁</span>`;
+          <span class="t-count">${unlockedPairs}/${coupleCount} 对解锁</span>`;
         ul.appendChild(li);
       });
     } else {
@@ -406,6 +400,7 @@
   // ===== 我的状态 =====
   function renderMyStatus(data, me) {
     myPlayer = me;
+    const c = ZMD.getCosts(data);
     $('myCard').style.display = '';
     $('openRegisterBtn').style.display = 'none';
     $('logoutBtn').style.display = '';
@@ -413,41 +408,24 @@
     $('identityPill').textContent = `${me.gender === 'female' ? '👧' : '👦'} ${me.majia}`;
     $('myName').textContent = me.majia;
 
-    if (me.status === 'matched' || me.status === 'confirmed') {
+      const isMatched = me.status === 'matched' || me.status === 'confirmed';
+      if (isMatched) {
       const spouse = data.players[me.partner];
       $('myWaiting').style.display = 'none';
       $('myMatched').style.display = '';
       $('spouseName').textContent = spouse ? spouse.majia : '?';
-      const isConfirmed = me.status === 'confirmed';
 
-      $('myStateEmoji').textContent = isConfirmed ? '💍' : '🎭';
-      $('myStateTitle').textContent = isConfirmed ? '良缘既定' : '红线初系';
+      $('myStateEmoji').textContent = '💍';
+      $('myStateTitle').textContent = '红线已系';
+      $('lockStatus').textContent = '已与你结为舞伴 · 可投入灵石解锁任务';
+      $('lockStatus').style.color = 'var(--green)';
+      $('myBond').textContent = '💍 红线牵引 · 今夜共舞';
 
-      if (isConfirmed) {
-        $('lockStatus').textContent = '双方已确认舞伴 · 可共投入灵石解锁任务';
-        $('lockStatus').style.color = 'var(--green)';
-        $('myBond').textContent = '💍 舞伴已确认 · 今夜共舞';
-        $('confirmBtn').disabled = true;
-        $('confirmBtn').querySelector('.act-title').textContent = '💍 已确认舞伴';
-      } else {
-        const myDone = !!me.myConfirmed;
-        $('lockStatus').textContent = myDone ? '你已确认，等待对方确认…' : '尚未确认舞伴';
-        $('lockStatus').style.color = myDone ? 'var(--gold-soft)' : '';
-        $('myBond').textContent = '红线牵引 · 今夜共舞';
-        $('confirmBtn').disabled = myDone;
-        $('confirmBtn').querySelector('.act-title').textContent = myDone ? '⏳ 等待对方确认' : '💍 确认舞伴';
-      }
-
-      // 共池与任务
+      // 共池与任务：配对成功即可投入
       const pool = (me.deposit || 0) + (spouse ? (spouse.deposit || 0) : 0);
       $('poolTotal').textContent = pool;
-      if (isConfirmed) {
-        $('depositTip').textContent = '双方灵石合计达标，即可点亮对应任务';
-        $('depositRow').style.display = '';
-      } else {
-        $('depositTip').textContent = '双方都确认舞伴后，方可投入灵石';
-        $('depositRow').style.display = 'none';
-      }
+      $('depositTip').textContent = '双方灵石合计达标，即可点亮对应任务';
+      $('depositRow').style.display = '';
 
       const ul = $('poolTasks');
       ul.innerHTML = '';
@@ -493,7 +471,7 @@
 
       let tip = '';
       if (myApplied) tip = '你已递交解除申请，等待对方回应…';
-      else if (spouseApplied) tip = '⚠️ 对方已申请解除，请选择是否同意（同意后双方各扣 1111 灵石）';
+      else if (spouseApplied) tip = `⚠️ 对方已申请解除，请选择是否同意（同意后双方各扣 ${c.release} 灵石）`;
       $('marriageTip').textContent = tip;
     } else {
       $('myWaiting').style.display = '';
@@ -501,11 +479,23 @@
     }
   }
 
+  // 费用文案：跟随后台设置动态更新
+  function applyCostTexts(data) {
+    const c = ZMD.getCosts(data);
+    $('applyReleaseBtn').querySelector('.act-cost').textContent = `双方同意各扣 ${c.release} 💎`;
+    $('forceReleaseBtn').querySelector('.act-cost').textContent = `${c.forceRelease} 💎`;
+    $('modalRules').innerHTML =
+      `门票 ${c.register}（报名录入名单时计入）<br>` +
+      `双方同意解除 各 ${c.release} · 单方强制解除 ${c.forceRelease}<br>` +
+      `灵石一经缴纳，除特殊说明外不退`;
+  }
+
   // ===== 刷新 =====
   async function refresh(force) {
     try {
       const data = await ZMD.load(force === true);
       renderBoard(data);
+      applyCostTexts(data);
       const me = (myMajia && data.players[myMajia]) ? data.players[myMajia] : null;
       if (me) {
         renderMyStatus(data, me);
@@ -527,13 +517,22 @@
     $('verifyMsg').textContent = '';
     $('verifyMsg').className = 'verify-msg';
   }
-  function showInfoStep(majia, ticket) {
+  function showInfoStep(majia, ticket, gender) {
     verifiedMajia = majia;
     verifiedTicket = ticket;
+    verifiedGender = gender || null;
     $('verifyStep').style.display = 'none';
     $('infoStep').style.display = '';
     $('okMajia').textContent = majia;
     $('okTicket').textContent = ticket;
+    $('okGender').textContent = verifiedGender ? (verifiedGender === 'female' ? ' · 女宾' : ' · 男宾') : '';
+    $('genderFixed').textContent = verifiedGender === 'female' ? '👧 女宾' : '👦 男宾';
+    $('genderKnownGroup').style.display = verifiedGender ? '' : 'none';
+    $('genderPickGroup').style.display = verifiedGender ? 'none' : '';
+    if (verifiedGender) {
+      chosenGender = verifiedGender;
+      document.querySelectorAll('.gender-btn').forEach(x => x.classList.remove('active'));
+    }
   }
 
   async function verifyTicket() {
@@ -569,21 +568,23 @@
         return;
       }
 
-      msg.textContent = '✓ 核对成功，请填写报名信息';
+      msg.textContent = item.gender
+        ? `✓ 核对成功（${item.gender === 'female' ? '女宾' : '男宾'}），请确认报名信息`
+        : '✓ 核对成功，请填写报名信息';
       msg.className = 'verify-msg ok';
-      showInfoStep(majia, ticket);
+      showInfoStep(majia, ticket, item.gender || null);
       $('registerBtn').textContent = existing
-        ? '回 到 舞 会（报名费已缴）'
-        : `缴纳 ${C.costs.register} 灵石 · 入场`;
+        ? '回 到 舞 会（门票已计入）'
+        : '核验通过 · 入场';
       if (existing) {
-        chosenGender = existing.gender || null;
-        $('wishInput').value = existing.wish || '';
-        $('aboutInput').value = existing.about || '';
-        if (chosenGender) {
+        if (!verifiedGender && existing.gender) {
+          chosenGender = existing.gender;
           document.querySelectorAll('.gender-btn').forEach(x => {
             x.classList.toggle('active', x.dataset.g === chosenGender);
           });
         }
+        $('wishInput').value = existing.wish || '';
+        $('aboutInput').value = existing.about || '';
       }
     } catch (e) {
       msg.textContent = '✗ 核对失败：' + e.message;
@@ -627,7 +628,6 @@
           wish, about,
           status: 'registered',
           partner: null,
-          myConfirmed: false,
           deposit: 0,
           public: false,
           matchScore: 0,
@@ -635,7 +635,6 @@
         };
         item.claimed = true;
         item.claimedAt = Date.now();
-        addLog(data, majia, '报名入场', -C.costs.register);
         await ZMD.save(data, `新舞宾入场: ${majia}`);
         toast('入场成功！面具之下，静候红线', 'success');
       }
@@ -659,37 +658,19 @@
     });
   }
 
-  // ===== 确认舞伴 =====
-  async function confirmPartner() {
-    const data = await ZMD.load();
-    const me = data.players[myMajia];
-    if (!me || (me.status !== 'matched' && me.status !== 'confirmed')) {
-      toast('当前没有婚配关系', 'error'); return;
-    }
-    if (me.myConfirmed || me.status === 'confirmed') { toast('你已确认过舞伴', 'error'); return; }
-    const cost = C.costs.confirm;
-
-    me.myConfirmed = true;
-    addLog(data, me.majia, '确认舞伴', -cost);
-
-    const spouse = data.players[me.partner];
-    if (spouse && spouse.myConfirmed) {
-      me.status = 'confirmed';
-      spouse.status = 'confirmed';
-      toast('💍 双方心意已定，舞伴关系确立', 'success');
-    } else {
-      toast(`已确认，记录了 ${cost} 灵石，等待对方确认`, 'success');
-    }
-    await ZMD.save(data, `${me.majia} 确认舞伴`);
-    refresh(true);
-  }
-
-  // ===== 申请解除（不扣费，需对方同意后双方各扣 1111）=====
+  // ===== 申请解除（不扣费，对方同意后双方各扣解除费）=====
   async function applyRelease() {
     const data = await ZMD.load();
     const me = data.players[myMajia];
     if (!me || !me.partner) { toast('当前没有舞伴', 'error'); return; }
     if (me.divorceRequested) { toast('你已递交解除申请', 'error'); return; }
+    const c = ZMD.getCosts(data);
+    confirmBox('申请解除', `向对方递交解除申请，对方同意后双方各扣 ${c.release} 灵石`, doApplyRelease);
+  }
+  async function doApplyRelease() {
+    const data = await ZMD.load(true);
+    const me = data.players[myMajia];
+    if (!me || !me.partner || me.divorceRequested) return;
     me.divorceRequested = true;
     await ZMD.save(data, `${me.majia} 申请解除舞伴`);
     toast('已递交解除申请，等待对方回应', 'success');
@@ -707,45 +688,60 @@
     refresh(true);
   }
 
-  // 同意对方解除申请 → 双方各扣 1111
+  // 同意对方解除申请 → 双方各扣解除费
   async function agreeRelease() {
     const data = await ZMD.load();
     const me = data.players[myMajia];
     if (!me || !me.partner) { toast('当前没有舞伴', 'error'); return; }
     const spouse = data.players[me.partner];
     if (!spouse || !spouse.divorceRequested) { toast('对方未申请解除', 'error'); return; }
-    const cost = C.costs.release;
-
-    addLog(data, me.majia, '同意解除舞伴', -cost);
-    addLog(data, spouse.majia, '同意解除舞伴', -cost);
+    const c = ZMD.getCosts(data);
+    confirmBox('同意解除', `将扣除你与对方各 ${c.release} 灵石，舞伴关系立即解除`, doAgreeRelease);
+  }
+  async function doAgreeRelease() {
+    const data = await ZMD.load(true);
+    const me = data.players[myMajia];
+    if (!me || !me.partner) return;
+    const spouse = data.players[me.partner];
+    if (!spouse || !spouse.divorceRequested) return;
+    const c = ZMD.getCosts(data);
+    addLog(data, me.majia, '同意解除舞伴', -c.release);
+    addLog(data, spouse.majia, '同意解除舞伴', -c.release);
     doRelease(data, me, spouse);
     await ZMD.save(data, `${me.majia} 与 ${spouse.majia} 双方同意解除舞伴`);
-    toast(`双方各记录 ${cost} 灵石，红线已断`, 'success');
+    toast(`双方各记录 ${c.release} 灵石，红线已断`, 'success');
     refresh(true);
   }
 
-  // 单方强制解除 2888
+  // 单方强制解除
   async function forceRelease() {
     const data = await ZMD.load();
     const me = data.players[myMajia];
     if (!me || !me.partner) { toast('当前没有舞伴', 'error'); return; }
-    const cost = C.costs.forceRelease;
-    addLog(data, me.majia, '单方强制解除舞伴', -cost);
+    const c = ZMD.getCosts(data);
+    confirmBox('单方强制解除', `扣除 ${c.forceRelease} 灵石，无需对方同意即可立即解除`, doForceRelease);
+  }
+  async function doForceRelease() {
+    const data = await ZMD.load(true);
+    const me = data.players[myMajia];
+    if (!me || !me.partner) return;
+    const c = ZMD.getCosts(data);
     const spouse = data.players[me.partner];
+    addLog(data, me.majia, '单方强制解除舞伴', -c.forceRelease);
     doRelease(data, me, spouse);
     await ZMD.save(data, `${me.majia} 单方强制解除舞伴`);
-    toast(`已记录 ${cost} 灵石，红线已断`, 'success');
+    toast(`已记录 ${c.forceRelease} 灵石，红线已断`, 'success');
     refresh(true);
   }
 
   // 解除关系的公共清理
   function doRelease(data, me, spouse) {
     me.partner = null; me.status = 'registered';
-    me.myConfirmed = false; me.deposit = 0; me.matchScore = 0;
+    me.deposit = 0; me.matchScore = 0;
     me.divorceRequested = false; me.public = false;
     if (spouse) {
       spouse.partner = null; spouse.status = 'registered';
-      spouse.myConfirmed = false; spouse.deposit = 0; spouse.matchScore = 0;
+      spouse.deposit = 0; spouse.matchScore = 0;
       spouse.divorceRequested = false; spouse.public = false;
     }
     const pm = spouse ? spouse.majia : null;
@@ -772,7 +768,7 @@
 
     const data = await ZMD.load(true);
     const me = data.players[myMajia];
-    if (!me || me.status !== 'confirmed') { toast('双方确认舞伴后方可投入', 'error'); return; }
+    if (!me || (me.status !== 'matched' && me.status !== 'confirmed')) { toast('匹配成功后方可投入', 'error'); return; }
     const spouse = data.players[me.partner];
     const pool = (me.deposit || 0) + (spouse ? (spouse.deposit || 0) : 0);
 
@@ -786,7 +782,7 @@
   async function doDeposit(val) {
     const data = await ZMD.load(true);
     const me = data.players[myMajia];
-    if (!me || me.status !== 'confirmed') { toast('双方确认舞伴后方可投入', 'error'); return; }
+    if (!me || (me.status !== 'matched' && me.status !== 'confirmed')) { toast('匹配成功后方可投入', 'error'); return; }
 
     me.deposit = (me.deposit || 0) + val;
     addLog(data, me.majia, `投入灵石(任务共池)`, -val);
@@ -832,14 +828,16 @@
 
     $('openRegisterBtn').addEventListener('click', () => {
       if (myMajia && myPlayer) {
-        // 已报名：直接进入信息页
-        showInfoStep(myPlayer.majia, myPlayer.ticket);
-        chosenGender = myPlayer.gender || null;
+        // 已报名：直接进入信息页（性别从名单/已登记信息带出）
+        showInfoStep(myPlayer.majia, myPlayer.ticket, myPlayer.gender || null);
+        if (!verifiedGender && myPlayer.gender) {
+          chosenGender = myPlayer.gender;
+          document.querySelectorAll('.gender-btn').forEach(x => {
+            x.classList.toggle('active', x.dataset.g === chosenGender);
+          });
+        }
         $('wishInput').value = myPlayer.wish || '';
         $('aboutInput').value = myPlayer.about || '';
-        document.querySelectorAll('.gender-btn').forEach(x => {
-          x.classList.toggle('active', x.dataset.g === chosenGender);
-        });
       } else {
         showVerifyStep();
         $('vMajia').value = '';
@@ -854,15 +852,10 @@
 
     $('registerBtn').addEventListener('click', register);
 
-    $('confirmBtn').addEventListener('click', () =>
-      confirmBox('确认舞伴', `扣除 ${C.costs.confirm} 灵石，双方都确认后舞伴关系正式确立`, confirmPartner));
-    $('applyReleaseBtn').addEventListener('click', () =>
-      confirmBox('申请解除', `向对方递交解除申请，对方同意后双方各扣 ${C.costs.release} 灵石`, applyRelease));
+    $('applyReleaseBtn').addEventListener('click', applyRelease);
     $('cancelApplyBtn').addEventListener('click', cancelApplyRelease);
-    $('agreeReleaseBtn').addEventListener('click', () =>
-      confirmBox('同意解除', `将扣除你与对方各 ${C.costs.release} 灵石，舞伴关系立即解除`, agreeRelease));
-    $('forceReleaseBtn').addEventListener('click', () =>
-      confirmBox('单方强制解除', `扣除 ${C.costs.forceRelease} 灵石，无需对方同意即可立即解除`, forceRelease));
+    $('agreeReleaseBtn').addEventListener('click', agreeRelease);
+    $('forceReleaseBtn').addEventListener('click', forceRelease);
     $('publicToggleBtn').addEventListener('click', togglePublic);
     $('depositBtn').addEventListener('click', depositStones);
     $('depositInput').addEventListener('keydown', e => {
