@@ -129,7 +129,7 @@
       "about": "大s",
       "status": "matched",
       "partner": "飒飒",
-      "deposit": 0,
+      "deposit": 1,
       "public": false,
       "matchScore": 0,
       "registeredAt": 1794315485096,
@@ -291,6 +291,12 @@
     {
       "time": "2026-11-10T13:08:11.074Z",
       "actor": "飒飒",
+      "action": "投入灵石(任务共池)",
+      "amount": -1
+    },
+    {
+      "time": "2026-11-10T13:08:44.402Z",
+      "actor": "璃雾",
       "action": "投入灵石(任务共池)",
       "amount": -1
     }
