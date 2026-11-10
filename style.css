@@ -314,26 +314,31 @@ body::after {
 .chip.female { background: rgba(244,114,182,.14); border: 1px solid rgba(244,114,182,.36); color: #fbcfe8; }
 .chip-empty { font-size: 11px; color: var(--text-dim); opacity: .65; }
 
-/* ============ 任务 ============ */
+/* ============ 任务（大屏底部紧凑带） ============ */
 .task-board {
-  border-radius: 16px; padding: 12px 14px;
+  display: flex; align-items: flex-start; gap: 10px;
+  border-radius: 12px; padding: 8px 12px;
   border: 1px solid var(--line);
   background: linear-gradient(160deg, rgba(157,23,77,.12), rgba(255,255,255,.02));
   box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
 }
 .task-board h2 {
-  font-family: var(--serif); font-size: 15px; letter-spacing: 3px;
-  color: var(--gold-soft); margin-bottom: 8px; text-align: center;
+  flex: none; margin: 0; padding-top: 1px;
+  font-family: var(--serif); font-size: 11px; letter-spacing: 2px;
+  color: var(--gold-soft); white-space: nowrap;
 }
-.task-list-screen { list-style: none; }
+.task-list-screen {
+  list-style: none; flex: 1; min-width: 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: 1px 16px;
+}
 .task-list-screen li {
-  display: flex; align-items: center; gap: 8px;
-  padding: 7px 2px; font-size: 13px;
-  border-bottom: 1px solid rgba(255,255,255,.06);
+  display: flex; align-items: center; gap: 6px;
+  min-width: 0; font-size: 11px; line-height: 1.75;
 }
-.task-list-screen li:last-child { border-bottom: none; }
-.task-list-screen li.done { text-decoration: line-through; opacity: .45; }
-.task-list-screen li .t-dot { color: var(--gold); font-size: 10px; }
+.task-list-screen li.done { text-decoration: line-through; opacity: .4; }
+.task-list-screen li.empty-tip { font-size: 11px; color: var(--text-dim); }
+.task-list-screen li .t-dot { flex: none; color: var(--gold); font-size: 9px; }
 
 /* ============ 我的状态卡（极致压缩） ============ */
 .my-card {
@@ -816,15 +821,17 @@ body::after {
 .pool-task.unlocked .pt-fill { background: linear-gradient(90deg, #34d399, #a7f3d0); }
 
 /* 大屏任务条目右侧徽章 */
-.task-list-screen .t-title-text { flex: 1; min-width: 0; }
+.task-list-screen .t-title-text {
+  flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 .task-list-screen .t-unlock {
-  font-size: 11px; color: var(--gold); white-space: nowrap;
-  padding: 2px 8px; border-radius: 999px;
-  border: 1px solid rgba(232,198,106,.28);
-  background: rgba(232,198,106,.07);
+  flex: none; font-size: 10px; color: var(--gold); white-space: nowrap;
+  padding: 0 5px; border-radius: 999px;
+  background: rgba(232,198,106,.1);
 }
 .task-list-screen .t-count {
-  font-size: 10px; color: var(--text-dim); white-space: nowrap;
+  flex: none; font-size: 9px; color: var(--text-dim); white-space: nowrap;
 }
 
 /* ============================================================
@@ -928,4 +935,6 @@ body::after {
   .stat-card .stat-label { font-size: 8px; }
   .app-main { padding: 12px 10px 40px; gap: 14px; }
   .stage-badge { display: none; }
+  .task-list-screen { grid-template-columns: 1fr; }
+  .task-board { gap: 8px; padding: 7px 9px; }
 }

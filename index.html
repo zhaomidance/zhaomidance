@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>蒙面舞会 · 婚配玩法</title>
-<link rel="stylesheet" href="style.css?v=20261110a">
+<link rel="stylesheet" href="style.css?v=20261110b">
 </head>
 <body>
 
@@ -164,7 +164,7 @@
 
     <!-- 任务（匹配成功后展示） -->
     <div class="task-board" id="taskBoard" style="display:none">
-      <h2>🌹 蒙面舞会任务</h2>
+      <h2>🌹 任务</h2>
       <ul class="task-list-screen" id="taskList"></ul>
     </div>
 
@@ -387,7 +387,7 @@
         if (t.done) li.className = 'done';
         li.innerHTML = `
           <span class="t-dot">${t.done ? '✦' : '❖'}</span>
-          <span class="t-title-text">${t.title}</span>
+          <span class="t-title-text" title="${t.title}">${t.title}</span>
           <span class="t-unlock">🔓 ${t.unlock || 0} 💎</span>
           <span class="t-count">${unlockedPairs}/${coupleCount} 对解锁</span>`;
         ul.appendChild(li);
