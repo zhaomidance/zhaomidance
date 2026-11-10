@@ -11,7 +11,8 @@
       "majia": "嶙峋",
       "ticket": "222",
       "gender": "male",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1794313434511
     }
   ],
   "players": {
@@ -27,6 +28,19 @@
       "public": false,
       "matchScore": 0,
       "registeredAt": 1794302125207
+    },
+    "嶙峋": {
+      "majia": "嶙峋",
+      "ticket": "222",
+      "gender": "male",
+      "wish": "随缘",
+      "about": "声可",
+      "status": "registered",
+      "partner": null,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1794313434511
     }
   },
   "matches": [],
