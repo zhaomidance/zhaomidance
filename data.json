@@ -1,11 +1,6 @@
 {
   "whitelist": [
     {
-      "majia": "端端",
-      "ticket": "001",
-      "claimed": false
-    },
-    {
       "majia": "初一",
       "ticket": "003",
       "claimed": false
