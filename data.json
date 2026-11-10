@@ -18,7 +18,8 @@
       "majia": "云深",
       "ticket": "002",
       "gender": "male",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1794314092227
     },
     {
       "majia": "飒飒",
@@ -59,6 +60,19 @@
       "public": false,
       "matchScore": 0,
       "registeredAt": 1794313434511
+    },
+    "云深": {
+      "majia": "云深",
+      "ticket": "002",
+      "gender": "male",
+      "wish": "",
+      "about": "",
+      "status": "registered",
+      "partner": null,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1794314092227
     }
   },
   "matches": [],
