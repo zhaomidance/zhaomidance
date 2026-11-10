@@ -27,6 +27,12 @@
       "gender": "female",
       "claimed": true,
       "claimedAt": 1794314309085
+    },
+    {
+      "majia": "羊羊",
+      "ticket": "999",
+      "gender": "female",
+      "claimed": false
     }
   ],
   "players": {
@@ -188,6 +194,12 @@
     {
       "time": "2026-11-10T12:31:49.477Z",
       "actor": "晚绾",
+      "action": "报名门票",
+      "amount": -999
+    },
+    {
+      "time": "2026-11-10T12:45:31.338Z",
+      "actor": "羊羊",
       "action": "报名门票",
       "amount": -999
     }
