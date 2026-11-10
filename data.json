@@ -13,6 +13,24 @@
       "gender": "male",
       "claimed": true,
       "claimedAt": 1794313434511
+    },
+    {
+      "majia": "云深",
+      "ticket": "002",
+      "gender": "male",
+      "claimed": false
+    },
+    {
+      "majia": "飒飒",
+      "ticket": "123",
+      "gender": "male",
+      "claimed": false
+    },
+    {
+      "majia": "晚绾",
+      "ticket": "321",
+      "gender": "female",
+      "claimed": false
     }
   ],
   "players": {
@@ -130,6 +148,24 @@
     {
       "time": "2026-11-10T12:10:55.623Z",
       "actor": "嶙峋",
+      "action": "报名门票",
+      "amount": -999
+    },
+    {
+      "time": "2026-11-10T12:31:49.477Z",
+      "actor": "云深",
+      "action": "报名门票",
+      "amount": -999
+    },
+    {
+      "time": "2026-11-10T12:31:49.477Z",
+      "actor": "飒飒",
+      "action": "报名门票",
+      "amount": -999
+    },
+    {
+      "time": "2026-11-10T12:31:49.477Z",
+      "actor": "晚绾",
       "action": "报名门票",
       "amount": -999
     }
