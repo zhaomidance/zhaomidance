@@ -1,12 +1,6 @@
 {
   "whitelist": [
     {
-      "majia": "阿强",
-      "ticket": "001",
-      "gender": "male",
-      "claimed": false
-    },
-    {
       "majia": "小美",
       "ticket": "002",
       "gender": "female",
