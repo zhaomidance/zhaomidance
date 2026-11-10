@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>蒙面舞会 · 管理后台</title>
-<link rel="stylesheet" href="style.css?v=20261110c">
+<link rel="stylesheet" href="style.css?v=20261110d">
 </head>
 <body>
 
@@ -565,6 +565,9 @@
       a.public = false; b.public = false;
       a.divorceRequested = false; b.divorceRequested = false;
       a.matchScore = pr.score; b.matchScore = pr.score;
+      // 新配对：清空该对的历史悄悄话
+      const ck = [a.majia, b.majia].sort().join('_');
+      if (data.chats && data.chats[ck]) delete data.chats[ck];
       if (!data.matches) data.matches = [];
       data.matches.push([a.majia, b.majia]);
       msg += `${a.majia} ❤ ${b.majia}\n`;
@@ -619,7 +622,11 @@
     if (!p) return;
     if (p.partner) {
       const spouse = data.players[p.partner];
-      if (spouse) { spouse.partner = null; spouse.status = 'registered'; spouse.deposit = 0; }
+      if (spouse) {
+        spouse.partner = null; spouse.status = 'registered'; spouse.deposit = 0;
+        const ck = [p.majia, spouse.majia].sort().join('_');
+        if (data.chats && data.chats[ck]) delete data.chats[ck];
+      }
     }
     delete data.players[majia];
     data.matches = (data.matches || []).filter(m => !m.includes(majia));
@@ -635,6 +642,8 @@
     const pa = data.players[a], pb = data.players[b];
     if (pa) { pa.partner = null; pa.status = 'registered'; pa.deposit = 0; pa.matchScore = 0; pa.divorceRequested = false; }
     if (pb) { pb.partner = null; pb.status = 'registered'; pb.deposit = 0; pb.matchScore = 0; pb.divorceRequested = false; }
+    const ck = [a, b].sort().join('_');
+    if (data.chats && data.chats[ck]) delete data.chats[ck];
     data.matches = (data.matches || []).filter(m => !m.includes(a) && !m.includes(b));
     await ZMD.save(data, '管理员强制解除婚配');
     refresh();

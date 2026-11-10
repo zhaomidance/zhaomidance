@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>蒙面舞会 · 婚配玩法</title>
-<link rel="stylesheet" href="style.css?v=20261110c">
+<link rel="stylesheet" href="style.css?v=20261110d">
 </head>
 <body>
 
@@ -116,6 +116,19 @@
         </div>
         <p class="warn-tip" id="publicTip"></p>
         <p class="warn-tip" id="marriageTip"></p>
+
+        <!-- 悄悄话：双方合计最多 10 条 -->
+        <div class="chat-box" id="chatBox">
+          <div class="chat-head">
+            <span>💬 悄悄话</span>
+            <span class="chat-count"><b id="chatCount">0</b> / 10 条</span>
+          </div>
+          <div class="chat-list" id="chatList"></div>
+          <div class="chat-input-row">
+            <input type="text" id="chatInput" maxlength="60" placeholder="说点什么…（≤60字）">
+            <button class="btn btn-gold btn-sm" id="chatSendBtn">发送</button>
+          </div>
+        </div>
 
         <!-- 灵石共池 · 解锁任务 -->
         <div class="deposit-box" id="depositBox">
@@ -471,9 +484,61 @@
       if (myApplied) tip = '你已递交解除申请，等待对方回应…';
       else if (spouseApplied) tip = `⚠️ 对方已申请解除，请选择是否同意（同意后双方各扣 ${c.release} 灵石）`;
       $('marriageTip').textContent = tip;
+
+      renderChat(data, me, spouse);
     } else {
       $('myWaiting').style.display = '';
       $('myMatched').style.display = 'none';
+    }
+  }
+
+  // ===== 悄悄话：双方合计最多 10 条 =====
+  function chatKey(a, b) {
+    return [a, b].sort().join('_');
+  }
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function renderChat(data, me, spouse) {
+    const key = chatKey(me.majia, spouse.majia);
+    const list = (data.chats && data.chats[key]) || [];
+    $('chatCount').textContent = list.length;
+    const ul = $('chatList');
+    ul.innerHTML = list.length
+      ? list.map(m => {
+          const mine = m.from === me.majia;
+          return `<div class="chat-msg ${mine ? 'mine' : 'theirs'}">
+            <div class="chat-bubble">${escHtml(m.text)}</div>
+          </div>`;
+        }).join('')
+      : '<div class="chat-empty">还没有悄悄话，先开口吧～</div>';
+    ul.scrollTop = ul.scrollHeight;
+    const full = list.length >= 10;
+    $('chatInput').disabled = full;
+    $('chatSendBtn').disabled = full;
+    $('chatInput').placeholder = full ? '对话已达 10 条上限' : '说点什么…（≤60字）';
+  }
+  async function sendChat() {
+    const text = $('chatInput').value.trim();
+    if (!text) return;
+    if (text.length > 60) { toast('消息不能超过 60 字', 'error'); return; }
+    try {
+      const data = await ZMD.load(true);
+      const me = data.players[myMajia];
+      if (!me || !me.partner) { toast('已无舞伴', 'error'); return; }
+      const spouse = data.players[me.partner];
+      const key = chatKey(me.majia, spouse.majia);
+      if (!data.chats) data.chats = {};
+      if (!data.chats[key]) data.chats[key] = [];
+      if (data.chats[key].length >= 10) { toast('对话已达 10 条上限', 'error'); return; }
+      data.chats[key].push({ from: me.majia, text, ts: Date.now() });
+      await ZMD.save(data, `${me.majia} 发送悄悄话`);
+      $('chatInput').value = '';
+      refresh(true);
+    } catch (e) {
+      toast('发送失败: ' + e.message, 'error');
     }
   }
 
@@ -741,6 +806,8 @@
       spouse.partner = null; spouse.status = 'registered';
       spouse.deposit = 0; spouse.matchScore = 0;
       spouse.divorceRequested = false; spouse.public = false;
+      const key = chatKey(me.majia, spouse.majia);
+      if (data.chats && data.chats[key]) delete data.chats[key];
     }
     const pm = spouse ? spouse.majia : null;
     data.matches = (data.matches || []).filter(m => !m.includes(me.majia) && !(pm && m.includes(pm)));
@@ -858,6 +925,10 @@
     $('depositBtn').addEventListener('click', depositStones);
     $('depositInput').addEventListener('keydown', e => {
       if (e.key === 'Enter') depositStones();
+    });
+    $('chatSendBtn').addEventListener('click', sendChat);
+    $('chatInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') sendChat();
     });
 
     $('logoutBtn').addEventListener('click', () => {
