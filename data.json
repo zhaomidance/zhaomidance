@@ -32,7 +32,8 @@
       "majia": "羊羊",
       "ticket": "999",
       "gender": "female",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1794314804606
     }
   ],
   "players": {
@@ -87,6 +88,19 @@
       "public": false,
       "matchScore": 0,
       "registeredAt": 1794314309085
+    },
+    "羊羊": {
+      "majia": "羊羊",
+      "ticket": "999",
+      "gender": "female",
+      "wish": "帅之",
+      "about": "美而萌之",
+      "status": "registered",
+      "partner": null,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1794314804606
     }
   },
   "matches": [],
