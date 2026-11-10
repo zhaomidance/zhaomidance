@@ -56,12 +56,13 @@
       "gender": "male",
       "wish": "随缘",
       "about": "声可",
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "晚绾",
       "deposit": 0,
       "public": false,
       "matchScore": 0,
-      "registeredAt": 1794313434511
+      "registeredAt": 1794313434511,
+      "divorceRequested": false
     },
     "云深": {
       "majia": "云深",
@@ -69,12 +70,13 @@
       "gender": "male",
       "wish": "",
       "about": "",
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "羊羊",
       "deposit": 0,
       "public": false,
       "matchScore": 0,
-      "registeredAt": 1794314092227
+      "registeredAt": 1794314092227,
+      "divorceRequested": false
     },
     "晚绾": {
       "majia": "晚绾",
@@ -82,12 +84,13 @@
       "gender": "female",
       "wish": "声音好听",
       "about": "小哑巴",
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "嶙峋",
       "deposit": 0,
       "public": false,
       "matchScore": 0,
-      "registeredAt": 1794314309085
+      "registeredAt": 1794314309085,
+      "divorceRequested": false
     },
     "羊羊": {
       "majia": "羊羊",
@@ -95,17 +98,27 @@
       "gender": "female",
       "wish": "帅之",
       "about": "美而萌之",
-      "status": "registered",
-      "partner": null,
+      "status": "matched",
+      "partner": "云深",
       "deposit": 0,
       "public": false,
       "matchScore": 0,
-      "registeredAt": 1794314804606
+      "registeredAt": 1794314804606,
+      "divorceRequested": false
     }
   },
-  "matches": [],
+  "matches": [
+    [
+      "嶙峋",
+      "晚绾"
+    ],
+    [
+      "云深",
+      "羊羊"
+    ]
+  ],
   "round": 7,
-  "stage": "round1",
+  "stage": "round2",
   "tasks": [
     {
       "id": 1792856165383,
