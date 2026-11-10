@@ -41,6 +41,12 @@
       "gender": "female",
       "claimed": true,
       "claimedAt": 1794315485096
+    },
+    {
+      "majia": "悬溺",
+      "ticket": "345",
+      "gender": "male",
+      "claimed": false
     }
   ],
   "players": {
@@ -253,6 +259,12 @@
     {
       "time": "2026-11-10T12:56:53.021Z",
       "actor": "璃雾",
+      "action": "报名门票",
+      "amount": -999
+    },
+    {
+      "time": "2026-11-10T13:02:09.246Z",
+      "actor": "悬溺",
       "action": "报名门票",
       "amount": -999
     }
