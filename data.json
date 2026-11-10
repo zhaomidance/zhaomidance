@@ -1,11 +1,5 @@
 {
-  "whitelist": [
-    {
-      "majia": "春秋",
-      "ticket": "008",
-      "claimed": false
-    }
-  ],
+  "whitelist": [],
   "players": {},
   "matches": [],
   "round": 7,
