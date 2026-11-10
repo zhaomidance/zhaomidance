@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>蒙面舞会 · 婚配玩法</title>
-<link rel="stylesheet" href="style.css?v=20261110b">
+<link rel="stylesheet" href="style.css?v=20261110c">
 </head>
 <body>
 
@@ -364,8 +364,8 @@
       grid.innerHTML = '<div class="empty-tip">🌙 今夜尚无佳偶<br>静待红娘摇铃，佳偶自来</div>';
     }
 
-    // 任务板
-    if (coupleCount > 0) {
+    // 任务板（常驻显示，无配对时只显示解锁值）
+    {
       $('taskBoard').style.display = '';
       const ul = $('taskList');
       ul.innerHTML = '';
@@ -389,11 +389,9 @@
           <span class="t-dot">${t.done ? '✦' : '❖'}</span>
           <span class="t-title-text" title="${t.title}">${t.title}</span>
           <span class="t-unlock">🔓 ${t.unlock || 0} 💎</span>
-          <span class="t-count">${unlockedPairs}/${coupleCount} 对解锁</span>`;
+          ${coupleCount > 0 ? `<span class="t-count">${unlockedPairs}/${coupleCount} 对解锁</span>` : ''}`;
         ul.appendChild(li);
       });
-    } else {
-      $('taskBoard').style.display = 'none';
     }
   }
 
