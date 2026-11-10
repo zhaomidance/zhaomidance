@@ -3,163 +3,32 @@
     {
       "majia": "端端",
       "ticket": "001",
-      "claimed": true,
-      "claimedAt": 1793703272409
+      "claimed": false
     },
     {
       "majia": "初一",
       "ticket": "003",
-      "claimed": true,
-      "claimedAt": 1793702677482
+      "claimed": false
     },
     {
       "majia": "璃雾",
       "ticket": "006",
-      "claimed": true,
-      "claimedAt": 1793704496583
+      "claimed": false
     },
     {
       "majia": "屁屁",
       "ticket": "007",
-      "claimed": true,
-      "claimedAt": 1793707459506
+      "claimed": false
     },
     {
       "majia": "春秋",
       "ticket": "008",
-      "claimed": true,
-      "claimedAt": 1793708512733
+      "claimed": false
     }
   ],
-  "players": {
-    "初一": {
-      "majia": "初一",
-      "ticket": "003",
-      "gender": "male",
-      "wish": "聊得来？我也不知道",
-      "about": "十年精神病史",
-      "status": "confirmed",
-      "partner": "璃雾",
-      "myConfirmed": true,
-      "deposit": 6570,
-      "public": false,
-      "matchScore": 2,
-      "registeredAt": 1793702677482,
-      "divorceRequested": false
-    },
-    "神采": {
-      "majia": "神采",
-      "ticket": "002",
-      "gender": "male",
-      "wish": "肤白貌美大长腿白瘦🐻大",
-      "about": "平凡",
-      "status": "registered",
-      "partner": null,
-      "myConfirmed": false,
-      "deposit": 0,
-      "public": false,
-      "matchScore": 0,
-      "registeredAt": 1793702770740,
-      "divorceRequested": false
-    },
-    "端端": {
-      "majia": "端端",
-      "ticket": "001",
-      "gender": "female",
-      "wish": "烧的有趣的灵魂有腹肌的皮囊和绝佳青叔音",
-      "about": "烧，胸大，有趣，小学生音",
-      "status": "registered",
-      "partner": null,
-      "myConfirmed": false,
-      "deposit": 0,
-      "public": true,
-      "matchScore": 0,
-      "registeredAt": 1793703272409,
-      "divorceRequested": false
-    },
-    "云深": {
-      "majia": "云深",
-      "ticket": "004",
-      "gender": "male",
-      "wish": "",
-      "about": "",
-      "status": "registered",
-      "partner": null,
-      "myConfirmed": false,
-      "deposit": 0,
-      "public": false,
-      "matchScore": 0,
-      "registeredAt": 1793703613204,
-      "divorceRequested": false
-    },
-    "璃雾": {
-      "majia": "璃雾",
-      "ticket": "006",
-      "gender": "female",
-      "wish": "不知道",
-      "about": "御姐，着迷最最厉害的大s",
-      "status": "confirmed",
-      "partner": "初一",
-      "myConfirmed": true,
-      "deposit": 6570,
-      "public": false,
-      "matchScore": 2,
-      "registeredAt": 1793704496583,
-      "divorceRequested": false
-    },
-    "苏苏": {
-      "majia": "苏苏",
-      "ticket": "005",
-      "gender": "female",
-      "wish": "耐心 有趣",
-      "about": "水瓶座",
-      "status": "registered",
-      "partner": null,
-      "myConfirmed": false,
-      "deposit": 0,
-      "public": false,
-      "matchScore": 0,
-      "registeredAt": 1793704636364,
-      "divorceRequested": false
-    },
-    "屁屁": {
-      "majia": "屁屁",
-      "ticket": "007",
-      "gender": "female",
-      "wish": "有趣的灵魂",
-      "about": "古灵精怪",
-      "status": "registered",
-      "partner": null,
-      "myConfirmed": false,
-      "deposit": 0,
-      "public": false,
-      "matchScore": 0,
-      "registeredAt": 1793707459506,
-      "divorceRequested": false
-    },
-    "春秋": {
-      "majia": "春秋",
-      "ticket": "008",
-      "gender": "male",
-      "wish": "",
-      "about": "",
-      "status": "registered",
-      "partner": null,
-      "myConfirmed": false,
-      "deposit": 0,
-      "public": false,
-      "matchScore": 0,
-      "registeredAt": 1793708512733,
-      "divorceRequested": false
-    }
-  },
-  "matches": [
-    [
-      "初一",
-      "璃雾"
-    ]
-  ],
-  "round": 6,
+  "players": {},
+  "matches": [],
+  "round": 7,
   "stage": "registering",
   "tasks": [
     {
@@ -205,120 +74,5 @@
       "done": false
     }
   ],
-  "logs": [
-    {
-      "time": "2026-11-03T10:44:37.483Z",
-      "actor": "初一",
-      "action": "报名入场",
-      "amount": -999
-    },
-    {
-      "time": "2026-11-03T10:46:10.740Z",
-      "actor": "神采",
-      "action": "报名入场",
-      "amount": -999
-    },
-    {
-      "time": "2026-11-03T10:54:32.409Z",
-      "actor": "端端",
-      "action": "报名入场",
-      "amount": -999
-    },
-    {
-      "time": "2026-11-03T11:00:13.204Z",
-      "actor": "云深",
-      "action": "报名入场",
-      "amount": -999
-    },
-    {
-      "time": "2026-11-03T11:14:56.584Z",
-      "actor": "璃雾",
-      "action": "报名入场",
-      "amount": -999
-    },
-    {
-      "time": "2026-11-03T11:17:16.364Z",
-      "actor": "苏苏",
-      "action": "报名入场",
-      "amount": -999
-    },
-    {
-      "time": "2026-11-03T12:04:19.506Z",
-      "actor": "屁屁",
-      "action": "报名入场",
-      "amount": -999
-    },
-    {
-      "time": "2026-11-03T12:07:13.492Z",
-      "actor": "初一",
-      "action": "确认舞伴",
-      "amount": -1314
-    },
-    {
-      "time": "2026-11-03T12:12:50.254Z",
-      "actor": "端端",
-      "action": "确认舞伴",
-      "amount": -1314
-    },
-    {
-      "time": "2026-11-03T12:21:52.734Z",
-      "actor": "春秋",
-      "action": "报名入场",
-      "amount": -999
-    },
-    {
-      "time": "2026-11-03T12:24:58.445Z",
-      "actor": "神采",
-      "action": "单方强制解除舞伴",
-      "amount": -2888
-    },
-    {
-      "time": "2026-11-03T12:28:14.971Z",
-      "actor": "璃雾",
-      "action": "确认舞伴",
-      "amount": -1314
-    },
-    {
-      "time": "2026-11-03T12:28:26.299Z",
-      "actor": "春秋",
-      "action": "确认舞伴",
-      "amount": -1314
-    },
-    {
-      "time": "2026-11-03T12:28:42.362Z",
-      "actor": "神采",
-      "action": "单方强制解除舞伴",
-      "amount": -2888
-    },
-    {
-      "time": "2026-11-03T12:29:08.568Z",
-      "actor": "初一",
-      "action": "投入灵石(任务共池)",
-      "amount": -3000
-    },
-    {
-      "time": "2026-11-03T12:29:54.625Z",
-      "actor": "璃雾",
-      "action": "投入灵石(任务共池)",
-      "amount": -3000
-    },
-    {
-      "time": "2026-11-03T12:35:04.167Z",
-      "actor": "春秋",
-      "action": "单方强制解除舞伴",
-      "amount": -2888
-    },
-    {
-      "time": "2026-11-03T12:51:35.138Z",
-      "actor": "初一",
-      "action": "投入灵石(任务共池)",
-      "amount": -3570
-    },
-    {
-      "time": "2026-11-03T12:53:48.856Z",
-      "actor": "璃雾",
-      "action": "投入灵石(任务共池)",
-      "amount": -3570
-    }
-  ]
+  "logs": []
 }
