@@ -39,7 +39,8 @@
       "majia": "璃雾",
       "ticket": "123",
       "gender": "female",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1794315485096
     }
   ],
   "players": {
@@ -111,6 +112,19 @@
       "matchScore": 0,
       "registeredAt": 1794314804606,
       "divorceRequested": false
+    },
+    "璃雾": {
+      "majia": "璃雾",
+      "ticket": "123",
+      "gender": "female",
+      "wish": "小m",
+      "about": "大s",
+      "status": "registered",
+      "partner": null,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1794315485096
     }
   },
   "matches": [
