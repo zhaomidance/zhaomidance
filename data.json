@@ -23,6 +23,12 @@
       "ticket": "004",
       "gender": "female",
       "claimed": false
+    },
+    {
+      "majia": "飒飒",
+      "ticket": "001",
+      "gender": "male",
+      "claimed": false
     }
   ],
   "players": {},
@@ -95,6 +101,12 @@
     {
       "time": "2026-11-10T09:10:36.789Z",
       "actor": "阿雅",
+      "action": "报名门票",
+      "amount": -999
+    },
+    {
+      "time": "2026-11-10T09:11:01.259Z",
+      "actor": "飒飒",
       "action": "报名门票",
       "amount": -999
     }
