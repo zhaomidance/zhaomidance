@@ -46,7 +46,8 @@
       "majia": "悬溺",
       "ticket": "345",
       "gender": "male",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1794315788377
     }
   ],
   "players": {
@@ -131,6 +132,19 @@
       "public": false,
       "matchScore": 0,
       "registeredAt": 1794315485096
+    },
+    "悬溺": {
+      "majia": "悬溺",
+      "ticket": "345",
+      "gender": "male",
+      "wish": "",
+      "about": "",
+      "status": "registered",
+      "partner": null,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1794315788377
     }
   },
   "matches": [
