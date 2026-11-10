@@ -6,6 +6,12 @@
       "gender": "male",
       "claimed": true,
       "claimedAt": 1794302125207
+    },
+    {
+      "majia": "嶙峋",
+      "ticket": "222",
+      "gender": "male",
+      "claimed": false
     }
   ],
   "players": {
@@ -104,6 +110,12 @@
     {
       "time": "2026-11-10T09:11:01.259Z",
       "actor": "飒飒",
+      "action": "报名门票",
+      "amount": -999
+    },
+    {
+      "time": "2026-11-10T12:10:55.623Z",
+      "actor": "嶙峋",
       "action": "报名门票",
       "amount": -999
     }
