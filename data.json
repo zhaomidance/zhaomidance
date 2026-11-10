@@ -31,7 +31,8 @@
       "majia": "晚绾",
       "ticket": "321",
       "gender": "female",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1794314309085
     }
   ],
   "players": {
@@ -73,6 +74,19 @@
       "public": false,
       "matchScore": 0,
       "registeredAt": 1794314092227
+    },
+    "晚绾": {
+      "majia": "晚绾",
+      "ticket": "321",
+      "gender": "female",
+      "wish": "声音好听",
+      "about": "小哑巴",
+      "status": "registered",
+      "partner": null,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1794314309085
     }
   },
   "matches": [],
