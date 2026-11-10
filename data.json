@@ -4,10 +4,25 @@
       "majia": "飒飒",
       "ticket": "001",
       "gender": "male",
-      "claimed": false
+      "claimed": true,
+      "claimedAt": 1794302125207
     }
   ],
-  "players": {},
+  "players": {
+    "飒飒": {
+      "majia": "飒飒",
+      "ticket": "001",
+      "gender": "male",
+      "wish": "不高冷的就好啦，我很不会和高冷姐姐搭话",
+      "about": "幽默，弟弟",
+      "status": "registered",
+      "partner": null,
+      "deposit": 0,
+      "public": false,
+      "matchScore": 0,
+      "registeredAt": 1794302125207
+    }
+  },
   "matches": [],
   "round": 7,
   "stage": "registering",
