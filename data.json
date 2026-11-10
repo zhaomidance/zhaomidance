@@ -1,5 +1,30 @@
 {
-  "whitelist": [],
+  "whitelist": [
+    {
+      "majia": "阿强",
+      "ticket": "001",
+      "gender": "male",
+      "claimed": false
+    },
+    {
+      "majia": "小美",
+      "ticket": "002",
+      "gender": "female",
+      "claimed": false
+    },
+    {
+      "majia": "阿龙",
+      "ticket": "003",
+      "gender": "male",
+      "claimed": false
+    },
+    {
+      "majia": "阿雅",
+      "ticket": "004",
+      "gender": "female",
+      "claimed": false
+    }
+  ],
   "players": {},
   "matches": [],
   "round": 7,
@@ -48,5 +73,30 @@
       "done": false
     }
   ],
-  "logs": []
+  "logs": [
+    {
+      "time": "2026-11-10T09:10:36.789Z",
+      "actor": "阿强",
+      "action": "报名门票",
+      "amount": -999
+    },
+    {
+      "time": "2026-11-10T09:10:36.789Z",
+      "actor": "小美",
+      "action": "报名门票",
+      "amount": -999
+    },
+    {
+      "time": "2026-11-10T09:10:36.789Z",
+      "actor": "阿龙",
+      "action": "报名门票",
+      "amount": -999
+    },
+    {
+      "time": "2026-11-10T09:10:36.789Z",
+      "actor": "阿雅",
+      "action": "报名门票",
+      "amount": -999
+    }
+  ]
 }
