@@ -1,13 +1,5 @@
 {
-  "whitelist": [
-    {
-      "majia": "悬溺",
-      "ticket": "345",
-      "gender": "male",
-      "claimed": true,
-      "claimedAt": 1794315788377
-    }
-  ],
+  "whitelist": [],
   "players": {
     "飒飒": {
       "majia": "飒飒",
