@@ -1,20 +1,6 @@
 {
   "whitelist": [
     {
-      "majia": "云深",
-      "ticket": "002",
-      "gender": "male",
-      "claimed": true,
-      "claimedAt": 1794314092227
-    },
-    {
-      "majia": "晚绾",
-      "ticket": "321",
-      "gender": "female",
-      "claimed": true,
-      "claimedAt": 1794314309085
-    },
-    {
       "majia": "羊羊",
       "ticket": "999",
       "gender": "female",
